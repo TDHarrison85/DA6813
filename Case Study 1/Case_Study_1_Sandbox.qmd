@@ -1,0 +1,179 @@
+---
+title: "Case Study 1"
+format: html
+---
+
+## Case Study 1
+
+```{r}
+pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr)
+```
+
+```{r}
+df1 <- read.csv(here('Case Study 1','bank-additional.csv'), sep = ';')
+```
+
+```{r}
+head(df1)
+skim(df1)
+```
+
+
+```{r}
+df2 <- df1 %>% mutate_if(is.character, as.factor)
+levels(df2$y)
+df3 <- df2 %>% mutate(
+  y = ifelse(y == 'yes',1,0)
+)
+```
+
+```{r}
+str(df3)
+```
+
+```{r}
+levels(df2$education)
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = age)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = campaign)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), x = previous)) +
+  geom_bar(position = 'fill')
+
+df3 %>% ggplot(aes(fill = as.factor(y), x = previous)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = emp.var.rate)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = cons.price.idx)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = cons.conf.idx)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = euribor3m)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = nr.employed)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = job)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = marital)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = education)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = default)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = housing)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = loan)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = contact)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = month)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = day_of_week)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = poutcome)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% group_by(y) %>% 
+  summarize(
+    resp_cnt = n()
+    )
+```
+
+
+```{r}
+cor1 <- df3 %>% select_if(is.numeric) %>% cor()
+corrplot(cor1)
+```
+
+```{r}
+df4 <- df3 %>% dplyr::select(!duration)
+```
+
+
+```{r}
+# Split data into training and testing samples
+# Setting seed locks the random number generator. 
+set.seed(321)
+trn_part <- sample(nrow(df4),0.8*nrow(df4),replace = F) # Setting training sample to be 80% of the data
+dftrain <- df4[trn_part,]
+dftest <- df4[-trn_part,]
+
+# With logistic regression
+m1.log = glm(y ~ ., data = dftrain, family = binomial)
+summary(m1.log) ## look at results
+#vif(m1.log) # double check multicollinearity, returns error
+
+alias(m1.log)
+m2.log = glm(y ~ .-housing, data = dftrain, family = binomial)
+summary(m2.log) ## look at results
+vif(m2.log) # double check multicollinearity, finds correlated var: nr.employed 
+
+m3.log = glm(y ~ .-housing -nr.employed, data = dftrain, family = binomial)
+summary(m3.log) ## look at results
+vif(m3.log) # double check multicollinearity, finds correlated var: emp.var.rate
+
+m4.log = glm(y ~ .-housing -nr.employed -emp.var.rate, data = dftrain, family = binomial)
+summary(m4.log) ## look at results
+vif(m4.log) # double check multicollinearity, none left over 5
+
+# Predict the responses on the testing data. 
+predprob_log <- predict.glm(m4.log, dftest, type = "response")  ## for logit
+predclass_log = ifelse(predprob_log >= 0.5, 1, 0)
+```
+
