@@ -4,9 +4,13 @@ format: html
 ---
 
 ## Case Study 1
+NOTES:
+---Create template (TIM) for write up - fill in tuesday
+---ask about the balance in specificity/ sensitivity chart (HOLLY)
 
-```{r}
-pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr)
+
+```{r setup}
+pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret)
 ```
 
 ```{r}
@@ -172,8 +176,42 @@ m4.log = glm(y ~ .-housing -nr.employed -emp.var.rate, data = dftrain, family = 
 summary(m4.log) ## look at results
 vif(m4.log) # double check multicollinearity, none left over 5
 
-# Predict the responses on the testing data. 
-predprob_log <- predict.glm(m4.log, dftest, type = "response")  ## for logit
-predclass_log = ifelse(predprob_log >= 0.5, 1, 0)
+
 ```
+
+
+```{r}
+m5.log = glm(y ~ .-housing -nr.employed -emp.var.rate -education, data = dftrain, family = binomial)
+summary(m5.log) ## look at results
+vif(m5.log) # double check multicollinearity, none left over 5
+
+```
+
+
+```{r}
+# Predict the responses on the testing data. 
+predprob_log <- predict.glm(m5.log, dftest, type = "response")  ## for logit
+predclass_log = ifelse(predprob_log >= 0.075, 1, 0)
+
+# Compare to actual results using the confusion matrix. 
+caret::confusionMatrix(as.factor(predclass_log), as.factor(dftest$y), positive = "1")
+#caret::confusionMatrix(as.factor(predclass_log_bal), dftest_bal$Attrition_Flag, positive = "Existing Customer")
+
+
+```
+
+------HOLLY (skip to end of process , start m5 create new m6 chunk)
+
+```{r}
+## Resample with more balanced data 
+df_sub = df4 %>% filter(y == 1)
+df_no_sub = df4 %>% filter(y == 0)
+sample_no_sub = sample_n(df_no_sub, nrow(df_sub))
+df_bal = rbind(sample_no_sub,df_sub)
+```
+
+
+
+
+
 
