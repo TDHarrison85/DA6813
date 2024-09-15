@@ -1,0 +1,328 @@
+---
+title: "Case Study 1"
+format: html
+---
+
+## Case Study 1
+NOTES:
+---Create template (TIM) for write up - fill in tuesday
+---ask about the balance in specificity/ sensitivity chart (HOLLY)
+
+
+```{r setup}
+pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ROCR)
+```
+
+```{r}
+df1 <- read.csv(here('Case Study 1','bank-additional.csv'), sep = ';')
+```
+
+```{r}
+head(df1)
+skim(df1)
+```
+
+
+```{r}
+df2 <- df1 %>% mutate_if(is.character, as.factor)
+levels(df2$y)
+df3 <- df2 %>% mutate(
+  y = ifelse(y == 'yes',1,0)
+)
+```
+
+```{r}
+str(df3)
+```
+
+```{r}
+levels(df2$education)
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = age)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = campaign)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), x = previous)) +
+  geom_bar(position = 'fill')
+
+df3 %>% ggplot(aes(fill = as.factor(y), x = previous)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = emp.var.rate)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = cons.price.idx)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = cons.conf.idx)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = euribor3m)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(x = as.factor(y), y = nr.employed)) +
+  geom_boxplot()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = job)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = marital)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = education)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = default)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = housing)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = loan)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = contact)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = month)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = day_of_week)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% ggplot(aes(fill = as.factor(y), y = poutcome)) +
+  geom_bar()
+```
+
+```{r}
+df3 %>% group_by(y) %>% 
+  summarize(
+    resp_cnt = n()
+    )
+```
+
+
+```{r}
+cor1 <- df3 %>% select_if(is.numeric) %>% cor()
+corrplot(cor1)
+```
+
+```{r}
+df4 <- df3 %>% dplyr::select(!duration)
+```
+
+
+```{r}
+# Split data into training and testing samples
+# Setting seed locks the random number generator. 
+set.seed(321)
+trn_part <- sample(nrow(df4),0.8*nrow(df4),replace = F) # Setting training sample to be 80% of the data
+dftrain <- df4[trn_part,]
+dftest <- df4[-trn_part,]
+
+# With logistic regression
+m1.log = glm(y ~ ., data = dftrain, family = binomial)
+summary(m1.log) ## look at results
+#vif(m1.log) # double check multicollinearity, returns error
+
+alias(m1.log)
+m2.log = glm(y ~ .-housing, data = dftrain, family = binomial)
+summary(m2.log) ## look at results
+vif(m2.log) # double check multicollinearity, finds correlated var: nr.employed 
+
+m3.log = glm(y ~ .-housing -nr.employed, data = dftrain, family = binomial)
+summary(m3.log) ## look at results
+vif(m3.log) # double check multicollinearity, finds correlated var: emp.var.rate
+
+m4.log = glm(y ~ .-housing -nr.employed -emp.var.rate, data = dftrain, family = binomial)
+summary(m4.log) ## look at results
+vif(m4.log) # double check multicollinearity, none left over 5
+
+
+```
+
+
+```{r}
+m5.log = glm(y ~ .-housing -nr.employed -emp.var.rate -education, data = dftrain, family = binomial)
+summary(m5.log) ## look at results
+vif(m5.log) # double check multicollinearity, none left over 5
+
+```
+
+
+```{r}
+# Predict the responses on the testing data. 
+predprob_log <- predict.glm(m5.log, dftest, type = "response")  ## for logit
+predclass_log = ifelse(predprob_log >= 0.075, 1, 0)
+
+# Compare to actual results using the confusion matrix. 
+caret::confusionMatrix(as.factor(predclass_log), as.factor(dftest$y), positive = "1")
+#caret::confusionMatrix(as.factor(predclass_log_bal), dftest_bal$Attrition_Flag, positive = "Existing Customer")
+
+
+```
+
+------HOLLY (skip to end of process , start m5 create new m6 chunk)
+
+```{r}
+## Resample with more balanced data 
+df_sub = df4 %>% filter(y == 1)
+df_no_sub = df4 %>% filter(y == 0)
+sample_no_sub = sample_n(df_no_sub, nrow(df_sub))
+df_bal = rbind(sample_no_sub,df_sub)
+```
+
+```{r}
+# Split data into training and testing balanced samples
+set.seed(321)
+tr_ind_bal <- sample(nrow(df_bal),0.8*nrow(df_bal),replace = F) # Setting training sample to be 80% of the data
+dftrain_bal <- df_bal[tr_ind_bal,]
+dftest_bal <- df_bal[-tr_ind_bal,]
+```
+
+
+```{r}
+### Build model with balanced data
+m6.log_bal = glm(y ~ .-housing -nr.employed -emp.var.rate -education, data = dftrain_bal, family = binomial)
+summary(m6.log_bal) ## look at results
+vif(m6.log_bal) # double check multicollinearity
+```
+
+```{r}
+### Build model with balanced data
+m7.log_bal = glm(y ~ .-housing -nr.employed -emp.var.rate -education -pdays -poutcome, data = dftrain_bal, family = binomial)
+summary(m7.log_bal) ## look at results
+vif(m7.log_bal) # double check multicollinearity
+```
+
+
+```{r}
+# Predict the responses on the balanced testing data. 
+predprob_log_bal <- predict.glm(m7.log_bal, dftest_bal, type = "response")  ## for logit
+predclass_log_bal = ifelse(predprob_log_bal >= 0.418, 1, 0)
+```
+
+
+```{r}
+# Compare to actual results using the confusion matrix. 
+caret::confusionMatrix(as.factor(predclass_log), as.factor(dftest$y), positive = "1")
+caret::confusionMatrix(as.factor(predclass_log_bal), as.factor(dftest_bal$y), positive = "1")
+```
+
+```{r}
+#ROC Curve and AUC
+pred <- prediction(predprob_log,dftest$y)
+pred_bal <- prediction(predprob_log_bal,dftest_bal$y) #Predicted Probability and True Classification
+
+# area under curve
+auc <- round(as.numeric(performance(pred, measure = "auc")@y.values),3)
+auc_bal <- round(as.numeric(performance(pred_bal, measure = "auc")@y.values),3)
+
+#plotting the ROC curve and computing AUC
+perf <- performance(pred, "tpr","fpr")
+perf_bal <- performance(pred_bal, "tpr","fpr")
+
+plot(perf,colorize = T, main = "ROC Curve Unbalanced")
+text(0.5,0.5, paste("AUC:", auc))
+
+plot(perf_bal,colorize = T, main = "ROC Curve Balanced")
+text(0.5,0.5, paste("AUC:", auc_bal))
+```
+
+
+```{r}
+# computing threshold for cutoff to best trade off sensitivity and specificity, unbalanced first
+#first sensitivity
+plot(unlist(performance(pred, "sens")@x.values), unlist(performance(pred, "sens")@y.values), 
+     type="l", lwd=2, 
+     ylab="Sensitivity", xlab="Cutoff", main = paste("Maximized Cutoff\n","AUC: ",auc))
+
+par(new=TRUE) # plot another line in same plot
+
+#second specificity
+plot(unlist(performance(pred, "spec")@x.values), unlist(performance(pred, "spec")@y.values), 
+     type="l", lwd=2, col='red', ylab="", xlab="")
+axis(4, at=seq(0,1,0.2)) #specificity axis labels
+mtext("Specificity",side=4, col='red')
+
+#find where the lines intersect
+min.diff <-which.min(abs(unlist(performance(pred, "sens")@y.values) - unlist(performance(pred, "spec")@y.values)))
+min.x<-unlist(performance(pred, "sens")@x.values)[min.diff]
+min.y<-unlist(performance(pred, "spec")@y.values)[min.diff]
+optimal <-min.x #this is the optimal points to best trade off sensitivity and specificity
+
+abline(h = min.y, lty = 3)
+abline(v = min.x, lty = 3)
+text(min.x,0,paste("optimal threshold=",round(optimal,2)), pos = 3)
+
+pr_class = ifelse(predprob_log>optimal, 1,0) #use the optimal cutoff to classify
+caret::confusionMatrix(as.factor(pr_class),as.factor(dftest$y)) #this function and package auto computes a lot of the metrics
+```
+
+```{r}
+# computing threshold for cutoff to best trade off sensitivity and specificity, unbalanced first
+#first sensitivity
+plot(unlist(performance(pred_bal, "sens")@x.values), unlist(performance(pred_bal, "sens")@y.values), 
+     type="l", lwd=2, 
+     ylab="Sensitivity", xlab="Cutoff", main = paste("Maximized Cutoff\n","AUC: ",auc_bal))
+
+par(new=TRUE) # plot another line in same plot
+
+#second specificity
+plot(unlist(performance(pred_bal, "spec")@x.values), unlist(performance(pred_bal, "spec")@y.values), 
+     type="l", lwd=2, col='red', ylab="", xlab="")
+axis(4, at=seq(0,1,0.2)) #specificity axis labels
+mtext("Specificity",side=4, col='red')
+
+#find where the lines intersect
+min.diff_bal <-which.min(abs(unlist(performance(pred_bal, "sens")@y.values) - unlist(performance(pred_bal, "spec")@y.values)))
+min.x_bal<-unlist(performance(pred_bal, "sens")@x.values)[min.diff_bal]
+min.y_bal<-unlist(performance(pred_bal, "spec")@y.values)[min.diff_bal]
+optimal_bal <-min.x_bal #this is the optimal points to best trade off sensitivity and specificity
+
+abline(h = min.y_bal, lty = 3)
+abline(v = min.x_bal, lty = 3)
+text(min.x,0,paste("optimal threshold=",round(optimal_bal,2)), pos = 3)
+
+pr_class_bal = ifelse(predprob_log_bal>optimal_bal, 1,0) #use the optimal cutoff to classify
+caret::confusionMatrix(as.factor(pr_class_bal),as.factor(dftest_bal$y)) #this function and package auto computes a lot of the metrics
+```
+
