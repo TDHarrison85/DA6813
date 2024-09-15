@@ -326,3 +326,29 @@ pr_class_bal = ifelse(predprob_log_bal>optimal_bal, 1,0) #use the optimal cutoff
 caret::confusionMatrix(as.factor(pr_class_bal),as.factor(dftest_bal$y)) #this function and package auto computes a lot of the metrics
 ```
 
+
+### LDA
+
+```{r}
+m1.lda <- lda(y ~ .-housing -nr.employed -emp.var.rate -education -pdays -poutcome, data = dftrain)
+m1.lda ## look at results
+```
+
+```{r}
+m2.lda_bal <- lda(y ~ .-housing -nr.employed -emp.var.rate -education -pdays -poutcome -default, data = dftrain_bal)
+m2.lda_bal ## look at results
+```
+
+
+```{r}
+# Predict the responses on the balanced and unbalanced testing data. 
+predclass_lda <- predict(m1.lda, dftest)
+predclass_lda_bal <- predict(m2.lda_bal, dftest_bal)
+```
+
+```{r}
+# Compare to actual results using the confusion matrix. 
+caret::confusionMatrix(as.factor(predclass_lda$class), as.factor(dftest$y), positive = "1")
+caret::confusionMatrix(as.factor(predclass_lda_bal$class), as.factor(dftest_bal$y), positive = "1")
+```
+
