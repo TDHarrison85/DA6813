@@ -211,6 +211,55 @@ df_bal = rbind(sample_no_sub,df_sub)
 ```
 
 
+```{r}
+# Split data into training and testing balanced samples
+set.seed(1)
+tr_ind_bal <- sample(nrow(df_bal), 0.8 * nrow(df_bal), replace = FALSE) # Setting training sample to be 80% of the balanced data
+dftrain_bal <- df_bal[tr_ind_bal, ]
+dftest_bal <- df_bal[-tr_ind_bal, ]
+
+```
+
+```{r}
+### Build model with balanced data
+m6.log = glm(y ~ . - loan - emp.var.rate - pdays - euribor3m, data = dftrain_bal, family = binomial)
+summary(m6.log)  # Check the model summary
+vif(m6.log)  # Check multicollinearity
+
+```
+
+```{r}
+# Predict the responses on the balanced testing data using the m6.log model
+predprob_log_bal <- predict(m6.log, dftest_bal, type = "response")  # Predict probabilities for the test set
+predclass_log_bal <- ifelse(predprob_log_bal >= 0.4, 1, 0)  # Classify based on the threshold
+
+# Check the classification results
+table(Predicted = predclass_log_bal, Actual = dftest_bal$y)
+
+```
+
+```{r}
+# Compare to actual results using the confusion matrix
+caret::confusionMatrix(as.factor(predclass_log_bal), as.factor(dftest_bal$y), positive = "1")
+
+```
+
+```{r}
+# Variable selection - reduce model complexity using stepwise backward elimination
+m7.log = step(glm(y ~ . - loan - emp.var.rate - pdays - euribor3m, data = dftrain_bal, family = binomial), direction = "backward")
+
+# Check the summary and VIF of the final model
+summary(m7.log)
+vif(m7.log)  # Double-check multicollinearity
+
+# Predict the responses on the balanced testing data using the reduced model
+predprob2_log_bal <- predict(m7.log, dftest_bal, type = "response")  # Predict probabilities for the test set
+predclass2_log_bal <- ifelse(predprob2_log_bal >= 0.5, 1, 0)  # Classify based on the threshold
+
+# Compare to actual results using the confusion matrix
+caret::confusionMatrix(as.factor(predclass2_log_bal), as.factor(dftest_bal$y), positive = "1")
+
+```
 
 
 
