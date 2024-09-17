@@ -1,0 +1,2108 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Case Study 1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Case_Study_1_Sandbox_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Case_Study_1_Sandbox_files/libs/quarto-html/quarto.js"></script>
+<script src="Case_Study_1_Sandbox_files/libs/quarto-html/popper.min.js"></script>
+<script src="Case_Study_1_Sandbox_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Case_Study_1_Sandbox_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Case_Study_1_Sandbox_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Case_Study_1_Sandbox_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Case_Study_1_Sandbox_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Case_Study_1_Sandbox_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Case_Study_1_Sandbox_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Case Study 1</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="case-study-1" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-1">Case Study 1</h2>
+<p>NOTES: —Create template (TIM) for write up - fill in tuesday —ask about the balance in specificity/ sensitivity chart (HOLLY)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(MASS, tidyverse, here, car, corrplot, skimr, caret)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">'Case Study 1'</span>,<span class="st">'bank-additional.csv'</span>), <span class="at">sep =</span> <span class="st">';'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  age         job marital         education default housing    loan   contact
+1  30 blue-collar married          basic.9y      no     yes      no  cellular
+2  39    services  single       high.school      no      no      no telephone
+3  25    services married       high.school      no     yes      no telephone
+4  38    services married          basic.9y      no unknown unknown telephone
+5  47      admin. married university.degree      no     yes      no  cellular
+6  32    services  single university.degree      no      no      no  cellular
+  month day_of_week duration campaign pdays previous    poutcome emp.var.rate
+1   may         fri      487        2   999        0 nonexistent         -1.8
+2   may         fri      346        4   999        0 nonexistent          1.1
+3   jun         wed      227        1   999        0 nonexistent          1.4
+4   jun         fri       17        3   999        0 nonexistent          1.4
+5   nov         mon       58        1   999        0 nonexistent         -0.1
+6   sep         thu      128        3   999        2     failure         -1.1
+  cons.price.idx cons.conf.idx euribor3m nr.employed  y
+1         92.893         -46.2     1.313      5099.1 no
+2         93.994         -36.4     4.855      5191.0 no
+3         94.465         -41.8     4.962      5228.1 no
+4         94.465         -41.8     4.959      5228.1 no
+5         93.200         -42.0     4.191      5195.8 no
+6         94.199         -37.5     0.884      4963.6 no</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(df1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">df1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">4119</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">21</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">empty</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: right;">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">job</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">marital</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">education</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">default</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">housing</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">loan</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">contact</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">month</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">day_of_week</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poutcome</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">y</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 14%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">40.11</td>
+<td style="text-align: right;">10.31</td>
+<td style="text-align: right;">18.00</td>
+<td style="text-align: right;">32.00</td>
+<td style="text-align: right;">38.00</td>
+<td style="text-align: right;">47.00</td>
+<td style="text-align: right;">88.00</td>
+<td style="text-align: left;">▅▇▅▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">duration</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">256.79</td>
+<td style="text-align: right;">254.70</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">103.00</td>
+<td style="text-align: right;">181.00</td>
+<td style="text-align: right;">317.00</td>
+<td style="text-align: right;">3643.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">campaign</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2.54</td>
+<td style="text-align: right;">2.57</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">3.00</td>
+<td style="text-align: right;">35.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pdays</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">960.42</td>
+<td style="text-align: right;">191.92</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">999.00</td>
+<td style="text-align: right;">999.00</td>
+<td style="text-align: right;">999.00</td>
+<td style="text-align: right;">999.00</td>
+<td style="text-align: left;">▁▁▁▁▇</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">previous</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">6.00</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">emp.var.rate</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">1.56</td>
+<td style="text-align: right;">-3.40</td>
+<td style="text-align: right;">-1.80</td>
+<td style="text-align: right;">1.10</td>
+<td style="text-align: right;">1.40</td>
+<td style="text-align: right;">1.40</td>
+<td style="text-align: left;">▁▃▁▁▇</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cons.price.idx</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">93.58</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">92.20</td>
+<td style="text-align: right;">93.08</td>
+<td style="text-align: right;">93.75</td>
+<td style="text-align: right;">93.99</td>
+<td style="text-align: right;">94.77</td>
+<td style="text-align: left;">▁▆▃▇▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">cons.conf.idx</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">-40.50</td>
+<td style="text-align: right;">4.59</td>
+<td style="text-align: right;">-50.80</td>
+<td style="text-align: right;">-42.70</td>
+<td style="text-align: right;">-41.80</td>
+<td style="text-align: right;">-36.40</td>
+<td style="text-align: right;">-26.90</td>
+<td style="text-align: left;">▅▇▁▇▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">euribor3m</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3.62</td>
+<td style="text-align: right;">1.73</td>
+<td style="text-align: right;">0.64</td>
+<td style="text-align: right;">1.33</td>
+<td style="text-align: right;">4.86</td>
+<td style="text-align: right;">4.96</td>
+<td style="text-align: right;">5.04</td>
+<td style="text-align: left;">▅▁▁▁▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nr.employed</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5166.48</td>
+<td style="text-align: right;">73.67</td>
+<td style="text-align: right;">4963.60</td>
+<td style="text-align: right;">5099.10</td>
+<td style="text-align: right;">5191.00</td>
+<td style="text-align: right;">5228.10</td>
+<td style="text-align: right;">5228.10</td>
+<td style="text-align: left;">▁▁▃▁▇</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> df1 <span class="sc">%&gt;%</span> <span class="fu">mutate_if</span>(is.character, as.factor)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(df2<span class="sc">$</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "no"  "yes"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="ot">&lt;-</span> df2 <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">ifelse</span>(y <span class="sc">==</span> <span class="st">'yes'</span>,<span class="dv">1</span>,<span class="dv">0</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   4119 obs. of  21 variables:
+ $ age           : int  30 39 25 38 47 32 32 41 31 35 ...
+ $ job           : Factor w/ 12 levels "admin.","blue-collar",..: 2 8 8 8 1 8 1 3 8 2 ...
+ $ marital       : Factor w/ 4 levels "divorced","married",..: 2 3 2 2 2 3 3 2 1 2 ...
+ $ education     : Factor w/ 8 levels "basic.4y","basic.6y",..: 3 4 4 3 7 7 7 7 6 3 ...
+ $ default       : Factor w/ 3 levels "no","unknown",..: 1 1 1 1 1 1 1 2 1 2 ...
+ $ housing       : Factor w/ 3 levels "no","unknown",..: 3 1 3 2 3 1 3 3 1 1 ...
+ $ loan          : Factor w/ 3 levels "no","unknown",..: 1 1 1 2 1 1 1 1 1 1 ...
+ $ contact       : Factor w/ 2 levels "cellular","telephone": 1 2 2 2 1 1 1 1 1 2 ...
+ $ month         : Factor w/ 10 levels "apr","aug","dec",..: 7 7 5 5 8 10 10 8 8 7 ...
+ $ day_of_week   : Factor w/ 5 levels "fri","mon","thu",..: 1 1 5 1 2 3 2 2 4 3 ...
+ $ duration      : int  487 346 227 17 58 128 290 44 68 170 ...
+ $ campaign      : int  2 4 1 3 1 3 4 2 1 1 ...
+ $ pdays         : int  999 999 999 999 999 999 999 999 999 999 ...
+ $ previous      : int  0 0 0 0 0 2 0 0 1 0 ...
+ $ poutcome      : Factor w/ 3 levels "failure","nonexistent",..: 2 2 2 2 2 1 2 2 1 2 ...
+ $ emp.var.rate  : num  -1.8 1.1 1.4 1.4 -0.1 -1.1 -1.1 -0.1 -0.1 1.1 ...
+ $ cons.price.idx: num  92.9 94 94.5 94.5 93.2 ...
+ $ cons.conf.idx : num  -46.2 -36.4 -41.8 -41.8 -42 -37.5 -37.5 -42 -42 -36.4 ...
+ $ euribor3m     : num  1.31 4.86 4.96 4.96 4.19 ...
+ $ nr.employed   : num  5099 5191 5228 5228 5196 ...
+ $ y             : num  0 0 0 0 0 0 0 0 0 0 ...</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(df2<span class="sc">$</span>education)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "basic.4y"            "basic.6y"            "basic.9y"           
+[4] "high.school"         "illiterate"          "professional.course"
+[7] "university.degree"   "unknown"            </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> age)) <span class="sc">+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> campaign)) <span class="sc">+</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">x =</span> previous)) <span class="sc">+</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">'fill'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">x =</span> previous)) <span class="sc">+</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> emp.var.rate)) <span class="sc">+</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> cons.price.idx)) <span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> cons.conf.idx)) <span class="sc">+</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> euribor3m)) <span class="sc">+</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> nr.employed)) <span class="sc">+</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> job)) <span class="sc">+</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> marital)) <span class="sc">+</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> education)) <span class="sc">+</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> default)) <span class="sc">+</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> housing)) <span class="sc">+</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> loan)) <span class="sc">+</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> contact)) <span class="sc">+</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> month)) <span class="sc">+</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> day_of_week)) <span class="sc">+</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.factor</span>(y), <span class="at">y =</span> poutcome)) <span class="sc">+</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(y) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">resp_cnt =</span> <span class="fu">n</span>()</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+      y resp_cnt
+  &lt;dbl&gt;    &lt;int&gt;
+1     0     3668
+2     1      451</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>cor1 <span class="ot">&lt;-</span> df3 <span class="sc">%&gt;%</span> <span class="fu">select_if</span>(is.numeric) <span class="sc">%&gt;%</span> <span class="fu">cor</span>()</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(cor1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case_Study_1_Sandbox_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>df4 <span class="ot">&lt;-</span> df3 <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">!</span>duration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split data into training and testing samples</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting seed locks the random number generator. </span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>trn_part <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(df4),<span class="fl">0.8</span><span class="sc">*</span><span class="fu">nrow</span>(df4),<span class="at">replace =</span> F) <span class="co"># Setting training sample to be 80% of the data</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>dftrain <span class="ot">&lt;-</span> df4[trn_part,]</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>dftest <span class="ot">&lt;-</span> df4[<span class="sc">-</span>trn_part,]</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co"># With logistic regression</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>m1.log <span class="ot">=</span> <span class="fu">glm</span>(y <span class="sc">~</span> ., <span class="at">data =</span> dftrain, <span class="at">family =</span> binomial)</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m1.log) <span class="do">## look at results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ ., family = binomial, data = dftrain)
+
+Coefficients: (1 not defined because of singularities)
+                               Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                  -1.618e+02  1.205e+02  -1.343  0.17931    
+age                           1.232e-02  7.646e-03   1.612  0.10706    
+jobblue-collar               -4.796e-01  2.484e-01  -1.931  0.05350 .  
+jobentrepreneur              -6.000e-01  4.329e-01  -1.386  0.16576    
+jobhousemaid                 -1.242e-01  4.125e-01  -0.301  0.76338    
+jobmanagement                -6.555e-01  2.760e-01  -2.375  0.01754 *  
+jobretired                   -2.702e-01  3.474e-01  -0.778  0.43670    
+jobself-employed             -6.753e-01  3.745e-01  -1.803  0.07135 .  
+jobservices                  -2.702e-01  2.651e-01  -1.019  0.30821    
+jobstudent                   -1.254e-02  3.800e-01  -0.033  0.97368    
+jobtechnician                -1.447e-01  2.110e-01  -0.686  0.49294    
+jobunemployed                -3.188e-01  4.000e-01  -0.797  0.42546    
+jobunknown                   -2.389e-01  6.960e-01  -0.343  0.73142    
+maritalmarried                1.787e-01  2.255e-01   0.792  0.42813    
+maritalsingle                 1.334e-01  2.594e-01   0.514  0.60711    
+maritalunknown                7.015e-01  1.103e+00   0.636  0.52490    
+educationbasic.6y             1.915e-01  3.859e-01   0.496  0.61965    
+educationbasic.9y             1.282e-01  2.982e-01   0.430  0.66725    
+educationhigh.school          3.462e-02  2.879e-01   0.120  0.90429    
+educationilliterate          -1.219e+01  5.354e+02  -0.023  0.98183    
+educationprofessional.course  2.591e-01  3.112e-01   0.833  0.40508    
+educationuniversity.degree    1.929e-01  2.873e-01   0.672  0.50190    
+educationunknown             -3.725e-02  3.848e-01  -0.097  0.92287    
+defaultunknown                1.257e-01  1.904e-01   0.660  0.50917    
+defaultyes                   -1.010e+01  5.354e+02  -0.019  0.98495    
+housingunknown               -3.785e-01  4.684e-01  -0.808  0.41901    
+housingyes                   -9.246e-02  1.302e-01  -0.710  0.47770    
+loanunknown                          NA         NA      NA       NA    
+loanyes                      -1.318e-02  1.716e-01  -0.077  0.93877    
+contacttelephone             -1.127e+00  2.653e-01  -4.248 2.16e-05 ***
+monthaug                     -6.154e-02  4.123e-01  -0.149  0.88136    
+monthdec                      6.299e-01  6.218e-01   1.013  0.31101    
+monthjul                      1.050e-01  3.428e-01   0.306  0.75941    
+monthjun                      1.035e-01  4.211e-01   0.246  0.80586    
+monthmar                      1.579e+00  5.204e-01   3.034  0.00242 ** 
+monthmay                     -2.372e-01  2.813e-01  -0.843  0.39911    
+monthnov                     -4.584e-01  3.916e-01  -1.171  0.24172    
+monthoct                     -2.495e-01  5.053e-01  -0.494  0.62154    
+monthsep                     -2.593e-01  5.914e-01  -0.438  0.66109    
+day_of_weekmon               -6.656e-02  2.002e-01  -0.333  0.73949    
+day_of_weekthu                3.225e-03  2.012e-01   0.016  0.98721    
+day_of_weektue                1.244e-02  2.050e-01   0.061  0.95163    
+day_of_weekwed                9.498e-02  2.111e-01   0.450  0.65274    
+campaign                     -7.446e-02  3.755e-02  -1.983  0.04739 *  
+pdays                        -7.863e-04  6.667e-04  -1.179  0.23827    
+previous                      2.261e-02  1.816e-01   0.124  0.90094    
+poutcomenonexistent           4.293e-01  2.951e-01   1.455  0.14566    
+poutcomesuccess               9.828e-01  6.631e-01   1.482  0.13830    
+emp.var.rate                 -9.523e-01  4.564e-01  -2.087  0.03691 *  
+cons.price.idx                1.586e+00  7.956e-01   1.994  0.04620 *  
+cons.conf.idx                 6.096e-02  2.643e-02   2.307  0.02108 *  
+euribor3m                     6.746e-03  4.078e-01   0.017  0.98680    
+nr.employed                   2.701e-03  9.721e-03   0.278  0.78112    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2314.9  on 3294  degrees of freedom
+Residual deviance: 1796.5  on 3243  degrees of freedom
+AIC: 1900.5
+
+Number of Fisher Scoring iterations: 12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">#vif(m1.log) # double check multicollinearity, returns error</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">alias</span>(m1.log)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Model :
+y ~ age + job + marital + education + default + housing + loan + 
+    contact + month + day_of_week + campaign + pdays + previous + 
+    poutcome + emp.var.rate + cons.price.idx + cons.conf.idx + 
+    euribor3m + nr.employed
+
+Complete :
+            (Intercept) age jobblue-collar jobentrepreneur jobhousemaid
+loanunknown 0           0   0              0               0           
+            jobmanagement jobretired jobself-employed jobservices jobstudent
+loanunknown 0             0          0                0           0         
+            jobtechnician jobunemployed jobunknown maritalmarried maritalsingle
+loanunknown 0             0             0          0              0            
+            maritalunknown educationbasic.6y educationbasic.9y
+loanunknown 0              0                 0                
+            educationhigh.school educationilliterate
+loanunknown 0                    0                  
+            educationprofessional.course educationuniversity.degree
+loanunknown 0                            0                         
+            educationunknown defaultunknown defaultyes housingunknown
+loanunknown 0                0              0          1             
+            housingyes loanyes contacttelephone monthaug monthdec monthjul
+loanunknown 0          0       0                0        0        0       
+            monthjun monthmar monthmay monthnov monthoct monthsep
+loanunknown 0        0        0        0        0        0       
+            day_of_weekmon day_of_weekthu day_of_weektue day_of_weekwed
+loanunknown 0              0              0              0             
+            campaign pdays previous poutcomenonexistent poutcomesuccess
+loanunknown 0        0     0        0                   0              
+            emp.var.rate cons.price.idx cons.conf.idx euribor3m nr.employed
+loanunknown 0            0              0             0         0          </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>m2.log <span class="ot">=</span> <span class="fu">glm</span>(y <span class="sc">~</span> .<span class="sc">-</span>housing, <span class="at">data =</span> dftrain, <span class="at">family =</span> binomial)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m2.log) <span class="do">## look at results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ . - housing, family = binomial, data = dftrain)
+
+Coefficients:
+                               Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                  -1.638e+02  1.205e+02  -1.360  0.17392    
+age                           1.238e-02  7.648e-03   1.618  0.10562    
+jobblue-collar               -4.750e-01  2.483e-01  -1.913  0.05574 .  
+jobentrepreneur              -6.019e-01  4.332e-01  -1.389  0.16474    
+jobhousemaid                 -1.197e-01  4.116e-01  -0.291  0.77112    
+jobmanagement                -6.543e-01  2.761e-01  -2.370  0.01781 *  
+jobretired                   -2.735e-01  3.476e-01  -0.787  0.43143    
+jobself-employed             -6.639e-01  3.733e-01  -1.778  0.07537 .  
+jobservices                  -2.664e-01  2.652e-01  -1.004  0.31524    
+jobstudent                   -2.034e-03  3.796e-01  -0.005  0.99572    
+jobtechnician                -1.437e-01  2.109e-01  -0.681  0.49564    
+jobunemployed                -3.192e-01  4.004e-01  -0.797  0.42535    
+jobunknown                   -2.569e-01  6.953e-01  -0.369  0.71180    
+maritalmarried                1.811e-01  2.254e-01   0.803  0.42180    
+maritalsingle                 1.368e-01  2.592e-01   0.528  0.59775    
+maritalunknown                7.080e-01  1.102e+00   0.642  0.52068    
+educationbasic.6y             1.778e-01  3.855e-01   0.461  0.64469    
+educationbasic.9y             1.187e-01  2.978e-01   0.399  0.69015    
+educationhigh.school          2.981e-02  2.877e-01   0.104  0.91748    
+educationilliterate          -1.213e+01  5.354e+02  -0.023  0.98192    
+educationprofessional.course  2.535e-01  3.107e-01   0.816  0.41464    
+educationuniversity.degree    1.848e-01  2.870e-01   0.644  0.51953    
+educationunknown             -4.947e-02  3.847e-01  -0.129  0.89767    
+defaultunknown                1.245e-01  1.904e-01   0.654  0.51314    
+defaultyes                   -1.004e+01  5.354e+02  -0.019  0.98503    
+loanunknown                  -3.286e-01  4.631e-01  -0.710  0.47794    
+loanyes                      -2.116e-02  1.711e-01  -0.124  0.90160    
+contacttelephone             -1.132e+00  2.653e-01  -4.265    2e-05 ***
+monthaug                     -5.792e-02  4.125e-01  -0.140  0.88832    
+monthdec                      6.451e-01  6.212e-01   1.038  0.29911    
+monthjul                      1.115e-01  3.427e-01   0.325  0.74483    
+monthjun                      1.078e-01  4.211e-01   0.256  0.79799    
+monthmar                      1.575e+00  5.204e-01   3.026  0.00248 ** 
+monthmay                     -2.270e-01  2.809e-01  -0.808  0.41903    
+monthnov                     -4.587e-01  3.916e-01  -1.171  0.24147    
+monthoct                     -2.390e-01  5.053e-01  -0.473  0.63619    
+monthsep                     -2.552e-01  5.915e-01  -0.431  0.66616    
+day_of_weekmon               -6.574e-02  2.001e-01  -0.329  0.74248    
+day_of_weekthu                3.500e-04  2.011e-01   0.002  0.99861    
+day_of_weektue                7.330e-03  2.049e-01   0.036  0.97146    
+day_of_weekwed                9.098e-02  2.110e-01   0.431  0.66630    
+campaign                     -7.421e-02  3.750e-02  -1.979  0.04783 *  
+pdays                        -7.944e-04  6.653e-04  -1.194  0.23245    
+previous                      1.865e-02  1.810e-01   0.103  0.91795    
+poutcomenonexistent           4.245e-01  2.945e-01   1.441  0.14950    
+poutcomesuccess               9.750e-01  6.616e-01   1.474  0.14054    
+emp.var.rate                 -9.617e-01  4.563e-01  -2.108  0.03505 *  
+cons.price.idx                1.603e+00  7.953e-01   2.016  0.04384 *  
+cons.conf.idx                 6.126e-02  2.644e-02   2.317  0.02049 *  
+euribor3m                     1.049e-02  4.077e-01   0.026  0.97947    
+nr.employed                   2.773e-03  9.721e-03   0.285  0.77544    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2314.9  on 3294  degrees of freedom
+Residual deviance: 1797.0  on 3244  degrees of freedom
+AIC: 1899
+
+Number of Fisher Scoring iterations: 12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(m2.log) <span class="co"># double check multicollinearity, finds correlated var: nr.employed </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                     GVIF Df GVIF^(1/(2*Df))
+age              2.100062  1        1.449159
+job              6.104066 11        1.085700
+marital          1.523673  3        1.072709
+education        3.593872  7        1.095678
+default          1.164363  2        1.038776
+loan             1.058584  2        1.014335
+contact          2.923556  1        1.709841
+month           97.980005  9        1.290086
+day_of_week      1.142362  4        1.016776
+campaign         1.057918  1        1.028551
+pdays            8.800909  1        2.966633
+previous         4.610074  1        2.147108
+poutcome        21.185012  2        2.145395
+emp.var.rate   157.462889  1       12.548422
+cons.price.idx  71.551597  1        8.458818
+cons.conf.idx    5.958763  1        2.441058
+euribor3m      143.448743  1       11.977009
+nr.employed    182.920815  1       13.524822</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>m3.log <span class="ot">=</span> <span class="fu">glm</span>(y <span class="sc">~</span> .<span class="sc">-</span>housing <span class="sc">-</span>nr.employed, <span class="at">data =</span> dftrain, <span class="at">family =</span> binomial)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m3.log) <span class="do">## look at results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ . - housing - nr.employed, family = binomial, 
+    data = dftrain)
+
+Coefficients:
+                               Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                  -1.307e+02  3.163e+01  -4.130 3.62e-05 ***
+age                           1.246e-02  7.641e-03   1.631  0.10285    
+jobblue-collar               -4.732e-01  2.482e-01  -1.906  0.05660 .  
+jobentrepreneur              -5.957e-01  4.325e-01  -1.378  0.16835    
+jobhousemaid                 -1.211e-01  4.119e-01  -0.294  0.76873    
+jobmanagement                -6.496e-01  2.755e-01  -2.358  0.01839 *  
+jobretired                   -2.727e-01  3.474e-01  -0.785  0.43261    
+jobself-employed             -6.676e-01  3.736e-01  -1.787  0.07394 .  
+jobservices                  -2.657e-01  2.653e-01  -1.002  0.31654    
+jobstudent                   -4.365e-03  3.798e-01  -0.011  0.99083    
+jobtechnician                -1.446e-01  2.109e-01  -0.686  0.49302    
+jobunemployed                -3.168e-01  4.003e-01  -0.792  0.42864    
+jobunknown                   -2.593e-01  6.965e-01  -0.372  0.70961    
+maritalmarried                1.796e-01  2.253e-01   0.797  0.42552    
+maritalsingle                 1.369e-01  2.591e-01   0.528  0.59739    
+maritalunknown                7.016e-01  1.102e+00   0.637  0.52425    
+educationbasic.6y             1.800e-01  3.853e-01   0.467  0.64050    
+educationbasic.9y             1.213e-01  2.977e-01   0.407  0.68373    
+educationhigh.school          3.103e-02  2.877e-01   0.108  0.91412    
+educationilliterate          -1.211e+01  5.354e+02  -0.023  0.98195    
+educationprofessional.course  2.535e-01  3.108e-01   0.816  0.41463    
+educationuniversity.degree    1.848e-01  2.870e-01   0.644  0.51972    
+educationunknown             -4.353e-02  3.840e-01  -0.113  0.90974    
+defaultunknown                1.252e-01  1.904e-01   0.658  0.51070    
+defaultyes                   -1.004e+01  5.354e+02  -0.019  0.98503    
+loanunknown                  -3.271e-01  4.633e-01  -0.706  0.48014    
+loanyes                      -2.255e-02  1.711e-01  -0.132  0.89514    
+contacttelephone             -1.111e+00  2.541e-01  -4.372 1.23e-05 ***
+monthaug                     -1.053e-01  3.777e-01  -0.279  0.78042    
+monthdec                      5.810e-01  5.789e-01   1.004  0.31553    
+monthjul                      1.125e-01  3.422e-01   0.329  0.74230    
+monthjun                      1.752e-01  3.483e-01   0.503  0.61485    
+monthmar                      1.499e+00  4.461e-01   3.360  0.00078 ***
+monthmay                     -2.544e-01  2.639e-01  -0.964  0.33507    
+monthnov                     -5.075e-01  3.523e-01  -1.440  0.14977    
+monthoct                     -3.187e-01  4.213e-01  -0.756  0.44945    
+monthsep                     -3.641e-01  4.521e-01  -0.805  0.42063    
+day_of_weekmon               -6.709e-02  2.001e-01  -0.335  0.73740    
+day_of_weekthu                3.163e-03  2.008e-01   0.016  0.98743    
+day_of_weektue                5.185e-03  2.048e-01   0.025  0.97980    
+day_of_weekwed                8.908e-02  2.109e-01   0.422  0.67278    
+campaign                     -7.399e-02  3.751e-02  -1.973  0.04854 *  
+pdays                        -7.943e-04  6.654e-04  -1.194  0.23258    
+previous                      1.865e-02  1.812e-01   0.103  0.91802    
+poutcomenonexistent           4.207e-01  2.945e-01   1.429  0.15314    
+poutcomesuccess               9.748e-01  6.617e-01   1.473  0.14067    
+emp.var.rate                 -8.824e-01  3.620e-01  -2.438  0.01477 *  
+cons.price.idx                1.397e+00  3.282e-01   4.255 2.09e-05 ***
+cons.conf.idx                 5.627e-02  1.981e-02   2.840  0.00451 ** 
+euribor3m                     9.524e-02  2.795e-01   0.341  0.73329    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2314.9  on 3294  degrees of freedom
+Residual deviance: 1797.1  on 3245  degrees of freedom
+AIC: 1897.1
+
+Number of Fisher Scoring iterations: 12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(m3.log) <span class="co"># double check multicollinearity, finds correlated var: emp.var.rate</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    GVIF Df GVIF^(1/(2*Df))
+age             2.097288  1        1.448202
+job             6.040846 11        1.085187
+marital         1.520707  3        1.072361
+education       3.575565  7        1.095279
+default         1.164461  2        1.038798
+loan            1.057428  2        1.014058
+contact         2.678949  1        1.636749
+month          21.179486  9        1.184846
+day_of_week     1.130757  4        1.015479
+campaign        1.057188  1        1.028196
+pdays           8.805177  1        2.967352
+previous        4.616001  1        2.148488
+poutcome       21.168805  2        2.144984
+emp.var.rate   99.081004  1        9.953944
+cons.price.idx 12.133212  1        3.483276
+cons.conf.idx   3.349317  1        1.830114
+euribor3m      67.416802  1        8.210774</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>m4.log <span class="ot">=</span> <span class="fu">glm</span>(y <span class="sc">~</span> .<span class="sc">-</span>housing <span class="sc">-</span>nr.employed <span class="sc">-</span>emp.var.rate, <span class="at">data =</span> dftrain, <span class="at">family =</span> binomial)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m4.log) <span class="do">## look at results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ . - housing - nr.employed - emp.var.rate, family = binomial, 
+    data = dftrain)
+
+Coefficients:
+                               Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                  -6.187e+01  1.413e+01  -4.379 1.19e-05 ***
+age                           1.263e-02  7.624e-03   1.656  0.09765 .  
+jobblue-collar               -4.943e-01  2.477e-01  -1.995  0.04603 *  
+jobentrepreneur              -6.161e-01  4.329e-01  -1.423  0.15465    
+jobhousemaid                 -1.433e-01  4.097e-01  -0.350  0.72652    
+jobmanagement                -6.301e-01  2.735e-01  -2.303  0.02126 *  
+jobretired                   -2.375e-01  3.456e-01  -0.687  0.49191    
+jobself-employed             -6.416e-01  3.735e-01  -1.718  0.08582 .  
+jobservices                  -2.481e-01  2.648e-01  -0.937  0.34875    
+jobstudent                    4.941e-02  3.781e-01   0.131  0.89602    
+jobtechnician                -1.582e-01  2.105e-01  -0.752  0.45215    
+jobunemployed                -2.708e-01  3.964e-01  -0.683  0.49449    
+jobunknown                   -1.958e-01  6.839e-01  -0.286  0.77468    
+maritalmarried                1.644e-01  2.240e-01   0.734  0.46295    
+maritalsingle                 1.248e-01  2.577e-01   0.484  0.62810    
+maritalunknown                7.076e-01  1.103e+00   0.642  0.52111    
+educationbasic.6y             1.984e-01  3.833e-01   0.518  0.60469    
+educationbasic.9y             1.226e-01  2.967e-01   0.413  0.67943    
+educationhigh.school          2.001e-02  2.864e-01   0.070  0.94429    
+educationilliterate          -1.219e+01  5.354e+02  -0.023  0.98184    
+educationprofessional.course  2.688e-01  3.094e-01   0.869  0.38506    
+educationuniversity.degree    1.844e-01  2.860e-01   0.645  0.51911    
+educationunknown             -5.250e-02  3.861e-01  -0.136  0.89184    
+defaultunknown                1.242e-01  1.899e-01   0.654  0.51286    
+defaultyes                   -1.003e+01  5.354e+02  -0.019  0.98505    
+loanunknown                  -3.416e-01  4.601e-01  -0.743  0.45777    
+loanyes                      -1.684e-02  1.708e-01  -0.099  0.92145    
+contacttelephone             -1.016e+00  2.474e-01  -4.106 4.02e-05 ***
+monthaug                     -4.311e-01  3.573e-01  -1.206  0.22765    
+monthdec                      5.967e-01  5.785e-01   1.032  0.30226    
+monthjul                      1.831e-01  3.417e-01   0.536  0.59206    
+monthjun                      5.912e-01  3.065e-01   1.929  0.05371 .  
+monthmar                      1.339e+00  4.603e-01   2.908  0.00364 ** 
+monthmay                     -3.672e-01  2.602e-01  -1.411  0.15815    
+monthnov                     -1.980e-01  3.297e-01  -0.601  0.54816    
+monthoct                     -2.080e-01  4.247e-01  -0.490  0.62433    
+monthsep                     -5.639e-01  4.494e-01  -1.255  0.20961    
+day_of_weekmon               -7.439e-02  1.992e-01  -0.373  0.70884    
+day_of_weekthu               -2.413e-02  1.998e-01  -0.121  0.90389    
+day_of_weektue                3.232e-04  2.041e-01   0.002  0.99874    
+day_of_weekwed                8.502e-02  2.101e-01   0.405  0.68578    
+campaign                     -7.874e-02  3.752e-02  -2.099  0.03586 *  
+pdays                        -7.931e-04  6.689e-04  -1.186  0.23574    
+previous                      3.415e-02  1.836e-01   0.186  0.85242    
+poutcomenonexistent           4.646e-01  2.956e-01   1.572  0.11598    
+poutcomesuccess               1.018e+00  6.637e-01   1.533  0.12518    
+cons.price.idx                6.957e-01  1.568e-01   4.438 9.07e-06 ***
+cons.conf.idx                 7.906e-02  1.794e-02   4.406 1.05e-05 ***
+euribor3m                    -5.725e-01  5.770e-02  -9.923  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2314.9  on 3294  degrees of freedom
+Residual deviance: 1802.9  on 3246  degrees of freedom
+AIC: 1900.9
+
+Number of Fisher Scoring iterations: 12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(m4.log) <span class="co"># double check multicollinearity, none left over 5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    GVIF Df GVIF^(1/(2*Df))
+age             2.091532  1        1.446213
+job             5.911032 11        1.084116
+marital         1.511336  3        1.071257
+education       3.550340  7        1.094725
+default         1.160358  2        1.037882
+loan            1.058776  2        1.014381
+contact         2.503810  1        1.582343
+month           7.471332  9        1.118207
+day_of_week     1.123624  4        1.014677
+campaign        1.054022  1        1.026656
+pdays           8.944357  1        2.990712
+previous        4.696612  1        2.167167
+poutcome       21.398906  2        2.150789
+cons.price.idx  2.792985  1        1.671223
+cons.conf.idx   2.744725  1        1.656721
+euribor3m       2.881949  1        1.697630</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>m5.log <span class="ot">=</span> <span class="fu">glm</span>(y <span class="sc">~</span> .<span class="sc">-</span>housing <span class="sc">-</span>nr.employed <span class="sc">-</span>emp.var.rate <span class="sc">-</span>education, <span class="at">data =</span> dftrain, <span class="at">family =</span> binomial)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m5.log) <span class="do">## look at results</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ . - housing - nr.employed - emp.var.rate - 
+    education, family = binomial, data = dftrain)
+
+Coefficients:
+                      Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)         -6.169e+01  1.407e+01  -4.384 1.17e-05 ***
+age                  1.191e-02  7.403e-03   1.608  0.10773    
+jobblue-collar      -5.240e-01  2.045e-01  -2.563  0.01038 *  
+jobentrepreneur     -6.154e-01  4.298e-01  -1.432  0.15219    
+jobhousemaid        -1.794e-01  3.940e-01  -0.455  0.64893    
+jobmanagement       -6.121e-01  2.714e-01  -2.256  0.02409 *  
+jobretired          -2.685e-01  3.351e-01  -0.801  0.42299    
+jobself-employed    -6.198e-01  3.715e-01  -1.668  0.09522 .  
+jobservices         -3.181e-01  2.504e-01  -1.270  0.20397    
+jobstudent          -4.421e-02  3.583e-01  -0.123  0.90179    
+jobtechnician       -9.880e-02  1.908e-01  -0.518  0.60466    
+jobunemployed       -2.722e-01  3.873e-01  -0.703  0.48219    
+jobunknown          -2.733e-01  6.636e-01  -0.412  0.68044    
+maritalmarried       1.836e-01  2.236e-01   0.821  0.41147    
+maritalsingle        1.390e-01  2.563e-01   0.542  0.58763    
+maritalunknown       6.959e-01  1.101e+00   0.632  0.52746    
+defaultunknown       1.064e-01  1.890e-01   0.563  0.57352    
+defaultyes          -9.163e+00  3.247e+02  -0.028  0.97749    
+loanunknown         -3.171e-01  4.568e-01  -0.694  0.48751    
+loanyes             -1.461e-02  1.706e-01  -0.086  0.93172    
+contacttelephone    -1.025e+00  2.464e-01  -4.158 3.21e-05 ***
+monthaug            -4.135e-01  3.565e-01  -1.160  0.24605    
+monthdec             6.144e-01  5.758e-01   1.067  0.28597    
+monthjul             1.846e-01  3.409e-01   0.542  0.58813    
+monthjun             6.154e-01  3.058e-01   2.012  0.04417 *  
+monthmar             1.377e+00  4.591e-01   2.999  0.00271 ** 
+monthmay            -3.571e-01  2.597e-01  -1.375  0.16910    
+monthnov            -1.791e-01  3.285e-01  -0.545  0.58566    
+monthoct            -1.806e-01  4.232e-01  -0.427  0.66958    
+monthsep            -5.429e-01  4.499e-01  -1.207  0.22759    
+day_of_weekmon      -7.546e-02  1.989e-01  -0.379  0.70437    
+day_of_weekthu      -1.687e-02  1.995e-01  -0.085  0.93259    
+day_of_weektue      -5.047e-03  2.035e-01  -0.025  0.98021    
+day_of_weekwed       7.525e-02  2.095e-01   0.359  0.71944    
+campaign            -7.893e-02  3.746e-02  -2.107  0.03512 *  
+pdays               -7.542e-04  6.653e-04  -1.134  0.25693    
+previous             3.292e-02  1.826e-01   0.180  0.85695    
+poutcomenonexistent  4.593e-01  2.942e-01   1.561  0.11847    
+poutcomesuccess      1.058e+00  6.606e-01   1.602  0.10916    
+cons.price.idx       6.946e-01  1.562e-01   4.447 8.70e-06 ***
+cons.conf.idx        7.861e-02  1.783e-02   4.409 1.04e-05 ***
+euribor3m           -5.699e-01  5.751e-02  -9.911  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 2314.9  on 3294  degrees of freedom
+Residual deviance: 1805.3  on 3253  degrees of freedom
+AIC: 1889.3
+
+Number of Fisher Scoring iterations: 11</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(m5.log) <span class="co"># double check multicollinearity, none left over 5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    GVIF Df GVIF^(1/(2*Df))
+age             1.974059  1        1.405012
+job             2.310360 11        1.038797
+marital         1.484515  3        1.068064
+default         1.148678  2        1.035260
+loan            1.053423  2        1.013096
+contact         2.484144  1        1.576117
+month           7.198284  9        1.115896
+day_of_week     1.109204  4        1.013040
+campaign        1.051854  1        1.025599
+pdays           8.877072  1        2.979442
+previous        4.669149  1        2.160821
+poutcome       21.094171  2        2.143091
+cons.price.idx  2.780724  1        1.667550
+cons.conf.idx   2.710131  1        1.646248
+euribor3m       2.866058  1        1.692944</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict the responses on the testing data. </span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>predprob_log <span class="ot">&lt;-</span> <span class="fu">predict.glm</span>(m5.log, dftest, <span class="at">type =</span> <span class="st">"response"</span>)  <span class="do">## for logit</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>predclass_log <span class="ot">=</span> <span class="fu">ifelse</span>(predprob_log <span class="sc">&gt;=</span> <span class="fl">0.075</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare to actual results using the confusion matrix. </span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(<span class="fu">as.factor</span>(predclass_log), <span class="fu">as.factor</span>(dftest<span class="sc">$</span>y), <span class="at">positive =</span> <span class="st">"1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 506  25
+         1 237  56
+                                         
+               Accuracy : 0.682          
+                 95% CI : (0.649, 0.7137)
+    No Information Rate : 0.9017         
+    P-Value [Acc &gt; NIR] : 1              
+                                         
+                  Kappa : 0.1719         
+                                         
+ Mcnemar's Test P-Value : &lt;2e-16         
+                                         
+            Sensitivity : 0.69136        
+            Specificity : 0.68102        
+         Pos Pred Value : 0.19113        
+         Neg Pred Value : 0.95292        
+             Prevalence : 0.09830        
+         Detection Rate : 0.06796        
+   Detection Prevalence : 0.35558        
+      Balanced Accuracy : 0.68619        
+                                         
+       'Positive' Class : 1              
+                                         </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co">#caret::confusionMatrix(as.factor(predclass_log_bal), dftest_bal$Attrition_Flag, positive = "Existing Customer")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>——HOLLY (skip to end of process , start m5 create new m6 chunk)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Resample with more balanced data </span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>df_sub <span class="ot">=</span> df4 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(y <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>df_no_sub <span class="ot">=</span> df4 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(y <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>sample_no_sub <span class="ot">=</span> <span class="fu">sample_n</span>(df_no_sub, <span class="fu">nrow</span>(df_sub))</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>df_bal <span class="ot">=</span> <span class="fu">rbind</span>(sample_no_sub,df_sub)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split data into training and testing balanced samples</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>tr_ind_bal <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(df_bal), <span class="fl">0.8</span> <span class="sc">*</span> <span class="fu">nrow</span>(df_bal), <span class="at">replace =</span> <span class="cn">FALSE</span>) <span class="co"># Setting training sample to be 80% of the balanced data</span></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>dftrain_bal <span class="ot">&lt;-</span> df_bal[tr_ind_bal, ]</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>dftest_bal <span class="ot">&lt;-</span> df_bal[<span class="sc">-</span>tr_ind_bal, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Build model with balanced data</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>m6.log <span class="ot">=</span> <span class="fu">glm</span>(y <span class="sc">~</span> . <span class="sc">-</span> loan <span class="sc">-</span> emp.var.rate <span class="sc">-</span> pdays <span class="sc">-</span> euribor3m, <span class="at">data =</span> dftrain_bal, <span class="at">family =</span> binomial)</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m6.log)  <span class="co"># Check the model summary</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ . - loan - emp.var.rate - pdays - euribor3m, 
+    family = binomial, data = dftrain_bal)
+
+Coefficients:
+                               Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                   6.781e+01  2.203e+01   3.078  0.00208 ** 
+age                           5.951e-03  1.119e-02   0.532  0.59476    
+jobblue-collar               -1.229e-01  3.357e-01  -0.366  0.71436    
+jobentrepreneur              -1.940e-01  5.500e-01  -0.353  0.72428    
+jobhousemaid                  4.070e-01  6.289e-01   0.647  0.51759    
+jobmanagement                -2.158e-01  4.163e-01  -0.518  0.60426    
+jobretired                    1.879e-02  4.924e-01   0.038  0.96956    
+jobself-employed             -9.277e-01  5.626e-01  -1.649  0.09917 .  
+jobservices                  -5.465e-02  3.914e-01  -0.140  0.88895    
+jobstudent                   -2.916e-01  6.610e-01  -0.441  0.65908    
+jobtechnician                 5.058e-02  3.127e-01   0.162  0.87151    
+jobunemployed                 1.868e-01  5.976e-01   0.313  0.75466    
+jobunknown                   -7.722e-01  8.908e-01  -0.867  0.38601    
+maritalmarried                7.537e-02  3.074e-01   0.245  0.80628    
+maritalsingle                 2.578e-01  3.509e-01   0.735  0.46254    
+maritalunknown               -1.304e+01  5.354e+02  -0.024  0.98057    
+educationbasic.6y            -2.107e-01  4.889e-01  -0.431  0.66643    
+educationbasic.9y             6.918e-02  3.842e-01   0.180  0.85711    
+educationhigh.school         -2.293e-01  3.897e-01  -0.588  0.55628    
+educationprofessional.course  9.711e-02  4.238e-01   0.229  0.81877    
+educationuniversity.degree   -5.538e-02  3.988e-01  -0.139  0.88954    
+educationunknown              3.013e-01  5.214e-01   0.578  0.56334    
+defaultunknown               -2.536e-01  2.670e-01  -0.950  0.34219    
+housingunknown               -9.001e-01  7.338e-01  -1.227  0.21995    
+housingyes                    1.146e-04  1.876e-01   0.001  0.99951    
+contacttelephone             -5.239e-01  3.707e-01  -1.413  0.15759    
+monthaug                     -3.121e-01  5.415e-01  -0.576  0.56430    
+monthdec                      1.250e+00  1.199e+00   1.043  0.29711    
+monthjul                      5.620e-01  4.909e-01   1.145  0.25224    
+monthjun                      9.176e-01  4.560e-01   2.012  0.04420 *  
+monthmar                      1.047e+00  6.538e-01   1.602  0.10916    
+monthmay                     -1.971e-01  3.791e-01  -0.520  0.60299    
+monthnov                     -6.741e-02  4.743e-01  -0.142  0.88698    
+monthoct                      1.572e-01  7.220e-01   0.218  0.82761    
+monthsep                     -7.408e-01  8.487e-01  -0.873  0.38274    
+day_of_weekmon                1.113e-01  2.843e-01   0.392  0.69534    
+day_of_weekthu                2.142e-01  2.930e-01   0.731  0.46465    
+day_of_weektue                1.988e-01  2.922e-01   0.680  0.49624    
+day_of_weekwed                3.596e-01  2.913e-01   1.235  0.21697    
+campaign                     -7.416e-02  4.591e-02  -1.615  0.10626    
+previous                      1.499e+00  7.538e-01   1.989  0.04674 *  
+poutcomenonexistent           1.909e+00  8.626e-01   2.213  0.02687 *  
+poutcomesuccess               1.584e+00  5.691e-01   2.784  0.00537 ** 
+cons.price.idx               -1.965e-01  2.251e-01  -0.873  0.38265    
+cons.conf.idx                 2.403e-02  2.812e-02   0.855  0.39283    
+nr.employed                  -9.853e-03  1.793e-03  -5.496 3.89e-08 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 999.45  on 720  degrees of freedom
+Residual deviance: 751.57  on 675  degrees of freedom
+AIC: 843.57
+
+Number of Fisher Scoring iterations: 12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(m6.log)  <span class="co"># Check multicollinearity</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    GVIF Df GVIF^(1/(2*Df))
+age             1.995108  1        1.412483
+job             7.962892 11        1.098899
+marital         1.498948  3        1.069788
+education       4.194771  6        1.126918
+default         1.184994  1        1.088574
+housing         1.187430  2        1.043884
+contact         3.468242  1        1.862322
+month          13.917077  9        1.157525
+day_of_week     1.299568  4        1.033296
+campaign        1.093672  1        1.045788
+previous       12.607211  1        3.550663
+poutcome       13.603366  2        1.920488
+cons.price.idx  2.488318  1        1.577440
+cons.conf.idx   2.434577  1        1.560313
+nr.employed     2.582361  1        1.606973</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict the responses on the balanced testing data using the m6.log model</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>predprob_log_bal <span class="ot">&lt;-</span> <span class="fu">predict</span>(m6.log, dftest_bal, <span class="at">type =</span> <span class="st">"response"</span>)  <span class="co"># Predict probabilities for the test set</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>predclass_log_bal <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(predprob_log_bal <span class="sc">&gt;=</span> <span class="fl">0.4</span>, <span class="dv">1</span>, <span class="dv">0</span>)  <span class="co"># Classify based on the threshold</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the classification results</span></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">Predicted =</span> predclass_log_bal, <span class="at">Actual =</span> dftest_bal<span class="sc">$</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Actual
+Predicted  0  1
+        0 61 27
+        1 33 60</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare to actual results using the confusion matrix</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(<span class="fu">as.factor</span>(predclass_log_bal), <span class="fu">as.factor</span>(dftest_bal<span class="sc">$</span>y), <span class="at">positive =</span> <span class="st">"1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 61 27
+         1 33 60
+                                          
+               Accuracy : 0.6685          
+                 95% CI : (0.5948, 0.7366)
+    No Information Rate : 0.5193          
+    P-Value [Acc &gt; NIR] : 3.382e-05       
+                                          
+                  Kappa : 0.3377          
+                                          
+ Mcnemar's Test P-Value : 0.5186          
+                                          
+            Sensitivity : 0.6897          
+            Specificity : 0.6489          
+         Pos Pred Value : 0.6452          
+         Neg Pred Value : 0.6932          
+             Prevalence : 0.4807          
+         Detection Rate : 0.3315          
+   Detection Prevalence : 0.5138          
+      Balanced Accuracy : 0.6693          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Variable selection - reduce model complexity using stepwise backward elimination</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>m7.log <span class="ot">=</span> <span class="fu">step</span>(<span class="fu">glm</span>(y <span class="sc">~</span> . <span class="sc">-</span> loan <span class="sc">-</span> emp.var.rate <span class="sc">-</span> pdays <span class="sc">-</span> euribor3m, <span class="at">data =</span> dftrain_bal, <span class="at">family =</span> binomial), <span class="at">direction =</span> <span class="st">"backward"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start:  AIC=843.57
+y ~ (age + job + marital + education + default + housing + loan + 
+    contact + month + day_of_week + campaign + pdays + previous + 
+    poutcome + emp.var.rate + cons.price.idx + cons.conf.idx + 
+    euribor3m + nr.employed) - loan - emp.var.rate - pdays - 
+    euribor3m
+
+                 Df Deviance    AIC
+- job            11   756.70 826.70
+- education       6   753.65 833.65
+- day_of_week     4   753.23 837.23
+- marital         3   753.32 839.32
+- housing         2   753.24 841.24
+- age             1   751.85 841.85
+- cons.conf.idx   1   752.31 842.31
+- cons.price.idx  1   752.32 842.32
+- default         1   752.48 842.48
+&lt;none&gt;                751.57 843.57
+- contact         1   753.58 843.58
+- campaign        1   754.47 844.47
+- month           9   774.17 848.17
+- previous        1   759.63 849.63
+- poutcome        2   765.82 853.82
+- nr.employed     1   786.00 876.00
+
+Step:  AIC=826.7
+y ~ age + marital + education + default + housing + contact + 
+    month + day_of_week + campaign + previous + poutcome + cons.price.idx + 
+    cons.conf.idx + nr.employed
+
+                 Df Deviance    AIC
+- education       6   758.45 816.45
+- day_of_week     4   758.57 820.57
+- marital         3   758.30 822.30
+- housing         2   758.34 824.34
+- age             1   757.17 825.17
+- cons.conf.idx   1   757.44 825.44
+- cons.price.idx  1   757.46 825.46
+- default         1   757.80 825.80
+- contact         1   758.62 826.62
+&lt;none&gt;                756.70 826.70
+- campaign        1   760.19 828.19
+- month           9   778.17 830.17
+- previous        1   764.43 832.43
+- poutcome        2   771.78 837.78
+- nr.employed     1   793.68 861.68
+
+Step:  AIC=816.45
+y ~ age + marital + default + housing + contact + month + day_of_week + 
+    campaign + previous + poutcome + cons.price.idx + cons.conf.idx + 
+    nr.employed
+
+                 Df Deviance    AIC
+- day_of_week     4   760.88 810.88
+- marital         3   760.33 812.33
+- housing         2   760.10 814.10
+- cons.price.idx  1   759.12 815.12
+- cons.conf.idx   1   759.24 815.24
+- age             1   759.24 815.24
+- default         1   759.75 815.75
+- contact         1   760.32 816.32
+&lt;none&gt;                758.45 816.45
+- campaign        1   762.18 818.18
+- month           9   779.92 819.92
+- previous        1   766.02 822.02
+- poutcome        2   773.51 827.51
+- nr.employed     1   796.17 852.17
+
+Step:  AIC=810.88
+y ~ age + marital + default + housing + contact + month + campaign + 
+    previous + poutcome + cons.price.idx + cons.conf.idx + nr.employed
+
+                 Df Deviance    AIC
+- marital         3   762.80 806.80
+- housing         2   762.66 808.66
+- cons.price.idx  1   761.50 809.50
+- age             1   761.64 809.64
+- cons.conf.idx   1   761.70 809.70
+- default         1   762.18 810.18
+- contact         1   762.66 810.66
+&lt;none&gt;                760.88 810.88
+- campaign        1   765.08 813.08
+- month           9   782.86 814.86
+- previous        1   768.44 816.44
+- poutcome        2   775.59 821.59
+- nr.employed     1   798.39 846.39
+
+Step:  AIC=806.8
+y ~ age + default + housing + contact + month + campaign + previous + 
+    poutcome + cons.price.idx + cons.conf.idx + nr.employed
+
+                 Df Deviance    AIC
+- housing         2   764.45 804.45
+- age             1   763.09 805.09
+- cons.price.idx  1   763.40 805.40
+- cons.conf.idx   1   763.70 805.70
+- default         1   764.15 806.15
+- contact         1   764.57 806.57
+&lt;none&gt;                762.80 806.80
+- campaign        1   766.65 808.65
+- month           9   785.48 811.48
+- previous        1   770.63 812.63
+- poutcome        2   778.09 818.09
+- nr.employed     1   801.40 843.40
+
+Step:  AIC=804.45
+y ~ age + default + contact + month + campaign + previous + poutcome + 
+    cons.price.idx + cons.conf.idx + nr.employed
+
+                 Df Deviance    AIC
+- age             1   764.69 802.69
+- cons.price.idx  1   765.06 803.06
+- cons.conf.idx   1   765.42 803.42
+- default         1   765.78 803.78
+- contact         1   766.42 804.42
+&lt;none&gt;                764.45 804.45
+- campaign        1   768.21 806.21
+- month           9   787.18 809.18
+- previous        1   771.66 809.66
+- poutcome        2   780.02 816.02
+- nr.employed     1   803.05 841.05
+
+Step:  AIC=802.69
+y ~ default + contact + month + campaign + previous + poutcome + 
+    cons.price.idx + cons.conf.idx + nr.employed
+
+                 Df Deviance    AIC
+- cons.price.idx  1   765.36 801.36
+- cons.conf.idx   1   765.67 801.67
+- default         1   765.86 801.86
+- contact         1   766.55 802.55
+&lt;none&gt;                764.69 802.69
+- campaign        1   768.49 804.49
+- month           9   787.38 807.38
+- previous        1   771.89 807.89
+- poutcome        2   780.30 814.30
+- nr.employed     1   805.07 841.07
+
+Step:  AIC=801.36
+y ~ default + contact + month + campaign + previous + poutcome + 
+    cons.conf.idx + nr.employed
+
+                Df Deviance    AIC
+- default        1   766.64 800.64
+- cons.conf.idx  1   766.92 800.92
+&lt;none&gt;               765.36 801.36
+- campaign       1   769.41 803.41
+- contact        1   769.65 803.65
+- month          9   787.68 805.68
+- previous       1   772.12 806.12
+- poutcome       2   780.35 812.35
+- nr.employed    1   806.06 840.06
+
+Step:  AIC=800.64
+y ~ contact + month + campaign + previous + poutcome + cons.conf.idx + 
+    nr.employed
+
+                Df Deviance    AIC
+- cons.conf.idx  1   768.10 800.10
+&lt;none&gt;               766.64 800.64
+- campaign       1   770.41 802.41
+- contact        1   771.07 803.07
+- previous       1   773.34 805.34
+- month          9   789.48 805.48
+- poutcome       2   781.82 811.82
+- nr.employed    1   809.34 841.34
+
+Step:  AIC=800.1
+y ~ contact + month + campaign + previous + poutcome + nr.employed
+
+              Df Deviance    AIC
+&lt;none&gt;             768.10 800.10
+- contact      1   771.16 801.16
+- campaign     1   771.92 801.92
+- month        9   789.71 803.71
+- previous     1   774.80 804.80
+- poutcome     2   784.00 812.00
+- nr.employed  1   814.04 844.04</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the summary and VIF of the final model</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m7.log)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ contact + month + campaign + previous + poutcome + 
+    nr.employed, family = binomial, data = dftrain_bal)
+
+Coefficients:
+                     Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)         52.835852   8.712484   6.064 1.32e-09 ***
+contacttelephone    -0.484961   0.276733  -1.752  0.07970 .  
+monthaug             0.033058   0.409783   0.081  0.93570    
+monthdec             1.420008   1.106435   1.283  0.19935    
+monthjul             0.534081   0.419495   1.273  0.20296    
+monthjun             0.795565   0.414534   1.919  0.05496 .  
+monthmar             1.061094   0.631951   1.679  0.09314 .  
+monthmay            -0.211124   0.355213  -0.594  0.55227    
+monthnov             0.053805   0.432844   0.124  0.90107    
+monthoct             0.404191   0.643812   0.628  0.53013    
+monthsep            -0.432090   0.778991  -0.555  0.57911    
+campaign            -0.084232   0.046010  -1.831  0.06714 .  
+previous             1.301135   0.698955   1.862  0.06267 .  
+poutcomenonexistent  1.769791   0.804556   2.200  0.02783 *  
+poutcomesuccess      1.642843   0.550630   2.984  0.00285 ** 
+nr.employed         -0.010611   0.001701  -6.236 4.48e-10 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 999.45  on 720  degrees of freedom
+Residual deviance: 768.10  on 705  degrees of freedom
+AIC: 800.1
+
+Number of Fisher Scoring iterations: 7</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(m7.log)  <span class="co"># Double-check multicollinearity</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 GVIF Df GVIF^(1/(2*Df))
+contact      1.976303  1        1.405811
+month        3.066430  9        1.064229
+campaign     1.041051  1        1.020319
+previous    11.309623  1        3.362978
+poutcome    11.870981  2        1.856187
+nr.employed  2.311182  1        1.520257</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict the responses on the balanced testing data using the reduced model</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>predprob2_log_bal <span class="ot">&lt;-</span> <span class="fu">predict</span>(m7.log, dftest_bal, <span class="at">type =</span> <span class="st">"response"</span>)  <span class="co"># Predict probabilities for the test set</span></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>predclass2_log_bal <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(predprob2_log_bal <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)  <span class="co"># Classify based on the threshold</span></span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare to actual results using the confusion matrix</span></span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(<span class="fu">as.factor</span>(predclass2_log_bal), <span class="fu">as.factor</span>(dftest_bal<span class="sc">$</span>y), <span class="at">positive =</span> <span class="st">"1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 75 31
+         1 19 56
+                                          
+               Accuracy : 0.7238          
+                 95% CI : (0.6525, 0.7875)
+    No Information Rate : 0.5193          
+    P-Value [Acc &gt; NIR] : 1.545e-08       
+                                          
+                  Kappa : 0.4438          
+                                          
+ Mcnemar's Test P-Value : 0.1198          
+                                          
+            Sensitivity : 0.6437          
+            Specificity : 0.7979          
+         Pos Pred Value : 0.7467          
+         Neg Pred Value : 0.7075          
+             Prevalence : 0.4807          
+         Detection Rate : 0.3094          
+   Detection Prevalence : 0.4144          
+      Balanced Accuracy : 0.7208          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

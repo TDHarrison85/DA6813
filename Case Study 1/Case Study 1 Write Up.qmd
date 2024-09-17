@@ -1,0 +1,133 @@
+---
+title: "DA 6813 Case Study 1 "
+author: "Will Hytlin, Holly Millazo and Tim Harrison"
+date: today
+format: 
+  html:
+    theme: lumen # or flatly, lumen, united, etc.
+    toc: true # Adds a table of contents
+    toc-depth: 2 # Depth of table of contents
+    toc-location: left
+    code-fold: true # Folds code by default
+    number-sections: true # Numbered sections
+    df-print: paged # Nice table format
+    fig-align: center # Centers figures
+    fig-width: 6 # Adjust figure size
+    fig-height: 4
+    reference-location: section # Valid value for citation references
+---
+
+```{r setup, echo=FALSE}
+pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret)
+df1 <- read.csv(here('Case Study 1','bank-additional.csv'), sep = ';')
+df2 <- df1 %>% mutate_if(is.character, as.factor)
+levels(df2$y)
+df3 <- df2 %>% mutate(
+  y = ifelse(y == 'yes',1,0)
+)
+```
+
+# Executive Summary
+
+<!-- 
+Purpose: Provide a concise overview of the key findings and results of the analysis.
+Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
+-->
+
+Content for Executive Summary goes here.
+
+# Problem Statement
+
+<!-- 
+Purpose: Explain the problem that the study aims to solve.
+Instructions: Clearly define the task at hand, which in this case is predicting customer acquisition. Outline the objectives and what solving this problem would mean for the company.
+-->
+
+
+
+The task of this case study is to develop a predictive model to classify whether clients of a Portuguese banking institution will subscribe to a term deposit following a direct marketing campaign. The campaigns were based on phone calls, and often, multiple contacts were made to the same client to assess if they would subscribe ('yes') or not ('no'). The goal is to accurately predict the likelihood of a client subscribing to a term deposit based on various input variables, including demographic, social, and economic indicators, as well as information from previous marketing campaigns.
+
+Key variables influencing the prediction include the client's age, job type, marital status, education, and financial status (e.g., default history, housing loan, and personal loan). Additionally, variables related to the marketing campaign, such as the type of contact, day, and month of the last contact, and previous campaign outcomes, are also critical in determining the client’s response. Social and economic context attributes, such as the employment variation rate and consumer confidence index, are included to enhance the model's predictive power.
+
+The primary objective is to build a classification model that can accurately predict whether a client will subscribe to a term deposit. This will allow the bank to target its marketing efforts more effectively, optimizing resource allocation, and improving conversion rates.
+
+# Additional Sources
+
+<!-- 
+Purpose: Reference relevant literature or sources to support the analysis.
+Instructions: Provide citations and key insights from sources relevant to the case study or the models used.
+-->
+
+Content for Additional Sources goes here.
+
+# Methodology
+
+<!-- 
+Purpose: Describe the methods and processes used to conduct the analysis.
+Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
+-->
+
+Content for Methodology goes here.
+
+# Data
+
+<!-- 
+Purpose: Explain the data used in the analysis and any preprocessing steps.
+Instructions: Provide an overview of the dataset, variables, and any cleaning steps or transformations made. Mention variables used or excluded and why.
+-->
+
+The dataset contains 4,119 rows and 21 variables. The variables are split between 11 categorical (character type) and 10 numeric variables. In preparation for analysis, categorical variables were converted into factors to ensure proper handling in models. The target variable, y, was converted into a binary outcome where "yes" was mapped to 1, indicating that the client subscribed to a term deposit, and "no" was mapped to 0.
+
+During exploratory data analysis (EDA), several visualizations were used to understand the distribution and relationships within the dataset. Box plots were employed to visualize the distribution of numeric variables such as **age**, **campaign**, **emp.var.rate**, **cons.price.idx**, **cons.conf.idx**, **euribor3m**, and **nr.employed**, grouped by whether the client subscribed to a deposit. These plots helped identify the differences in distributions between those who subscribed and those who did not.
+
+Additionally, bar plots were used to visualize the distribution of categorical variables such as **job**, **marital status**, **education**, **default**, **housing**, **loan**, **contact**, **month**, **day_of_week**, and **poutcome**. These visuals highlighted the relative frequencies of each category in relation to the target outcome, providing insights into which factors may be more predictive of a client's decision to subscribe.
+
+To further explore relationships between numeric variables, a correlation matrix was generated, with a corresponding heatmap to visually represent the strength of correlations between variables.
+```{r,echo=FALSE}
+# Boxplot for age by subscription outcome
+df3 %>% ggplot(aes(x = as.factor(y), y = age)) +
+  geom_boxplot()
+
+# Boxplot for campaign by subscription outcome
+df3 %>% ggplot(aes(x = as.factor(y), y = campaign)) +
+  geom_boxplot()
+
+# Bar plot for previous contacts by subscription outcome
+df3 %>% ggplot(aes(fill = as.factor(y), x = previous)) +
+  geom_bar(position = 'fill')
+
+# Boxplot for emp.var.rate by subscription outcome
+df3 %>% ggplot(aes(x = as.factor(y), y = emp.var.rate)) +
+  geom_boxplot()
+
+# Correlation matrix and heatmap for numeric variables
+cor1 <- df3 %>% select_if(is.numeric) %>% cor()
+corrplot(cor1)
+```
+
+# Findings
+
+<!-- 
+Purpose: Present the results of the analysis.
+Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
+-->
+
+Content for Findings goes here.
+
+# Conclusion
+
+<!-- 
+Purpose: Summarize the key takeaways and provide actionable recommendations.
+Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
+-->
+
+Content for Conclusion goes here.
+
+# Appendix
+
+<!-- 
+Purpose: Include supplementary material or detailed technical results.
+Instructions: Provide code snippets, detailed model output, and data summaries.
+-->
+
+Content for Appendix goes here.
