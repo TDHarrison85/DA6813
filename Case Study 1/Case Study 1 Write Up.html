@@ -132,7 +132,9 @@ Instructions: Provide citations and key insights from sources relevant to the ca
 Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
-<p>Content for Methodology goes here.</p>
+<p>The analysis utilized logistic regression as the primary method to predict whether clients would subscribe to a term deposit. The dataset was split into training and testing sets, with 80% of the data used for training and 20% for testing, ensuring that the model could be evaluated on unseen data to prevent overfitting. Multiple iterations of the logistic regression model were run, starting with all relevant variables. Stepwise refinement was used to remove variables that displayed multicollinearity, improving the model’s accuracy. <strong>Variance Inflation Factor (VIF)</strong> was employed to check for multicollinearity, which led to the exclusion of variables like <strong>housing</strong>, <strong>nr.employed</strong>, and <strong>emp.var.rate</strong>.</p>
+<p>Several key assumptions of logistic regression were taken into account throughout the analysis. First, the assumption of the <strong>linearity of log odds</strong> required the relationship between the predictors and the log odds of the outcome to be linear; variables that did not meet this assumption were either transformed or excluded from the model. The <strong>independence of errors</strong> was also ensured by the random sampling method used during data splitting. <strong>Multicollinearity</strong> was carefully addressed, with any variables that had a VIF value greater than 5 removed to avoid inflated standard errors. Additionally, the model assumes a <strong>large sample size</strong>, and with over 4,000 rows in the dataset, this assumption was comfortably met.</p>
+<p>To further refine the model, hyperparameter tuning was used to adjust the classification threshold for predicting whether clients would subscribe to the term deposit. To address class imbalance in the target variable, a balanced dataset was created through oversampling the minority class. Once the final logistic regression model was built, performance metrics such as accuracy, specificity, and sensitivity were evaluated using confusion matrices. The model’s results were further validated through resampling to ensure consistent performance across various subsets of the data.</p>
 </section>
 <section id="data" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Data</h1>
@@ -181,7 +183,6 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 </div>
 </div>
 </div>
-<p>-The dataset includes demographic, economic, and campaign-related variables. -Categorical variables such as job, marital status, education, housing, and loan were converted from character types to factors for appropriate handling in modeling. -The target variable, y, was transformed into a binary format, with 1 indicating a subscription and 0 indicating no subscription. -The duration variable was excluded because it would reveal the outcome, compromising the predictive nature of the model. -Other variables were retained based on relevance and to avoid bias, ensuring a well-structured dataset for further analysis.</p>
 </section>
 <section id="findings" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Findings</h1>

@@ -67,7 +67,11 @@ Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
 
-Content for Methodology goes here.
+The analysis utilized logistic regression as the primary method to predict whether clients would subscribe to a term deposit. The dataset was split into training and testing sets, with 80% of the data used for training and 20% for testing, ensuring that the model could be evaluated on unseen data to prevent overfitting. Multiple iterations of the logistic regression model were run, starting with all relevant variables. Stepwise refinement was used to remove variables that displayed multicollinearity, improving the model's accuracy. **Variance Inflation Factor (VIF)** was employed to check for multicollinearity, which led to the exclusion of variables like **housing**, **nr.employed**, and **emp.var.rate**.
+
+Several key assumptions of logistic regression were taken into account throughout the analysis. First, the assumption of the **linearity of log odds** required the relationship between the predictors and the log odds of the outcome to be linear; variables that did not meet this assumption were either transformed or excluded from the model. The **independence of errors** was also ensured by the random sampling method used during data splitting. **Multicollinearity** was carefully addressed, with any variables that had a VIF value greater than 5 removed to avoid inflated standard errors. Additionally, the model assumes a **large sample size**, and with over 4,000 rows in the dataset, this assumption was comfortably met.
+
+To further refine the model, hyperparameter tuning was used to adjust the classification threshold for predicting whether clients would subscribe to the term deposit. To address class imbalance in the target variable, a balanced dataset was created through oversampling the minority class. Once the final logistic regression model was built, performance metrics such as accuracy, specificity, and sensitivity were evaluated using confusion matrices. The model’s results were further validated through resampling to ensure consistent performance across various subsets of the data.
 
 # Data
 
