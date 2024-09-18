@@ -10,7 +10,7 @@ NOTES:
 
 
 ```{r setup}
-pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret)
+pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ROCR)
 ```
 
 ```{r}
@@ -27,8 +27,9 @@ skim(df1)
 df2 <- df1 %>% mutate_if(is.character, as.factor)
 levels(df2$y)
 df3 <- df2 %>% mutate(
+  pcontact = ifelse(pdays == 999, 0, 1),
   y = ifelse(y == 'yes',1,0)
-)
+) %>% select(!pdays)
 ```
 
 ```{r}
@@ -213,7 +214,7 @@ df_bal = rbind(sample_no_sub,df_sub)
 
 ```{r}
 # Split data into training and testing balanced samples
-set.seed(1)
+set.seed(321)
 tr_ind_bal <- sample(nrow(df_bal), 0.8 * nrow(df_bal), replace = FALSE) # Setting training sample to be 80% of the balanced data
 dftrain_bal <- df_bal[tr_ind_bal, ]
 dftest_bal <- df_bal[-tr_ind_bal, ]
@@ -222,7 +223,7 @@ dftest_bal <- df_bal[-tr_ind_bal, ]
 
 ```{r}
 ### Build model with balanced data
-m6.log = glm(y ~ . - loan - emp.var.rate - pdays - euribor3m, data = dftrain_bal, family = binomial)
+m6.log = glm(y ~ .- loan - emp.var.rate - euribor3m, data = dftrain_bal, family = binomial)
 summary(m6.log)  # Check the model summary
 vif(m6.log)  # Check multicollinearity
 
@@ -231,7 +232,7 @@ vif(m6.log)  # Check multicollinearity
 ```{r}
 # Predict the responses on the balanced testing data using the m6.log model
 predprob_log_bal <- predict(m6.log, dftest_bal, type = "response")  # Predict probabilities for the test set
-predclass_log_bal <- ifelse(predprob_log_bal >= 0.4, 1, 0)  # Classify based on the threshold
+predclass_log_bal <- ifelse(predprob_log_bal >= 0.5, 1, 0)  # Classify based on the threshold
 
 # Check the classification results
 table(Predicted = predclass_log_bal, Actual = dftest_bal$y)
@@ -246,19 +247,87 @@ caret::confusionMatrix(as.factor(predclass_log_bal), as.factor(dftest_bal$y), po
 
 ```{r}
 # Variable selection - reduce model complexity using stepwise backward elimination
-m7.log = step(glm(y ~ . - loan - emp.var.rate - pdays - euribor3m, data = dftrain_bal, family = binomial), direction = "backward")
+m7.log = step(glm(as.factor(y) ~ . - loan - emp.var.rate - euribor3m, data = dftrain_bal, family = binomial), direction = "backward")
 
 # Check the summary and VIF of the final model
 summary(m7.log)
 vif(m7.log)  # Double-check multicollinearity
 
 # Predict the responses on the balanced testing data using the reduced model
-predprob2_log_bal <- predict(m7.log, dftest_bal, type = "response")  # Predict probabilities for the test set
-predclass2_log_bal <- ifelse(predprob2_log_bal >= 0.5, 1, 0)  # Classify based on the threshold
+predprob2_log_bal <- predict(m7.log, newdata = dftest_bal, type = "response")  # Predict probabilities for the test set
+predclass2_log_bal <- ifelse(predprob2_log_bal >= 0.35, 1, 0)  # Classify based on the threshold
 
 # Compare to actual results using the confusion matrix
 caret::confusionMatrix(as.factor(predclass2_log_bal), as.factor(dftest_bal$y), positive = "1")
 
+```
+
+```{r}
+#ROC Curve and AUC
+pred_bal <- prediction(predprob2_log_bal,dftest_bal$y) #Predicted Probability and True Classification
+
+# area under curve
+auc_bal <- round(as.numeric(performance(pred_bal, measure = "auc")@y.values),3)
+
+#plotting the ROC curve and computing AUC
+perf_bal <- performance(pred_bal, "tpr","fpr")
+
+plot(perf_bal,colorize = T, main = "ROC Curve Balanced")
+text(0.5,0.5, paste("AUC:", auc_bal))
+```
+
+```{r}
+# computing threshold for cutoff to best trade off sensitivity and specificity, unbalanced first
+#first sensitivity
+plot(unlist(performance(pred_bal, "sens")@x.values), unlist(performance(pred_bal, "sens")@y.values), 
+     type="l", lwd=2, 
+     ylab="Sensitivity", xlab="Cutoff", main = paste("Maximized Cutoff\n","AUC: ",auc_bal))
+
+par(new=TRUE) # plot another line in same plot
+
+#second specificity
+plot(unlist(performance(pred_bal, "spec")@x.values), unlist(performance(pred_bal, "spec")@y.values), 
+     type="l", lwd=2, col='red', ylab="", xlab="")
+axis(4, at=seq(0,1,0.2)) #specificity axis labels
+mtext("Specificity",side=4, col='red')
+
+#find where the lines intersect
+min.diff_bal <-which.min(abs(unlist(performance(pred_bal, "sens")@y.values) - unlist(performance(pred_bal, "spec")@y.values)))
+min.x_bal<-unlist(performance(pred_bal, "sens")@x.values)[min.diff_bal]
+min.y_bal<-unlist(performance(pred_bal, "spec")@y.values)[min.diff_bal]
+optimal_bal <-min.x_bal #this is the optimal points to best trade off sensitivity and specificity
+
+abline(h = min.y_bal, lty = 3)
+abline(v = min.x_bal, lty = 3)
+text(min.x_bal,0,paste("optimal threshold=",round(optimal_bal,2)), pos = 3)
+
+pr_class_bal = ifelse(predprob2_log_bal>optimal_bal, 1,0) #use the optimal cutoff to classify
+caret::confusionMatrix(as.factor(pr_class_bal),as.factor(dftest_bal$y)) #this function and package auto computes a lot of the metrics
+```
+
+### LDA
+
+```{r}
+m1.lda <- lda(y ~ .- loan - emp.var.rate - euribor3m, data = dftrain)
+m1.lda ## look at results
+```
+
+```{r}
+m2.lda_bal <- lda(y ~ .-housing -nr.employed -emp.var.rate -education -default, data = dftrain_bal)
+m2.lda_bal ## look at results
+```
+
+
+```{r}
+# Predict the responses on the balanced and unbalanced testing data. 
+predclass_lda <- predict(m1.lda, dftest)
+predclass_lda_bal <- predict(m2.lda_bal, dftest_bal)
+```
+
+```{r}
+# Compare to actual results using the confusion matrix. 
+caret::confusionMatrix(as.factor(predclass_lda$class), as.factor(dftest$y), positive = "1")
+caret::confusionMatrix(as.factor(predclass_lda_bal$class), as.factor(dftest_bal$y), positive = "1")
 ```
 
 
