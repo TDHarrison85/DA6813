@@ -51,14 +51,6 @@ Key variables influencing the prediction include the client's age, job type, mar
 
 The primary objective is to build a classification model that can accurately predict whether a client will subscribe to a term deposit. This will allow the bank to target its marketing efforts more effectively, optimizing resource allocation, and improving conversion rates.
 
-# Additional Sources
-
-<!-- 
-Purpose: Reference relevant literature or sources to support the analysis.
-Instructions: Provide citations and key insights from sources relevant to the case study or the models used.
--->
-
-Content for Additional Sources goes here.
 
 # Methodology
 
@@ -85,6 +77,8 @@ The dataset contains 4,119 rows and 21 variables. The variables are split betwee
 During exploratory data analysis (EDA), several visualizations were used to understand the distribution and relationships within the dataset. Box plots were employed to visualize the distribution of numeric variables such as **age**, **campaign**, **emp.var.rate**, **cons.price.idx**, **cons.conf.idx**, **euribor3m**, and **nr.employed**, grouped by whether the client subscribed to a deposit. These plots helped identify the differences in distributions between those who subscribed and those who did not.
 
 Additionally, bar plots were used to visualize the distribution of categorical variables such as **job**, **marital status**, **education**, **default**, **housing**, **loan**, **contact**, **month**, **day_of_week**, and **poutcome**. These visuals highlighted the relative frequencies of each category in relation to the target outcome, providing insights into which factors may be more predictive of a client's decision to subscribe.
+
+Make a note to talk about pdays: 999 means no and and other number means yes they have been previsouly contacted. We changed this to binary yes they have been previsouls contacted or no the have not been preivouls contacted.
 
 To further explore relationships between numeric variables, a correlation matrix was generated, with a corresponding heatmap to visually represent the strength of correlations between variables.
 ```{r,echo=FALSE}
@@ -115,9 +109,22 @@ corrplot(cor1)
 Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
-
-Content for Findings goes here.
-
+ 
+ 
+ Split data set, 
+ Whil performing LOGREG checked VIF Funciton to check for multi=colinearity and removed those above 5
+ did backwards AIC elimination for reomove (insert variables removed)
+Logist Regression with these variables (- loan - emp.var.rate - euribor3m
+age           
+contact       
+month     
+campaign      
+cons.conf.idx
+nr.employed
+pcontact)
+Confusion matrix here:
+We found that the data still seem skewed after it was balanced so we adjusted the cut-off threshold optimization.
+LDA confusion matrix for LDA model
 # Conclusion
 
 <!-- 
