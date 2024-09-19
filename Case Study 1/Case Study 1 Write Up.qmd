@@ -18,13 +18,16 @@ format:
 ---
 
 ```{r setup, echo=FALSE}
-pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret)
+pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ggplot2, dplyr, tidyr)
 df1 <- read.csv(here('Case Study 1','bank-additional.csv'), sep = ';')
 df2 <- df1 %>% mutate_if(is.character, as.factor)
 levels(df2$y)
 df3 <- df2 %>% mutate(
+  pcontact = ifelse(pdays == 999, 0, 1),
   y = ifelse(y == 'yes',1,0)
-)
+) %>% select(!pdays)
+
+
 ```
 
 # Executive Summary
@@ -74,6 +77,10 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 
 The dataset contains 4,119 rows and 21 variables. The variables are split between 11 categorical (character type) and 10 numeric variables. In preparation for analysis, categorical variables were converted into factors to ensure proper handling in models. The target variable, y, was converted into a binary outcome where "yes" was mapped to 1, indicating that the client subscribed to a term deposit, and "no" was mapped to 0.
 
+```{r, echo=FALSE}
+skim(df3)
+```
+
 During exploratory data analysis (EDA), several visualizations were used to understand the distribution and relationships within the dataset. Box plots were employed to visualize the distribution of numeric variables such as **age**, **campaign**, **emp.var.rate**, **cons.price.idx**, **cons.conf.idx**, **euribor3m**, and **nr.employed**, grouped by whether the client subscribed to a deposit. These plots helped identify the differences in distributions between those who subscribed and those who did not.
 
 Additionally, bar plots were used to visualize the distribution of categorical variables such as **job**, **marital status**, **education**, **default**, **housing**, **loan**, **contact**, **month**, **day_of_week**, and **poutcome**. These visuals highlighted the relative frequencies of each category in relation to the target outcome, providing insights into which factors may be more predictive of a client's decision to subscribe.
@@ -82,25 +89,48 @@ Make a note to talk about pdays: 999 means no and and other number means yes the
 
 To further explore relationships between numeric variables, a correlation matrix was generated, with a corresponding heatmap to visually represent the strength of correlations between variables.
 ```{r,echo=FALSE}
-# Boxplot for age by subscription outcome
-df3 %>% ggplot(aes(x = as.factor(y), y = age)) +
-  geom_boxplot()
 
-# Boxplot for campaign by subscription outcome
-df3 %>% ggplot(aes(x = as.factor(y), y = campaign)) +
-  geom_boxplot()
 
-# Bar plot for previous contacts by subscription outcome
-df3 %>% ggplot(aes(fill = as.factor(y), x = previous)) +
-  geom_bar(position = 'fill')
+# Transforming the dataframe to long format
+df_long <- df3 %>%
+  pivot_longer(cols = c(age, campaign, emp.var.rate, cons.price.idx, cons.conf.idx, euribor3m, nr.employed), 
+               names_to = "variable", values_to = "value")
 
-# Boxplot for emp.var.rate by subscription outcome
-df3 %>% ggplot(aes(x = as.factor(y), y = emp.var.rate)) +
-  geom_boxplot()
+# Creating the boxplots for all variables
+ggplot(df_long, aes(x = as.factor(y), y = value)) +
+  geom_boxplot() +
+  facet_wrap(~variable, scales = "free") +
+  labs(x = "y", y = "Value") +
+  theme_minimal()
 
-# Correlation matrix and heatmap for numeric variables
+
+# Convert 'previous' and 'pcontact' to factors
+dflong2 <- df3 %>% mutate(
+  previous = as.factor(previous),
+  pcontact = as.factor(pcontact)
+)
+
+# Transforming the dataframe to long format
+df_long2 <- dflong2 %>%
+  pivot_longer(cols = c(job, marital, education, default, housing, loan, contact, month, day_of_week, poutcome, previous, pcontact),
+               names_to = "variable", values_to = "value")
+
+# Creating bar plots for all categorical variables
+ggplot(df_long2, aes(fill = as.factor(y), x = value)) +
+  geom_bar(position = "dodge") +
+  facet_wrap(~variable, scales = "free_x", nrow = 3) +  # Set nrow for larger facet grid
+  labs(x = "Variable", y = "Count", fill = "y") +
+  ylim(0, 4000) +  # Set y-axis limits from 0 to 4000
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),  # Adjust text angle and size
+    strip.text = element_text(size = 10)  # Increase facet label size
+  )
+
 cor1 <- df3 %>% select_if(is.numeric) %>% cor()
 corrplot(cor1)
+
+
 ```
 
 # Findings
@@ -110,6 +140,53 @@ Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
  
+```{r}
+df4 <- df3 %>% dplyr::select(!duration)
+```
+
+
+
+
+
+
+```{r}
+# Split data into training and testing samples
+# Setting seed locks the random number generator. 
+set.seed(321)
+trn_part <- sample(nrow(df4),0.8*nrow(df4),replace = F) # Setting training sample to be 80% of the data
+dftrain <- df4[trn_part,]
+dftest <- df4[-trn_part,]
+
+## Resample with more balanced data 
+df_sub = df4 %>% filter(y == 1)
+df_no_sub = df4 %>% filter(y == 0)
+sample_no_sub = sample_n(df_no_sub, nrow(df_sub))
+df_bal = rbind(sample_no_sub,df_sub)
+
+# Split data into training and testing balanced samples
+set.seed(321)
+tr_ind_bal <- sample(nrow(df_bal), 0.8 * nrow(df_bal), replace = FALSE) # Setting training sample to be 80% of the balanced data
+dftrain_bal <- df_bal[tr_ind_bal, ]
+dftest_bal <- df_bal[-tr_ind_bal, ]
+
+
+
+# Variable selection - reduce model complexity using stepwise backward elimination
+m7.log = step(glm(as.factor(y) ~ . - loan - emp.var.rate - euribor3m, data = dftrain_bal, family = binomial), direction = "backward")
+
+# Check the summary and VIF of the final model
+summary(m7.log)
+vif(m7.log)  # Double-check multicollinearity
+
+# Predict the responses on the balanced testing data using the reduced model
+predprob2_log_bal <- predict(m7.log, newdata = dftest_bal, type = "response")  # Predict probabilities for the test set
+predclass2_log_bal <- ifelse(predprob2_log_bal >= 0.35, 1, 0)  # Classify based on the threshold
+
+# Compare to actual results using the confusion matrix
+caret::confusionMatrix(as.factor(predclass2_log_bal), as.factor(dftest_bal$y), positive = "1")
+
+```
+
  
  Split data set, 
  Whil performing LOGREG checked VIF Funciton to check for multi=colinearity and removed those above 5

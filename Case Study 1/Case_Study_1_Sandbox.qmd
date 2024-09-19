@@ -10,7 +10,7 @@ NOTES:
 
 
 ```{r setup}
-pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ROCR)
+pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ROCR, dplyr)
 ```
 
 ```{r}
