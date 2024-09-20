@@ -18,7 +18,7 @@ format:
 ---
 
 ```{r setup, echo=FALSE}
-pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ggplot2, dplyr, tidyr)
+pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ggplot2, dplyr, tidyr, ROCR)
 df1 <- read.csv(here('Case Study 1','bank-additional.csv'), sep = ';')
 df2 <- df1 %>% mutate_if(is.character, as.factor)
 levels(df2$y)
@@ -180,13 +180,44 @@ vif(m7.log)  # Double-check multicollinearity
 
 # Predict the responses on the balanced testing data using the reduced model
 predprob2_log_bal <- predict(m7.log, newdata = dftest_bal, type = "response")  # Predict probabilities for the test set
-predclass2_log_bal <- ifelse(predprob2_log_bal >= 0.35, 1, 0)  # Classify based on the threshold
+predclass2_log_bal <- ifelse(predprob2_log_bal >= 0.5, 1, 0)  # Classify based on the threshold
 
 # Compare to actual results using the confusion matrix
 caret::confusionMatrix(as.factor(predclass2_log_bal), as.factor(dftest_bal$y), positive = "1")
-
 ```
 
+```{r}
+pred_bal <- prediction(predprob2_log_bal,dftest_bal$y) #Predicted Probability and True Classification
+
+auc_bal <- round(as.numeric(performance(pred_bal, measure = "auc")@y.values),3)
+
+# computing threshold for cutoff to best trade off sensitivity and specificity, unbalanced first
+#first sensitivity
+plot(unlist(performance(pred_bal, "sens")@x.values), unlist(performance(pred_bal, "sens")@y.values), 
+     type="l", lwd=2, 
+     ylab="Sensitivity", xlab="Cutoff", main = paste("Maximized Cutoff\n","AUC: ",auc_bal))
+
+par(new=TRUE) # plot another line in same plot
+
+#second specificity
+plot(unlist(performance(pred_bal, "spec")@x.values), unlist(performance(pred_bal, "spec")@y.values), 
+     type="l", lwd=2, col='red', ylab="", xlab="")
+axis(4, at=seq(0,1,0.2)) #specificity axis labels
+mtext("Specificity",side=4, col='red')
+
+#find where the lines intersect
+min.diff_bal <-which.min(abs(unlist(performance(pred_bal, "sens")@y.values) - unlist(performance(pred_bal, "spec")@y.values)))
+min.x_bal<-unlist(performance(pred_bal, "sens")@x.values)[min.diff_bal]
+min.y_bal<-unlist(performance(pred_bal, "spec")@y.values)[min.diff_bal]
+optimal_bal <-min.x_bal #this is the optimal points to best trade off sensitivity and specificity
+
+abline(h = min.y_bal, lty = 3)
+abline(v = min.x_bal, lty = 3)
+text(min.x_bal,0,paste("optimal threshold=",round(optimal_bal,2)), pos = 3)
+
+pr_class_bal = ifelse(predprob2_log_bal>optimal_bal, 1,0) #use the optimal cutoff to classify
+caret::confusionMatrix(as.factor(pr_class_bal),as.factor(dftest_bal$y)) #this function and package auto computes a lot of the metrics
+```
  
  Split data set, 
  Whil performing LOGREG checked VIF Funciton to check for multi=colinearity and removed those above 5

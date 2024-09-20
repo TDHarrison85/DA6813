@@ -247,6 +247,7 @@ caret::confusionMatrix(as.factor(predclass_log_bal), as.factor(dftest_bal$y), po
 
 ```{r}
 # Variable selection - reduce model complexity using stepwise backward elimination
+set.seed(321)
 m7.log = step(glm(as.factor(y) ~ . - loan - emp.var.rate - euribor3m, data = dftrain_bal, family = binomial), direction = "backward")
 
 # Check the summary and VIF of the final model
