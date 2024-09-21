@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Will Hytlin, Holly Millazo and Tim Harrison">
-<meta name="dcterms.date" content="2024-09-19">
+<meta name="dcterms.date" content="2024-09-20">
 
 <title>DA 6813 Case Study 1</title>
 <style>
@@ -21,40 +21,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -72,6 +38,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="Case Study 1 Write Up_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="Case Study 1 Write Up_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -88,7 +83,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology"><span class="header-section-number">3</span> Methodology</a></li>
   <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">4</span> Data</a></li>
   <li><a href="#findings" id="toc-findings" class="nav-link" data-scroll-target="#findings"><span class="header-section-number">5</span> Findings</a></li>
-  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix"><span class="header-section-number">6</span> Appendix</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">6</span> Conclusion</a></li>
+  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix"><span class="header-section-number">7</span> Appendix</a></li>
   </ul>
 </nav>
 </div>
@@ -115,7 +111,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 19, 2024</p>
+      <p class="date">September 20, 2024</p>
     </div>
   </div>
   
@@ -127,18 +123,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "no"  "yes"</code></pre>
-</div>
-</div>
 <section id="executive-summary" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Executive Summary</h1>
 <!-- 
 Purpose: Provide a concise overview of the key findings and results of the analysis.
 Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
 -->
-<p>Content for Executive Summary goes here.</p>
+<p>This study aimed to develop a predictive model to determine whether clients of a Portuguese banking institution would subscribe to a term deposit following a marketing campaign. The analysis focused on a dataset containing client demographics, financial indicators, and marketing campaign details. Key variables such as age, contact type, month of the campaign, number of previous contacts, employment rate, and previous client contacts were found to influence the likelihood of subscription.</p>
+<p>A logistic regression model was built using backward stepwise selection based on the Akaike Information Criterion (AIC). Initially, the model had high sensitivity (86.36%), meaning it effectively identified clients likely to subscribe. However, it underperformed in identifying clients who would not subscribe, as reflected by its lower specificity (56.99%).</p>
+<p>To improve the model’s overall performance, an optimal decision threshold was identified, balancing sensitivity and specificity. After optimization, the model achieved a balanced accuracy of 73.48%, with both sensitivity and specificity improving to 73.86% and 73.12%, respectively. This adjustment enhanced the model’s ability to accurately classify both subscribing and non-subscribing clients.</p>
+<p>The results provide actionable insights for the bank, enabling it to more effectively target clients and optimize marketing resources. The findings suggest that further improvements, such as testing alternative models or incorporating more detailed features, could yield even higher predictive performance.</p>
 </section>
 <section id="problem-statement" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Problem Statement</h1>
@@ -156,9 +150,11 @@ Instructions: Clearly define the task at hand, which in this case is predicting 
 Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
-<p>The analysis utilized logistic regression as the primary method to predict whether clients would subscribe to a term deposit. The dataset was split into training and testing sets, with 80% of the data used for training and 20% for testing, ensuring that the model could be evaluated on unseen data to prevent overfitting. Multiple iterations of the logistic regression model were run, starting with all relevant variables. Stepwise refinement was used to remove variables that displayed multicollinearity, improving the model’s accuracy. <strong>Variance Inflation Factor (VIF)</strong> was employed to check for multicollinearity, which led to the exclusion of variables like <strong>housing</strong>, <strong>nr.employed</strong>, and <strong>emp.var.rate</strong>.</p>
-<p>Several key assumptions of logistic regression were taken into account throughout the analysis. First, the assumption of the <strong>linearity of log odds</strong> required the relationship between the predictors and the log odds of the outcome to be linear; variables that did not meet this assumption were either transformed or excluded from the model. The <strong>independence of errors</strong> was also ensured by the random sampling method used during data splitting. <strong>Multicollinearity</strong> was carefully addressed, with any variables that had a VIF value greater than 5 removed to avoid inflated standard errors. Additionally, the model assumes a <strong>large sample size</strong>, and with over 4,000 rows in the dataset, this assumption was comfortably met.</p>
-<p>To further refine the model, hyperparameter tuning was used to adjust the classification threshold for predicting whether clients would subscribe to the term deposit. To address class imbalance in the target variable, a balanced dataset was created through oversampling the minority class. Once the final logistic regression model was built, performance metrics such as accuracy, specificity, and sensitivity were evaluated using confusion matrices. The model’s results were further validated through resampling to ensure consistent performance across various subsets of the data.</p>
+<p>The analysis began with data preparation, where the dataset of 21 variables, both categorical and numeric, was cleaned and transformed. Categorical variables were converted to factors for proper handling in models, and the target variable, <code>y</code>, was transformed into a binary indicator, where 1 indicated a client subscribed to a term deposit and 0 indicated otherwise. The <code>pdays</code> variable, which represented the number of days since a previous contact, was recoded into a binary indicator named <code>pcontact</code> to simplify the analysis.</p>
+<p>Exploratory data analysis (EDA) was conducted to explore the distribution and relationships within the data. Box plots were generated to visualize the distribution of numeric variables based on the target outcome, and bar plots were used to explore the frequency distribution of categorical variables. Additionally, a correlation matrix was constructed to examine the relationships among numeric variables and to identify potential multicollinearity issues.</p>
+<p>The dataset was then split into a training set (80%) and a test set (20%) to ensure model evaluation was conducted on unseen data. To address class imbalance, as there were significantly more clients who did not subscribe to the term deposit, resampling techniques were applied to create a balanced dataset for training.</p>
+<p>Logistic regression was selected as the primary modeling technique. A stepwise backward selection method, based on the Akaike Information Criterion (AIC), was used to remove insignificant variables and select the most parsimonious model. To mitigate multicollinearity, variables with high variance inflation factor (VIF) values were removed.</p>
+<p>The model was evaluated using metrics such as accuracy, sensitivity, and specificity, and the results were summarized in a confusion matrix. Given that class imbalance persisted, even after balancing the data, an optimal cutoff threshold for classifying clients was determined by balancing sensitivity and specificity. This threshold optimization helped improve the performance of the logistic regression model by identifying the point where sensitivity and specificity converged.</p>
 </section>
 <section id="data" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Data</h1>
@@ -491,10 +487,10 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 </table>
 </div>
 </div>
-<p>During exploratory data analysis (EDA), several visualizations were used to understand the distribution and relationships within the dataset. Box plots were employed to visualize the distribution of numeric variables such as <strong>age</strong>, <strong>campaign</strong>, <strong>emp.var.rate</strong>, <strong>cons.price.idx</strong>, <strong>cons.conf.idx</strong>, <strong>euribor3m</strong>, and <strong>nr.employed</strong>, grouped by whether the client subscribed to a deposit. These plots helped identify the differences in distributions between those who subscribed and those who did not.</p>
-<p>Additionally, bar plots were used to visualize the distribution of categorical variables such as <strong>job</strong>, <strong>marital status</strong>, <strong>education</strong>, <strong>default</strong>, <strong>housing</strong>, <strong>loan</strong>, <strong>contact</strong>, <strong>month</strong>, <strong>day_of_week</strong>, and <strong>poutcome</strong>. These visuals highlighted the relative frequencies of each category in relation to the target outcome, providing insights into which factors may be more predictive of a client’s decision to subscribe.</p>
-<p>Make a note to talk about pdays: 999 means no and and other number means yes they have been previsouly contacted. We changed this to binary yes they have been previsouls contacted or no the have not been preivouls contacted.</p>
-<p>To further explore relationships between numeric variables, a correlation matrix was generated, with a corresponding heatmap to visually represent the strength of correlations between variables.</p>
+<p>During the exploratory data analysis (EDA), various visualizations were utilized to examine the distributions and relationships within the dataset. Box plots were used to display the distribution of numeric variables such as <strong>age</strong>, <strong>campaign</strong>, <strong>emp.var.rate</strong>, <strong>cons.price.idx</strong>, <strong>cons.conf.idx</strong>, <strong>euribor3m</strong>, and <strong>nr.employed</strong>, stratified by whether or not the client subscribed to a deposit. These visualizations helped identify differences in the distributions between clients who subscribed and those who did not.</p>
+<p>Bar plots were also used to explore the distribution of categorical variables like <strong>job</strong>, <strong>marital status</strong>, <strong>education</strong>, <strong>default</strong>, <strong>housing</strong>, <strong>loan</strong>, <strong>contact</strong>, <strong>month</strong>, <strong>day_of_week</strong>, and <strong>poutcome</strong>. These plots illustrated the relative frequencies of each category concerning the target outcome, shedding light on which factors might be more indicative of a client’s decision to subscribe.</p>
+<p>Regarding the <strong>pdays</strong> variable, a value of 999 indicated that a client had not been previously contacted, while any other number signified prior contact. To simplify the analysis, this variable was transformed into a binary indicator, where “yes” denotes previous contact and “no” indicates no prior contact.</p>
+<p>Finally, to explore relationships among numeric variables, a correlation matrix was generated. This matrix was visualized using a heatmap to provide a clear representation of the strength and direction of correlations between variables.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -521,358 +517,288 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 </section>
 <section id="findings" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Findings</h1>
+<p>The logistic regression model was built using a backward stepwise elimination process based on the Akaike Information Criterion (AIC). During each step, insignificant variables such as job, day_of_week, education, marital status, and others were removed to improve model parsimony and fit. The final model included age, contact, month, campaign, nr.employed, and pcontact as the key predictors.</p>
+<p>Two sets of results were generated to evaluate the performance of the model—one based on the initial logistic regression with a non-optimal threshold and the other with an optimized threshold for better classification performance.</p>
+<p>For the <strong>non-optimal threshold</strong>, the confusion matrix showed an accuracy of 71.27%, with a sensitivity of 86.36% and a specificity of 56.99%. The model had higher sensitivity, meaning it was better at correctly identifying clients who subscribed, but it performed less well in identifying those who did not.</p>
+<p>After <strong>threshold optimization</strong>, the model’s performance improved. The confusion matrix for the optimized model yielded an accuracy of 73.48%, with more balanced sensitivity (73.86%) and specificity (73.12%). This optimization process allowed for better classification of both subscribing and non-subscribing clients by adjusting the decision threshold to balance the trade-off between sensitivity and specificity.</p>
+<p>Overall, the findings indicate that the threshold adjustment improved the model’s ability to predict both positive and negative outcomes more evenly. This highlights the importance of optimizing decision thresholds, particularly in imbalanced datasets like this one.</p>
 <!-- 
 Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
 <div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df4 <span class="ot">&lt;-</span> df3 <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">!</span>duration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>AIC at Each Step</caption>
+<colgroup>
+<col style="width: 26%">
+<col style="width: 5%">
+<col style="width: 17%">
+<col style="width: 16%">
+<col style="width: 17%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Step</th>
+<th style="text-align: center;">Df</th>
+<th style="text-align: center;">Deviance</th>
+<th style="text-align: center;">Resid. Df</th>
+<th style="text-align: center;">Resid. Dev</th>
+<th style="text-align: center;">AIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"></td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">NA</td>
+<td style="text-align: center;">674</td>
+<td style="text-align: center;">744.9079</td>
+<td style="text-align: center;">838.9079</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">- job</td>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">10.1992377</td>
+<td style="text-align: center;">685</td>
+<td style="text-align: center;">755.1072</td>
+<td style="text-align: center;">827.1072</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">- day_of_week</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">0.9350717</td>
+<td style="text-align: center;">689</td>
+<td style="text-align: center;">756.0423</td>
+<td style="text-align: center;">820.0423</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">- education</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">5.8197873</td>
+<td style="text-align: center;">695</td>
+<td style="text-align: center;">761.8620</td>
+<td style="text-align: center;">813.8620</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">- marital</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1.8152111</td>
+<td style="text-align: center;">698</td>
+<td style="text-align: center;">763.6772</td>
+<td style="text-align: center;">809.6772</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">- cons.price.idx</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.0286753</td>
+<td style="text-align: center;">699</td>
+<td style="text-align: center;">763.7059</td>
+<td style="text-align: center;">807.7059</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">- default</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.0548683</td>
+<td style="text-align: center;">700</td>
+<td style="text-align: center;">763.7608</td>
+<td style="text-align: center;">805.7608</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">- cons.conf.idx</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.2981325</td>
+<td style="text-align: center;">701</td>
+<td style="text-align: center;">764.0589</td>
+<td style="text-align: center;">804.0589</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">- housing</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">2.4672400</td>
+<td style="text-align: center;">703</td>
+<td style="text-align: center;">766.5262</td>
+<td style="text-align: center;">802.5262</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">- previous</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1.0908448</td>
+<td style="text-align: center;">704</td>
+<td style="text-align: center;">767.6170</td>
+<td style="text-align: center;">801.6170</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">- poutcome</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3.4459295</td>
+<td style="text-align: center;">706</td>
+<td style="text-align: center;">771.0629</td>
+<td style="text-align: center;">801.0629</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Confusion Matrix Non-Optimal Value</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">0</th>
+<th style="text-align: center;">1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0</td>
+<td style="text-align: center;">76</td>
+<td style="text-align: center;">40</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">53</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Model Results Non-Optimal Value</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Metric</th>
+<th style="text-align: center;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Accuracy</td>
+<td style="text-align: center;">0.7127</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sensitivity</td>
+<td style="text-align: center;">0.8636</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Specificity</td>
+<td style="text-align: center;">0.5699</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Split data into training and testing samples</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting seed locks the random number generator. </span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>trn_part <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(df4),<span class="fl">0.8</span><span class="sc">*</span><span class="fu">nrow</span>(df4),<span class="at">replace =</span> F) <span class="co"># Setting training sample to be 80% of the data</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>dftrain <span class="ot">&lt;-</span> df4[trn_part,]</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>dftest <span class="ot">&lt;-</span> df4[<span class="sc">-</span>trn_part,]</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Resample with more balanced data </span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>df_sub <span class="ot">=</span> df4 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(y <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>df_no_sub <span class="ot">=</span> df4 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(y <span class="sc">==</span> <span class="dv">0</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>sample_no_sub <span class="ot">=</span> <span class="fu">sample_n</span>(df_no_sub, <span class="fu">nrow</span>(df_sub))</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>df_bal <span class="ot">=</span> <span class="fu">rbind</span>(sample_no_sub,df_sub)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Split data into training and testing balanced samples</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>tr_ind_bal <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(df_bal), <span class="fl">0.8</span> <span class="sc">*</span> <span class="fu">nrow</span>(df_bal), <span class="at">replace =</span> <span class="cn">FALSE</span>) <span class="co"># Setting training sample to be 80% of the balanced data</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>dftrain_bal <span class="ot">&lt;-</span> df_bal[tr_ind_bal, ]</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>dftest_bal <span class="ot">&lt;-</span> df_bal[<span class="sc">-</span>tr_ind_bal, ]</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Variable selection - reduce model complexity using stepwise backward elimination</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>m7.log <span class="ot">=</span> <span class="fu">step</span>(<span class="fu">glm</span>(<span class="fu">as.factor</span>(y) <span class="sc">~</span> . <span class="sc">-</span> loan <span class="sc">-</span> emp.var.rate <span class="sc">-</span> euribor3m, <span class="at">data =</span> dftrain_bal, <span class="at">family =</span> binomial), <span class="at">direction =</span> <span class="st">"backward"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-1-Write-Up_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Confusion Matrix Optimal Value</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">0</th>
+<th style="text-align: center;">1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0</td>
+<td style="text-align: center;">65</td>
+<td style="text-align: center;">25</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: center;">23</td>
+<td style="text-align: center;">68</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Model Results Optimal Value</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Metric</th>
+<th style="text-align: center;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Accuracy</td>
+<td style="text-align: center;">0.7348</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sensitivity</td>
+<td style="text-align: center;">0.7386</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Specificity</td>
+<td style="text-align: center;">0.7312</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Start:  AIC=838.91
-as.factor(y) ~ (age + job + marital + education + default + housing + 
-    loan + contact + month + day_of_week + campaign + previous + 
-    poutcome + emp.var.rate + cons.price.idx + cons.conf.idx + 
-    euribor3m + nr.employed + pcontact) - loan - emp.var.rate - 
-    euribor3m
-
-                 Df Deviance    AIC
-- job            11   755.11 827.11
-- education       6   749.92 831.92
-- day_of_week     4   746.13 832.13
-- marital         3   747.03 835.03
-- cons.price.idx  1   744.93 836.93
-- housing         2   746.97 836.97
-- cons.conf.idx   1   745.14 837.14
-- default         1   745.20 837.20
-- previous        1   746.03 838.03
-- pcontact        1   746.07 838.07
-- poutcome        2   748.33 838.33
-&lt;none&gt;                744.91 838.91
-- contact         1   747.76 839.76
-- age             1   748.03 840.03
-- campaign        1   749.49 841.49
-- month           9   766.39 842.39
-- nr.employed     1   781.31 873.31
-
-Step:  AIC=827.11
-as.factor(y) ~ age + marital + education + default + housing + 
-    contact + month + day_of_week + campaign + previous + poutcome + 
-    cons.price.idx + cons.conf.idx + nr.employed + pcontact
-
-                 Df Deviance    AIC
-- day_of_week     4   756.04 820.04
-- education       6   760.64 820.64
-- marital         3   756.66 822.66
-- cons.price.idx  1   755.11 825.11
-- cons.conf.idx   1   755.28 825.28
-- housing         2   757.39 825.39
-- default         1   755.42 825.42
-- pcontact        1   756.24 826.24
-- previous        1   756.33 826.33
-- poutcome        2   758.70 826.70
-&lt;none&gt;                755.11 827.11
-- contact         1   757.59 827.59
-- age             1   759.10 829.10
-- month           9   775.69 829.69
-- campaign        1   760.25 830.25
-- nr.employed     1   791.95 861.95
-
-Step:  AIC=820.04
-as.factor(y) ~ age + marital + education + default + housing + 
-    contact + month + campaign + previous + poutcome + cons.price.idx + 
-    cons.conf.idx + nr.employed + pcontact
-
-                 Df Deviance    AIC
-- education       6   761.86 813.86
-- marital         3   757.63 815.63
-- cons.price.idx  1   756.05 818.05
-- cons.conf.idx   1   756.22 818.22
-- default         1   756.31 818.31
-- housing         2   758.48 818.48
-- pcontact        1   757.16 819.16
-- previous        1   757.29 819.29
-- poutcome        2   759.67 819.67
-&lt;none&gt;                756.04 820.04
-- contact         1   758.55 820.55
-- age             1   759.88 821.88
-- month           9   777.35 823.35
-- campaign        1   761.61 823.61
-- nr.employed     1   792.53 854.53
-
-Step:  AIC=813.86
-as.factor(y) ~ age + marital + default + housing + contact + 
-    month + campaign + previous + poutcome + cons.price.idx + 
-    cons.conf.idx + nr.employed + pcontact
-
-                 Df Deviance    AIC
-- marital         3   763.68 809.68
-- cons.price.idx  1   761.88 811.88
-- default         1   761.96 811.96
-- cons.conf.idx   1   762.13 812.13
-- housing         2   764.23 812.23
-- pcontact        1   763.03 813.03
-- previous        1   763.11 813.11
-- poutcome        2   765.51 813.51
-&lt;none&gt;                761.86 813.86
-- contact         1   764.31 814.31
-- age             1   766.11 816.11
-- month           9   782.86 816.86
-- campaign        1   768.36 818.36
-- nr.employed     1   799.24 849.24
-
-Step:  AIC=809.68
-as.factor(y) ~ age + default + housing + contact + month + campaign + 
-    previous + poutcome + cons.price.idx + cons.conf.idx + nr.employed + 
-    pcontact
-
-                 Df Deviance    AIC
-- cons.price.idx  1   763.71 807.71
-- default         1   763.73 807.73
-- cons.conf.idx   1   763.99 807.99
-- housing         2   766.09 808.09
-- pcontact        1   764.84 808.84
-- previous        1   765.01 809.01
-- poutcome        2   767.37 809.37
-&lt;none&gt;                763.68 809.68
-- contact         1   766.09 810.09
-- age             1   766.39 810.39
-- month           9   785.84 813.84
-- campaign        1   769.87 813.87
-- nr.employed     1   802.41 846.41
-
-Step:  AIC=807.71
-as.factor(y) ~ age + default + housing + contact + month + campaign + 
-    previous + poutcome + cons.conf.idx + nr.employed + pcontact
-
-                Df Deviance    AIC
-- default        1   763.76 805.76
-- cons.conf.idx  1   763.99 805.99
-- housing        2   766.11 806.11
-- pcontact       1   764.85 806.85
-- previous       1   765.12 807.12
-- poutcome       2   767.55 807.55
-&lt;none&gt;               763.71 807.71
-- age            1   766.40 808.40
-- contact        1   766.46 808.46
-- campaign       1   769.87 811.87
-- month          9   788.29 814.29
-- nr.employed    1   802.46 844.46
-
-Step:  AIC=805.76
-as.factor(y) ~ age + housing + contact + month + campaign + previous + 
-    poutcome + cons.conf.idx + nr.employed + pcontact
-
-                Df Deviance    AIC
-- cons.conf.idx  1   764.06 804.06
-- housing        2   766.16 804.16
-- pcontact       1   764.91 804.91
-- previous       1   765.19 805.19
-- poutcome       2   767.65 805.65
-&lt;none&gt;               763.76 805.76
-- contact        1   766.51 806.51
-- age            1   766.67 806.67
-- campaign       1   769.98 809.98
-- month          9   788.30 812.30
-- nr.employed    1   802.83 842.83
-
-Step:  AIC=804.06
-as.factor(y) ~ age + housing + contact + month + campaign + previous + 
-    poutcome + nr.employed + pcontact
-
-              Df Deviance    AIC
-- housing      2   766.53 802.53
-- pcontact     1   765.26 803.26
-- previous     1   765.51 803.51
-- poutcome     2   767.95 803.95
-&lt;none&gt;             764.06 804.06
-- contact      1   766.57 804.57
-- age          1   766.97 804.97
-- campaign     1   770.22 808.22
-- month        9   789.23 811.23
-- nr.employed  1   805.44 843.44
-
-Step:  AIC=802.53
-as.factor(y) ~ age + contact + month + campaign + previous + 
-    poutcome + nr.employed + pcontact
-
-              Df Deviance    AIC
-- previous     1   767.62 801.62
-- pcontact     1   767.94 801.94
-- poutcome     2   770.29 802.29
-&lt;none&gt;             766.53 802.53
-- age          1   769.18 803.18
-- contact      1   769.50 803.50
-- campaign     1   772.45 806.45
-- month        9   790.98 808.98
-- nr.employed  1   807.99 841.99
-
-Step:  AIC=801.62
-as.factor(y) ~ age + contact + month + campaign + poutcome + 
-    nr.employed + pcontact
-
-              Df Deviance    AIC
-- poutcome     2   771.06 801.06
-&lt;none&gt;             767.62 801.62
-- age          1   770.27 802.27
-- contact      1   770.41 802.41
-- pcontact     1   770.65 802.65
-- campaign     1   773.54 805.54
-- month        9   792.92 808.92
-- nr.employed  1   812.12 844.12
-
-Step:  AIC=801.06
-as.factor(y) ~ age + contact + month + campaign + nr.employed + 
-    pcontact
-
-              Df Deviance    AIC
-&lt;none&gt;             771.06 801.06
-- contact      1   773.38 801.38
-- age          1   773.64 801.64
-- campaign     1   777.12 805.12
-- month        9   797.29 809.29
-- pcontact     1   788.85 816.85
-- nr.employed  1   812.71 840.71</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the summary and VIF of the final model</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m7.log)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-glm(formula = as.factor(y) ~ age + contact + month + campaign + 
-    nr.employed + pcontact, family = binomial, data = dftrain_bal)
-
-Coefficients:
-                  Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)      48.706620   8.171565   5.961 2.51e-09 ***
-age               0.012996   0.008159   1.593 0.111188    
-contacttelephone -0.408616   0.268499  -1.522 0.128046    
-monthaug          0.469097   0.409848   1.145 0.252390    
-monthdec          0.505752   0.881509   0.574 0.566147    
-monthjul          0.647060   0.413096   1.566 0.117263    
-monthjun          1.081414   0.414388   2.610 0.009063 ** 
-monthmar          1.789458   0.820782   2.180 0.029244 *  
-monthmay         -0.073644   0.351233  -0.210 0.833923    
-monthnov          0.113763   0.425928   0.267 0.789396    
-monthoct          1.004064   0.668790   1.501 0.133274    
-monthsep          0.102028   0.740559   0.138 0.890421    
-campaign         -0.105242   0.046475  -2.264 0.023544 *  
-nr.employed      -0.009619   0.001603  -5.999 1.98e-09 ***
-pcontact          1.809398   0.502590   3.600 0.000318 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-(Dispersion parameter for binomial family taken to be 1)
-
-    Null deviance: 999.48  on 720  degrees of freedom
-Residual deviance: 771.06  on 706  degrees of freedom
-AIC: 801.06
-
-Number of Fisher Scoring iterations: 5</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(m7.log)  <span class="co"># Double-check multicollinearity</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>                GVIF Df GVIF^(1/(2*Df))
-age         1.034835  1        1.017269
-contact     1.833075  1        1.353911
-month       2.883726  9        1.060603
-campaign    1.039624  1        1.019619
-nr.employed 2.138719  1        1.462436
-pcontact    1.110850  1        1.053969</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict the responses on the balanced testing data using the reduced model</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>predprob2_log_bal <span class="ot">&lt;-</span> <span class="fu">predict</span>(m7.log, <span class="at">newdata =</span> dftest_bal, <span class="at">type =</span> <span class="st">"response"</span>)  <span class="co"># Predict probabilities for the test set</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>predclass2_log_bal <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(predprob2_log_bal <span class="sc">&gt;=</span> <span class="fl">0.35</span>, <span class="dv">1</span>, <span class="dv">0</span>)  <span class="co"># Classify based on the threshold</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare to actual results using the confusion matrix</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(<span class="fu">as.factor</span>(predclass2_log_bal), <span class="fu">as.factor</span>(dftest_bal<span class="sc">$</span>y), <span class="at">positive =</span> <span class="st">"1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Confusion Matrix and Statistics
-
-          Reference
-Prediction  0  1
-         0 58 22
-         1 30 71
-                                          
-               Accuracy : 0.7127          
-                 95% CI : (0.6409, 0.7774)
-    No Information Rate : 0.5138          
-    P-Value [Acc &gt; NIR] : 3.96e-08        
-                                          
-                  Kappa : 0.4236          
-                                          
- Mcnemar's Test P-Value : 0.3317          
-                                          
-            Sensitivity : 0.7634          
-            Specificity : 0.6591          
-         Pos Pred Value : 0.7030          
-         Neg Pred Value : 0.7250          
-             Prevalence : 0.5138          
-         Detection Rate : 0.3923          
-   Detection Prevalence : 0.5580          
-      Balanced Accuracy : 0.7113          
-                                          
-       'Positive' Class : 1               
-                                          </code></pre>
+<pre><code>as.factor(y) ~ age + contact + month + campaign + nr.employed + 
+    pcontact</code></pre>
 </div>
 </div>
-<p>Split data set, Whil performing LOGREG checked VIF Funciton to check for multi=colinearity and removed those above 5 did backwards AIC elimination for reomove (insert variables removed) Logist Regression with these variables (- loan - emp.var.rate - euribor3m age<br>
-contact<br>
-month<br>
-campaign<br>
-cons.conf.idx nr.employed pcontact) Confusion matrix here: We found that the data still seem skewed after it was balanced so we adjusted the cut-off threshold optimization. LDA confusion matrix for LDA model # Conclusion</p>
+</section>
+<section id="conclusion" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Conclusion</h1>
 <!-- 
 Purpose: Summarize the key takeaways and provide actionable recommendations.
 Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
 -->
-<p>Content for Conclusion goes here.</p>
+<p>The analysis successfully developed a logistic regression model to predict whether clients would subscribe to a term deposit following a marketing campaign. Through data preparation, exploratory analysis, and model building, key predictors such as age, contact, month, campaign, employment status (nr.employed), and previous contact (pcontact) were identified as significant factors influencing client subscription decisions.</p>
+<p>The initial model had a higher sensitivity but lower specificity, meaning it was more effective at identifying clients who subscribed but less so for those who did not. After optimizing the decision threshold, the model achieved a more balanced performance, with improved accuracy, sensitivity, and specificity. This highlights the value of threshold adjustment in classification problems, particularly when dealing with imbalanced datasets.</p>
+<p>In conclusion, the model offers actionable insights for the bank to more effectively target potential customers, allowing for better allocation of marketing resources and improved conversion rates. Further enhancements, such as testing additional models or incorporating more complex feature engineering, could further improve predictive performance.</p>
 </section>
-<section id="appendix" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Appendix</h1>
+<section id="appendix" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Appendix</h1>
 <!-- 
 Purpose: Include supplementary material or detailed technical results.
 Instructions: Provide code snippets, detailed model output, and data summaries.
 -->
-<p>Content for Appendix goes here.</p>
+<p>pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ggplot2, dplyr, tidyr, ROCR,knitr) df1 &lt;- read.csv(here(‘Case Study 1’,‘bank-additional.csv’), sep = ‘;’) df2 &lt;- df1 %&gt;% mutate_if(is.character, as.factor) df3 &lt;- df2 %&gt;% mutate( pcontact = ifelse(pdays == 999, 0, 1), y = ifelse(y == ‘yes’,1,0) ) %&gt;% select(!pdays)</p>
+<p>df_long &lt;- df3 %&gt;% pivot_longer(cols = c(age, campaign, emp.var.rate, cons.price.idx, cons.conf.idx, euribor3m, nr.employed), names_to = “variable”, values_to = “value”)</p>
+<p>ggplot(df_long, aes(x = as.factor(y), y = value)) + geom_boxplot() + facet_wrap(~variable, scales = “free”) + labs(x = “y”, y = “Value”) + theme_minimal()</p>
+<p>dflong2 &lt;- df3 %&gt;% mutate( previous = as.factor(previous), pcontact = as.factor(pcontact) )</p>
+<p>df_long2 &lt;- dflong2 %&gt;% pivot_longer(cols = c(job, marital, education, default, housing, loan, contact, month, day_of_week, poutcome, previous, pcontact), names_to = “variable”, values_to = “value”)</p>
+<p>ggplot(df_long2, aes(fill = as.factor(y), x = value)) + geom_bar(position = “dodge”) + facet_wrap(~variable, scales = “free_x”, nrow = 3) + labs(x = “Variable”, y = “Count”, fill = “y”) + ylim(0, 4000) + theme_minimal() + theme( axis.text.x = element_text(angle = 45, hjust = 1, size = 8), strip.text = element_text(size = 10) )</p>
+<p>cor1 &lt;- df3 %&gt;% select_if(is.numeric) %&gt;% cor() corrplot(cor1)</p>
+<p>df4 &lt;- df3 %&gt;% dplyr::select(!duration) set.seed(321) trn_part &lt;- sample(nrow(df4),0.8*nrow(df4),replace = F) dftrain &lt;- df4[trn_part,] dftest &lt;- df4[-trn_part,]</p>
+<p>df_sub = df4 %&gt;% filter(y == 1) df_no_sub = df4 %&gt;% filter(y == 0) sample_no_sub = sample_n(df_no_sub, nrow(df_sub)) df_bal = rbind(sample_no_sub,df_sub)</p>
+<p>set.seed(321) tr_ind_bal &lt;- sample(nrow(df_bal), 0.8 * nrow(df_bal), replace = FALSE) dftrain_bal &lt;- df_bal[tr_ind_bal, ] dftest_bal &lt;- df_bal[-tr_ind_bal, ]</p>
+<p>m7.log &lt;- step(glm(as.factor(y) ~ . - loan - emp.var.rate - euribor3m, data = dftrain_bal, family = binomial), direction = “backward”, trace = 0)</p>
+<p>predprob_final &lt;- predict(m7.log, newdata = dftest_bal, type = “response”) pr_class_final &lt;- ifelse(predprob_final &gt; 0.5, 1, 0)</p>
+<p>predprob2_log_bal &lt;- predict(m7.log, newdata = dftest_bal, type = “response”) predclass2_log_bal &lt;- ifelse(predprob2_log_bal &gt;= 0.5, 1, 0)</p>
+<p>conf_matrix &lt;- caret::confusionMatrix(as.factor(pr_class_final), as.factor(dftest_bal<span class="math inline">\(y))
+cm1_table &lt;- as.data.frame.matrix(conf_matrix\)</span>table) accuracy &lt;- round(conf_matrix<span class="math inline">\(overall['Accuracy'], 4)
+sensitivity &lt;- round(conf_matrix\)</span>byClass[‘Sensitivity’], 4) specificity &lt;- round(conf_matrix$byClass[‘Specificity’], 4)</p>
+<p>pred_bal &lt;- prediction(predprob2_log_bal,dftest_bal$y) auc_bal &lt;- round(as.numeric(performance(pred_bal, measure = “auc”)<span class="citation" data-cites="y.values">@y.values</span>),3)</p>
+<p>plot(unlist(performance(pred_bal, “sens”)<span class="citation" data-cites="x.values">@x.values</span>), unlist(performance(pred_bal, “sens”)<span class="citation" data-cites="y.values">@y.values</span>), type=“l”, lwd=2, ylab=“Sensitivity”, xlab=“Cutoff”, main = paste(“Maximized Cutoff”,“AUC:”,auc_bal))</p>
+<p>par(new=TRUE)</p>
+<p>plot(unlist(performance(pred_bal, “spec”)<span class="citation" data-cites="x.values">@x.values</span>), unlist(performance(pred_bal, “spec”)<span class="citation" data-cites="y.values">@y.values</span>), type=“l”, lwd=2, col=‘red’, ylab=““, xlab=”“) axis(4, at=seq(0,1,0.2)) mtext(”Specificity”,side=4, col=‘red’)</p>
+<p>min.diff_bal &lt;- which.min(abs(unlist(performance(pred_bal, “sens”)<span class="citation" data-cites="y.values">@y.values</span>) - unlist(performance(pred_bal, “spec”)<span class="citation" data-cites="y.values">@y.values</span>))) min.x_bal&lt;-unlist(performance(pred_bal, “sens”)<span class="citation" data-cites="x.values">@x.values</span>)[min.diff_bal] min.y_bal&lt;-unlist(performance(pred_bal, “spec”)<span class="citation" data-cites="y.values">@y.values</span>)[min.diff_bal] optimal_bal &lt;-min.x_bal</p>
+<p>abline(h = min.y_bal, lty = 3) abline(v = min.x_bal, lty = 3) text(min.x_bal,0,paste(“optimal threshold=”,round(optimal_bal,2)), pos = 3)</p>
+<p>pr_class_bal = ifelse(predprob2_log_bal &gt; optimal_bal, 1, 0)</p>
+<p>conf_matrix &lt;- caret::confusionMatrix(as.factor(pr_class_bal), as.factor(dftest_bal<span class="math inline">\(y))
+cm_table &lt;- as.data.frame.matrix(conf_matrix\)</span>table) accuracy &lt;- conf_matrix<span class="math inline">\(overall['Accuracy']
+sensitivity &lt;- conf_matrix\)</span>byClass[‘Sensitivity’] specificity &lt;- conf_matrix$byClass[‘Specificity’]</p>
+<p>results_df &lt;- data.frame( Value = c(round(accuracy, 4), round(sensitivity, 4), round(specificity, 4)) )</p>
+<p>kable(cm_table, format = “pipe”, align = “c”, caption = “Confusion Matrix Optimal Value”) kable(results_df, format = “pipe”, align = “c”, col.names = c(“Metric”, “Value”), caption = “Model Results Optimal Value”) final_formula &lt;- formula(m7.log) print(final_formula)</p>
 </section>
 
 </main>
