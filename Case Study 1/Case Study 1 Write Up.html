@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.555">
+<meta name="generator" content="quarto-1.4.554">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Will Hytlin, Holly Millazo and Tim Harrison">
-<meta name="dcterms.date" content="2024-09-20">
+<meta name="author" content="Will Hyltin, Holly Milazzo and Tim Harrison">
+<meta name="dcterms.date" content="2024-09-22">
 
 <title>DA 6813 Case Study 1</title>
 <style>
@@ -36,37 +36,10 @@ ul.task-list li input[type="checkbox"] {
 <link href="Case Study 1 Write Up_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="Case Study 1 Write Up_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <link href="Case Study 1 Write Up_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+
 <script src="Case Study 1 Write Up_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -104,14 +77,14 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Will Hytlin, Holly Millazo and Tim Harrison </p>
+             <p>Will Hyltin, Holly Milazzo and Tim Harrison </p>
           </div>
   </div>
     
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 20, 2024</p>
+      <p class="date">September 22, 2024</p>
     </div>
   </div>
   
@@ -130,8 +103,8 @@ Purpose: Provide a concise overview of the key findings and results of the analy
 Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
 -->
 <p>This study aimed to develop a predictive model to determine whether clients of a Portuguese banking institution would subscribe to a term deposit following a marketing campaign. The analysis focused on a dataset containing client demographics, financial indicators, and marketing campaign details. Key variables such as age, contact type, month of the campaign, number of previous contacts, employment rate, and previous client contacts were found to influence the likelihood of subscription.</p>
-<p>A logistic regression model was built using backward stepwise selection based on the Akaike Information Criterion (AIC). Initially, the model had high sensitivity (86.36%), meaning it effectively identified clients likely to subscribe. However, it underperformed in identifying clients who would not subscribe, as reflected by its lower specificity (56.99%).</p>
-<p>To improve the model’s overall performance, an optimal decision threshold was identified, balancing sensitivity and specificity. After optimization, the model achieved a balanced accuracy of 73.48%, with both sensitivity and specificity improving to 73.86% and 73.12%, respectively. This adjustment enhanced the model’s ability to accurately classify both subscribing and non-subscribing clients.</p>
+<p>Due to the unbalanced nature of our response variable, a balanced sample was taken so the model would not favor prediction for those who did not subscribe versus those that did. Then, a logistic regression model was built using backward stepwise selection based on the Akaike Information Criterion (AIC). Initially, the model had high specificity (86.36%), meaning it effectively identified clients that did not subscribe. However, despite balancing train and test sets, it underperformed in identifying clients who did subscribe, as reflected by its lower sensitivity (56.99%).</p>
+<p>To further improve the model’s overall performance, an optimal decision threshold was identified, balancing sensitivity and specificity. After optimization, the model achieved a balanced accuracy of 73.48%, with both sensitivity and specificity improving to 73.12% and 73.86%, respectively. This adjustment enhanced the model’s ability to accurately classify both subscribing and non-subscribing clients.</p>
 <p>The results provide actionable insights for the bank, enabling it to more effectively target clients and optimize marketing resources. The findings suggest that further improvements, such as testing alternative models or incorporating more detailed features, could yield even higher predictive performance.</p>
 </section>
 <section id="problem-statement" class="level1" data-number="2">
@@ -152,7 +125,7 @@ Instructions: Detail the models used and the reasoning behind them. Include spec
 -->
 <p>The analysis began with data preparation, where the dataset of 21 variables, both categorical and numeric, was cleaned and transformed. Categorical variables were converted to factors for proper handling in models, and the target variable, <code>y</code>, was transformed into a binary indicator, where 1 indicated a client subscribed to a term deposit and 0 indicated otherwise. The <code>pdays</code> variable, which represented the number of days since a previous contact, was recoded into a binary indicator named <code>pcontact</code> to simplify the analysis.</p>
 <p>Exploratory data analysis (EDA) was conducted to explore the distribution and relationships within the data. Box plots were generated to visualize the distribution of numeric variables based on the target outcome, and bar plots were used to explore the frequency distribution of categorical variables. Additionally, a correlation matrix was constructed to examine the relationships among numeric variables and to identify potential multicollinearity issues.</p>
-<p>The dataset was then split into a training set (80%) and a test set (20%) to ensure model evaluation was conducted on unseen data. To address class imbalance, as there were significantly more clients who did not subscribe to the term deposit, resampling techniques were applied to create a balanced dataset for training.</p>
+<p>The dataset was then split into a training set (80%) and a test set (20%) to ensure model evaluation was conducted on unseen data. To address class imbalance, as there were significantly more clients who did not subscribe to the term deposit, resampling techniques were applied to create a balanced dataset for training. This was done by narrowing down to all responses where a bank customer subscribed and an equal number of those who did not subscribe before performing the train and test split.</p>
 <p>Logistic regression was selected as the primary modeling technique. A stepwise backward selection method, based on the Akaike Information Criterion (AIC), was used to remove insignificant variables and select the most parsimonious model. To mitigate multicollinearity, variables with high variance inflation factor (VIF) values were removed.</p>
 <p>The model was evaluated using metrics such as accuracy, sensitivity, and specificity, and the results were summarized in a confusion matrix. Given that class imbalance persisted, even after balancing the data, an optimal cutoff threshold for classifying clients was determined by balancing sensitivity and specificity. This threshold optimization helped improve the performance of the logistic regression model by identifying the point where sensitivity and specificity converged.</p>
 </section>
@@ -165,7 +138,7 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 <p>The dataset contains 4,119 rows and 21 variables. The variables are split between 11 categorical (character type) and 10 numeric variables. In preparation for analysis, categorical variables were converted into factors to ensure proper handling in models. The target variable, y, was converted into a binary outcome where “yes” was mapped to 1, indicating that the client subscribed to a term deposit, and “no” was mapped to 0.</p>
 <div class="cell">
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="table table-sm table-striped small">
 <caption>Data summary</caption>
 <tbody>
 <tr class="odd">
@@ -207,7 +180,7 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 </tbody>
 </table>
 <p><strong>Variable type: factor</strong></p>
-<table class="caption-top table table-sm table-striped small">
+<table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 14%">
 <col style="width: 10%">
@@ -310,7 +283,7 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 </tbody>
 </table>
 <p><strong>Variable type: numeric</strong></p>
-<table class="caption-top table table-sm table-striped small">
+<table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 15%">
 <col style="width: 10%">
@@ -489,7 +462,7 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 </div>
 <p>During the exploratory data analysis (EDA), various visualizations were utilized to examine the distributions and relationships within the dataset. Box plots were used to display the distribution of numeric variables such as <strong>age</strong>, <strong>campaign</strong>, <strong>emp.var.rate</strong>, <strong>cons.price.idx</strong>, <strong>cons.conf.idx</strong>, <strong>euribor3m</strong>, and <strong>nr.employed</strong>, stratified by whether or not the client subscribed to a deposit. These visualizations helped identify differences in the distributions between clients who subscribed and those who did not.</p>
 <p>Bar plots were also used to explore the distribution of categorical variables like <strong>job</strong>, <strong>marital status</strong>, <strong>education</strong>, <strong>default</strong>, <strong>housing</strong>, <strong>loan</strong>, <strong>contact</strong>, <strong>month</strong>, <strong>day_of_week</strong>, and <strong>poutcome</strong>. These plots illustrated the relative frequencies of each category concerning the target outcome, shedding light on which factors might be more indicative of a client’s decision to subscribe.</p>
-<p>Regarding the <strong>pdays</strong> variable, a value of 999 indicated that a client had not been previously contacted, while any other number signified prior contact. To simplify the analysis, this variable was transformed into a binary indicator, where “yes” denotes previous contact and “no” indicates no prior contact.</p>
+<p>Regarding the <strong>pdays</strong> variable, a value of 999 indicated that a client had not been previously contacted, while any other number signified prior contact. To simplify the analysis, this variable was transformed into a binary indicator, where “1” denotes previous contact and “0” indicates no prior contact.</p>
 <p>Finally, to explore relationships among numeric variables, a correlation matrix was generated. This matrix was visualized using a heatmap to provide a clear representation of the strength and direction of correlations between variables.</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -519,16 +492,16 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 <h1 data-number="5"><span class="header-section-number">5</span> Findings</h1>
 <p>The logistic regression model was built using a backward stepwise elimination process based on the Akaike Information Criterion (AIC). During each step, insignificant variables such as job, day_of_week, education, marital status, and others were removed to improve model parsimony and fit. The final model included age, contact, month, campaign, nr.employed, and pcontact as the key predictors.</p>
 <p>Two sets of results were generated to evaluate the performance of the model—one based on the initial logistic regression with a non-optimal threshold and the other with an optimized threshold for better classification performance.</p>
-<p>For the <strong>non-optimal threshold</strong>, the confusion matrix showed an accuracy of 71.27%, with a sensitivity of 86.36% and a specificity of 56.99%. The model had higher sensitivity, meaning it was better at correctly identifying clients who subscribed, but it performed less well in identifying those who did not.</p>
-<p>After <strong>threshold optimization</strong>, the model’s performance improved. The confusion matrix for the optimized model yielded an accuracy of 73.48%, with more balanced sensitivity (73.86%) and specificity (73.12%). This optimization process allowed for better classification of both subscribing and non-subscribing clients by adjusting the decision threshold to balance the trade-off between sensitivity and specificity.</p>
-<p>Overall, the findings indicate that the threshold adjustment improved the model’s ability to predict both positive and negative outcomes more evenly. This highlights the importance of optimizing decision thresholds, particularly in imbalanced datasets like this one.</p>
+<p>For the <strong>non-optimal threshold</strong>, the confusion matrix showed an accuracy of 71.27%, with a specificity of 86.36% and a sensitivity of 56.99%. The model had higher specificity, meaning it was better at correctly identifying clients who did not subscribe, but it performed less well in identifying those who did.</p>
+<p>After <strong>threshold optimization</strong>, the model’s performance improved. The confusion matrix for the optimized model yielded an accuracy of 73.48%, with more balanced specificity (73.86%) and sensitivity (73.12%). This optimization process allowed for better classification of both subscribing and non-subscribing clients by adjusting the decision threshold to balance the trade-off between specificity. and sensitivity</p>
+<p>Overall, the findings indicate that the threshold adjustment improved the model’s ability to predict both positive and negative outcomes more evenly. This highlights the importance of optimizing decision thresholds, particularly in imbalanced datasets like this one. Interestingly, this issue was still encountered despite balancing the initial audience data based on the response value, suggesting that an imbalance in the predictors may also influence a binary classification model’s performance.</p>
 <!-- 
 Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
 <div class="cell">
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="table table-sm table-striped small">
 <caption>AIC at Each Step</caption>
 <colgroup>
 <col style="width: 26%">
@@ -641,7 +614,7 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 </table>
 </div>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="table table-sm table-striped small">
 <caption>Confusion Matrix Non-Optimal Value</caption>
 <thead>
 <tr class="header">
@@ -665,7 +638,7 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 </table>
 </div>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="table table-sm table-striped small">
 <caption>Model Results Non-Optimal Value</caption>
 <thead>
 <tr class="header">
@@ -680,11 +653,11 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 </tr>
 <tr class="even">
 <td style="text-align: left;">Sensitivity</td>
-<td style="text-align: center;">0.8636</td>
+<td style="text-align: center;">0.5699</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Specificity</td>
-<td style="text-align: center;">0.5699</td>
+<td style="text-align: center;">0.8636</td>
 </tr>
 </tbody>
 </table>
@@ -701,7 +674,7 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 </div>
 <div class="cell">
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="table table-sm table-striped small">
 <caption>Confusion Matrix Optimal Value</caption>
 <thead>
 <tr class="header">
@@ -725,7 +698,7 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 </table>
 </div>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="table table-sm table-striped small">
 <caption>Model Results Optimal Value</caption>
 <thead>
 <tr class="header">
@@ -740,11 +713,11 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 </tr>
 <tr class="even">
 <td style="text-align: left;">Sensitivity</td>
-<td style="text-align: center;">0.7386</td>
+<td style="text-align: center;">0.7312</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Specificity</td>
-<td style="text-align: center;">0.7312</td>
+<td style="text-align: center;">0.7386</td>
 </tr>
 </tbody>
 </table>
@@ -762,7 +735,7 @@ Purpose: Summarize the key takeaways and provide actionable recommendations.
 Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
 -->
 <p>The analysis successfully developed a logistic regression model to predict whether clients would subscribe to a term deposit following a marketing campaign. Through data preparation, exploratory analysis, and model building, key predictors such as age, contact, month, campaign, employment status (nr.employed), and previous contact (pcontact) were identified as significant factors influencing client subscription decisions.</p>
-<p>The initial model had a higher sensitivity but lower specificity, meaning it was more effective at identifying clients who subscribed but less so for those who did not. After optimizing the decision threshold, the model achieved a more balanced performance, with improved accuracy, sensitivity, and specificity. This highlights the value of threshold adjustment in classification problems, particularly when dealing with imbalanced datasets.</p>
+<p>The initial model had a higher specificity but lower sensitivity, meaning it was more effective at identifying clients who did not subscribe but less so for those who did. After optimizing the decision threshold, the model achieved a more balanced performance, with improved accuracy and sensitivity. This highlights the value of threshold adjustment in classification problems, particularly when dealing with imbalanced datasets.</p>
 <p>In conclusion, the model offers actionable insights for the bank to more effectively target potential customers, allowing for better allocation of marketing resources and improved conversion rates. Further enhancements, such as testing additional models or incorporating more complex feature engineering, could further improve predictive performance.</p>
 </section>
 <section id="appendix" class="level1" data-number="7">
@@ -771,34 +744,118 @@ Instructions: Conclude with the most important findings and offer suggestions fo
 Purpose: Include supplementary material or detailed technical results.
 Instructions: Provide code snippets, detailed model output, and data summaries.
 -->
-<p>pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ggplot2, dplyr, tidyr, ROCR,knitr) df1 &lt;- read.csv(here(‘Case Study 1’,‘bank-additional.csv’), sep = ‘;’) df2 &lt;- df1 %&gt;% mutate_if(is.character, as.factor) df3 &lt;- df2 %&gt;% mutate( pcontact = ifelse(pdays == 999, 0, 1), y = ifelse(y == ‘yes’,1,0) ) %&gt;% select(!pdays)</p>
-<p>df_long &lt;- df3 %&gt;% pivot_longer(cols = c(age, campaign, emp.var.rate, cons.price.idx, cons.conf.idx, euribor3m, nr.employed), names_to = “variable”, values_to = “value”)</p>
-<p>ggplot(df_long, aes(x = as.factor(y), y = value)) + geom_boxplot() + facet_wrap(~variable, scales = “free”) + labs(x = “y”, y = “Value”) + theme_minimal()</p>
-<p>dflong2 &lt;- df3 %&gt;% mutate( previous = as.factor(previous), pcontact = as.factor(pcontact) )</p>
-<p>df_long2 &lt;- dflong2 %&gt;% pivot_longer(cols = c(job, marital, education, default, housing, loan, contact, month, day_of_week, poutcome, previous, pcontact), names_to = “variable”, values_to = “value”)</p>
-<p>ggplot(df_long2, aes(fill = as.factor(y), x = value)) + geom_bar(position = “dodge”) + facet_wrap(~variable, scales = “free_x”, nrow = 3) + labs(x = “Variable”, y = “Count”, fill = “y”) + ylim(0, 4000) + theme_minimal() + theme( axis.text.x = element_text(angle = 45, hjust = 1, size = 8), strip.text = element_text(size = 10) )</p>
-<p>cor1 &lt;- df3 %&gt;% select_if(is.numeric) %&gt;% cor() corrplot(cor1)</p>
-<p>df4 &lt;- df3 %&gt;% dplyr::select(!duration) set.seed(321) trn_part &lt;- sample(nrow(df4),0.8*nrow(df4),replace = F) dftrain &lt;- df4[trn_part,] dftest &lt;- df4[-trn_part,]</p>
-<p>df_sub = df4 %&gt;% filter(y == 1) df_no_sub = df4 %&gt;% filter(y == 0) sample_no_sub = sample_n(df_no_sub, nrow(df_sub)) df_bal = rbind(sample_no_sub,df_sub)</p>
-<p>set.seed(321) tr_ind_bal &lt;- sample(nrow(df_bal), 0.8 * nrow(df_bal), replace = FALSE) dftrain_bal &lt;- df_bal[tr_ind_bal, ] dftest_bal &lt;- df_bal[-tr_ind_bal, ]</p>
-<p>m7.log &lt;- step(glm(as.factor(y) ~ . - loan - emp.var.rate - euribor3m, data = dftrain_bal, family = binomial), direction = “backward”, trace = 0)</p>
-<p>predprob_final &lt;- predict(m7.log, newdata = dftest_bal, type = “response”) pr_class_final &lt;- ifelse(predprob_final &gt; 0.5, 1, 0)</p>
-<p>predprob2_log_bal &lt;- predict(m7.log, newdata = dftest_bal, type = “response”) predclass2_log_bal &lt;- ifelse(predprob2_log_bal &gt;= 0.5, 1, 0)</p>
-<p>conf_matrix &lt;- caret::confusionMatrix(as.factor(pr_class_final), as.factor(dftest_bal<span class="math inline">\(y))
-cm1_table &lt;- as.data.frame.matrix(conf_matrix\)</span>table) accuracy &lt;- round(conf_matrix<span class="math inline">\(overall['Accuracy'], 4)
-sensitivity &lt;- round(conf_matrix\)</span>byClass[‘Sensitivity’], 4) specificity &lt;- round(conf_matrix$byClass[‘Specificity’], 4)</p>
-<p>pred_bal &lt;- prediction(predprob2_log_bal,dftest_bal$y) auc_bal &lt;- round(as.numeric(performance(pred_bal, measure = “auc”)<span class="citation" data-cites="y.values">@y.values</span>),3)</p>
-<p>plot(unlist(performance(pred_bal, “sens”)<span class="citation" data-cites="x.values">@x.values</span>), unlist(performance(pred_bal, “sens”)<span class="citation" data-cites="y.values">@y.values</span>), type=“l”, lwd=2, ylab=“Sensitivity”, xlab=“Cutoff”, main = paste(“Maximized Cutoff”,“AUC:”,auc_bal))</p>
-<p>par(new=TRUE)</p>
-<p>plot(unlist(performance(pred_bal, “spec”)<span class="citation" data-cites="x.values">@x.values</span>), unlist(performance(pred_bal, “spec”)<span class="citation" data-cites="y.values">@y.values</span>), type=“l”, lwd=2, col=‘red’, ylab=““, xlab=”“) axis(4, at=seq(0,1,0.2)) mtext(”Specificity”,side=4, col=‘red’)</p>
-<p>min.diff_bal &lt;- which.min(abs(unlist(performance(pred_bal, “sens”)<span class="citation" data-cites="y.values">@y.values</span>) - unlist(performance(pred_bal, “spec”)<span class="citation" data-cites="y.values">@y.values</span>))) min.x_bal&lt;-unlist(performance(pred_bal, “sens”)<span class="citation" data-cites="x.values">@x.values</span>)[min.diff_bal] min.y_bal&lt;-unlist(performance(pred_bal, “spec”)<span class="citation" data-cites="y.values">@y.values</span>)[min.diff_bal] optimal_bal &lt;-min.x_bal</p>
-<p>abline(h = min.y_bal, lty = 3) abline(v = min.x_bal, lty = 3) text(min.x_bal,0,paste(“optimal threshold=”,round(optimal_bal,2)), pos = 3)</p>
-<p>pr_class_bal = ifelse(predprob2_log_bal &gt; optimal_bal, 1, 0)</p>
-<p>conf_matrix &lt;- caret::confusionMatrix(as.factor(pr_class_bal), as.factor(dftest_bal<span class="math inline">\(y))
-cm_table &lt;- as.data.frame.matrix(conf_matrix\)</span>table) accuracy &lt;- conf_matrix<span class="math inline">\(overall['Accuracy']
-sensitivity &lt;- conf_matrix\)</span>byClass[‘Sensitivity’] specificity &lt;- conf_matrix$byClass[‘Specificity’]</p>
-<p>results_df &lt;- data.frame( Value = c(round(accuracy, 4), round(sensitivity, 4), round(specificity, 4)) )</p>
-<p>kable(cm_table, format = “pipe”, align = “c”, caption = “Confusion Matrix Optimal Value”) kable(results_df, format = “pipe”, align = “c”, col.names = c(“Metric”, “Value”), caption = “Model Results Optimal Value”) final_formula &lt;- formula(m7.log) print(final_formula)</p>
+<pre><code>pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ggplot2, dplyr, tidyr, ROCR,knitr)
+df1 &lt;- read.csv(here('Case Study 1','bank-additional.csv'), sep = ';')
+df2 &lt;- df1 %&gt;% mutate_if(is.character, as.factor)
+df3 &lt;- df2 %&gt;% mutate(
+  pcontact = ifelse(pdays == 999, 0, 1),
+  y = ifelse(y == 'yes',1,0)
+) %&gt;% select(!pdays)
+
+df_long &lt;- df3 %&gt;%
+  pivot_longer(cols = c(age, campaign, emp.var.rate, cons.price.idx, cons.conf.idx, euribor3m, nr.employed), 
+               names_to = "variable", values_to = "value")
+
+ggplot(df_long, aes(x = as.factor(y), y = value)) +
+  geom_boxplot() +
+  facet_wrap(~variable, scales = "free") +
+  labs(x = "y", y = "Value") +
+  theme_minimal()
+
+dflong2 &lt;- df3 %&gt;% mutate(
+  previous = as.factor(previous),
+  pcontact = as.factor(pcontact)
+)
+
+df_long2 &lt;- dflong2 %&gt;%
+  pivot_longer(cols = c(job, marital, education, default, housing, loan, contact, month, day_of_week, poutcome, previous, pcontact),
+               names_to = "variable", values_to = "value")
+
+ggplot(df_long2, aes(fill = as.factor(y), x = value)) +
+  geom_bar(position = "dodge") +
+  facet_wrap(~variable, scales = "free_x", nrow = 3) +
+  labs(x = "Variable", y = "Count", fill = "y") +
+  ylim(0, 4000) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+    strip.text = element_text(size = 10)
+  )
+
+cor1 &lt;- df3 %&gt;% select_if(is.numeric) %&gt;% cor()
+corrplot(cor1)
+
+df4 &lt;- df3 %&gt;% dplyr::select(!duration)
+set.seed(321)
+trn_part &lt;- sample(nrow(df4),0.8*nrow(df4),replace = F)
+dftrain &lt;- df4[trn_part,]
+dftest &lt;- df4[-trn_part,]
+
+df_sub = df4 %&gt;% filter(y == 1)
+df_no_sub = df4 %&gt;% filter(y == 0)
+sample_no_sub = sample_n(df_no_sub, nrow(df_sub))
+df_bal = rbind(sample_no_sub,df_sub)
+
+set.seed(321)
+tr_ind_bal &lt;- sample(nrow(df_bal), 0.8 * nrow(df_bal), replace = FALSE)
+dftrain_bal &lt;- df_bal[tr_ind_bal, ]
+dftest_bal &lt;- df_bal[-tr_ind_bal, ]
+
+m7.log &lt;- step(glm(as.factor(y) ~ . - loan - emp.var.rate - euribor3m, 
+                   data = dftrain_bal, family = binomial), 
+               direction = "backward", trace = 0)
+
+predprob_final &lt;- predict(m7.log, newdata = dftest_bal, type = "response")
+pr_class_final &lt;- ifelse(predprob_final &gt; 0.5, 1, 0)
+
+predprob2_log_bal &lt;- predict(m7.log, newdata = dftest_bal, type = "response")
+predclass2_log_bal &lt;- ifelse(predprob2_log_bal &gt;= 0.5, 1, 0)
+
+conf_matrix &lt;- caret::confusionMatrix(as.factor(pr_class_final), as.factor(dftest_bal$y))
+cm1_table &lt;- as.data.frame.matrix(conf_matrix$table)
+accuracy &lt;- round(conf_matrix$overall['Accuracy'], 4)
+sensitivity &lt;- round(conf_matrix$byClass['Sensitivity'], 4)
+specificity &lt;- round(conf_matrix$byClass['Specificity'], 4)
+
+pred_bal &lt;- prediction(predprob2_log_bal,dftest_bal$y)
+auc_bal &lt;- round(as.numeric(performance(pred_bal, measure = "auc")@y.values),3)
+
+plot(unlist(performance(pred_bal, "sens")@x.values), unlist(performance(pred_bal, "sens")@y.values), 
+     type="l", lwd=2, 
+     ylab="Sensitivity", xlab="Cutoff", main = paste("Maximized Cutoff\n","AUC: ",auc_bal))
+
+par(new=TRUE)
+
+plot(unlist(performance(pred_bal, "spec")@x.values), unlist(performance(pred_bal, "spec")@y.values), 
+     type="l", lwd=2, col='red', ylab="", xlab="")
+axis(4, at=seq(0,1,0.2))
+mtext("Specificity",side=4, col='red')
+
+min.diff_bal &lt;- which.min(abs(unlist(performance(pred_bal, "sens")@y.values) - unlist(performance(pred_bal, "spec")@y.values)))
+min.x_bal&lt;-unlist(performance(pred_bal, "sens")@x.values)[min.diff_bal]
+min.y_bal&lt;-unlist(performance(pred_bal, "spec")@y.values)[min.diff_bal]
+optimal_bal &lt;-min.x_bal
+
+abline(h = min.y_bal, lty = 3)
+abline(v = min.x_bal, lty = 3)
+text(min.x_bal,0,paste("optimal threshold=",round(optimal_bal,2)), pos = 3)
+
+pr_class_bal = ifelse(predprob2_log_bal &gt; optimal_bal, 1, 0)
+
+conf_matrix &lt;- caret::confusionMatrix(as.factor(pr_class_bal), as.factor(dftest_bal$y))
+cm_table &lt;- as.data.frame.matrix(conf_matrix$table)
+accuracy &lt;- conf_matrix$overall['Accuracy']
+sensitivity &lt;- conf_matrix$byClass['Sensitivity']
+specificity &lt;- conf_matrix$byClass['Specificity']
+
+results_df &lt;- data.frame(
+  Value = c(round(accuracy, 4), round(sensitivity, 4), round(specificity, 4))
+)
+
+kable(cm_table, format = "pipe", align = "c", caption = "Confusion Matrix Optimal Value")
+kable(results_df, format = "pipe", align = "c", col.names = c("Metric", "Value"), caption = "Model Results Optimal Value")
+final_formula &lt;- formula(m7.log)
+print(final_formula)</code></pre>
 </section>
 
 </main>

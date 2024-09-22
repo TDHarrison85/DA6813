@@ -1,6 +1,6 @@
 ---
 title: "DA 6813 Case Study 1 "
-author: "Will Hytlin, Holly Millazo and Tim Harrison"
+author: "Will Hyltin, Holly Milazzo and Tim Harrison"
 date: today
 format: 
   html:
@@ -41,9 +41,9 @@ Instructions: Summarize the performance of the models (e.g., random forest, deci
 
 This study aimed to develop a predictive model to determine whether clients of a Portuguese banking institution would subscribe to a term deposit following a marketing campaign. The analysis focused on a dataset containing client demographics, financial indicators, and marketing campaign details. Key variables such as age, contact type, month of the campaign, number of previous contacts, employment rate, and previous client contacts were found to influence the likelihood of subscription.
 
-A logistic regression model was built using backward stepwise selection based on the Akaike Information Criterion (AIC). Initially, the model had high sensitivity (86.36%), meaning it effectively identified clients likely to subscribe. However, it underperformed in identifying clients who would not subscribe, as reflected by its lower specificity (56.99%).
+Due to the unbalanced nature of our response variable, a balanced sample was taken so the model would not favor prediction for those who did not subscribe versus those that did. Then, a logistic regression model was built using backward stepwise selection based on the Akaike Information Criterion (AIC). Initially, the model had high specificity (86.36%), meaning it effectively identified clients that did not subscribe. However, despite balancing train and test sets, it underperformed in identifying clients who did subscribe, as reflected by its lower sensitivity (56.99%).
 
-To improve the model's overall performance, an optimal decision threshold was identified, balancing sensitivity and specificity. After optimization, the model achieved a balanced accuracy of 73.48%, with both sensitivity and specificity improving to 73.86% and 73.12%, respectively. This adjustment enhanced the model's ability to accurately classify both subscribing and non-subscribing clients.
+To further improve the model's overall performance, an optimal decision threshold was identified, balancing sensitivity and specificity. After optimization, the model achieved a balanced accuracy of 73.48%, with both sensitivity and specificity improving to 73.12% and 73.86%, respectively. This adjustment enhanced the model's ability to accurately classify both subscribing and non-subscribing clients.
 
 The results provide actionable insights for the bank, enabling it to more effectively target clients and optimize marketing resources. The findings suggest that further improvements, such as testing alternative models or incorporating more detailed features, could yield even higher predictive performance.
 
@@ -75,7 +75,7 @@ The analysis began with data preparation, where the dataset of 21 variables, bot
 
 Exploratory data analysis (EDA) was conducted to explore the distribution and relationships within the data. Box plots were generated to visualize the distribution of numeric variables based on the target outcome, and bar plots were used to explore the frequency distribution of categorical variables. Additionally, a correlation matrix was constructed to examine the relationships among numeric variables and to identify potential multicollinearity issues.
 
-The dataset was then split into a training set (80%) and a test set (20%) to ensure model evaluation was conducted on unseen data. To address class imbalance, as there were significantly more clients who did not subscribe to the term deposit, resampling techniques were applied to create a balanced dataset for training.
+The dataset was then split into a training set (80%) and a test set (20%) to ensure model evaluation was conducted on unseen data. To address class imbalance, as there were significantly more clients who did not subscribe to the term deposit, resampling techniques were applied to create a balanced dataset for training. This was done by narrowing down to all responses where a bank customer subscribed and an equal number of those who did not subscribe before performing the train and test split.
 
 Logistic regression was selected as the primary modeling technique. A stepwise backward selection method, based on the Akaike Information Criterion (AIC), was used to remove insignificant variables and select the most parsimonious model. To mitigate multicollinearity, variables with high variance inflation factor (VIF) values were removed. 
 
@@ -101,7 +101,7 @@ During the exploratory data analysis (EDA), various visualizations were utilized
 
 Bar plots were also used to explore the distribution of categorical variables like **job**, **marital status**, **education**, **default**, **housing**, **loan**, **contact**, **month**, **day_of_week**, and **poutcome**. These plots illustrated the relative frequencies of each category concerning the target outcome, shedding light on which factors might be more indicative of a client’s decision to subscribe.
 
-Regarding the **pdays** variable, a value of 999 indicated that a client had not been previously contacted, while any other number signified prior contact. To simplify the analysis, this variable was transformed into a binary indicator, where "yes" denotes previous contact and "no" indicates no prior contact.
+Regarding the **pdays** variable, a value of 999 indicated that a client had not been previously contacted, while any other number signified prior contact. To simplify the analysis, this variable was transformed into a binary indicator, where "1" denotes previous contact and "0" indicates no prior contact.
 
 Finally, to explore relationships among numeric variables, a correlation matrix was generated. This matrix was visualized using a heatmap to provide a clear representation of the strength and direction of correlations between variables.
 
@@ -156,11 +156,11 @@ The logistic regression model was built using a backward stepwise elimination pr
 
 Two sets of results were generated to evaluate the performance of the model—one based on the initial logistic regression with a non-optimal threshold and the other with an optimized threshold for better classification performance.
 
-For the **non-optimal threshold**, the confusion matrix showed an accuracy of 71.27%, with a sensitivity of 86.36% and a specificity of 56.99%. The model had higher sensitivity, meaning it was better at correctly identifying clients who subscribed, but it performed less well in identifying those who did not.
+For the **non-optimal threshold**, the confusion matrix showed an accuracy of 71.27%, with a specificity of 86.36% and a sensitivity of 56.99%. The model had higher specificity, meaning it was better at correctly identifying clients who did not subscribe, but it performed less well in identifying those who did.
 
-After **threshold optimization**, the model's performance improved. The confusion matrix for the optimized model yielded an accuracy of 73.48%, with more balanced sensitivity (73.86%) and specificity (73.12%). This optimization process allowed for better classification of both subscribing and non-subscribing clients by adjusting the decision threshold to balance the trade-off between sensitivity and specificity.
+After **threshold optimization**, the model's performance improved. The confusion matrix for the optimized model yielded an accuracy of 73.48%, with more balanced specificity (73.86%) and sensitivity (73.12%). This optimization process allowed for better classification of both subscribing and non-subscribing clients by adjusting the decision threshold to balance the trade-off between specificity. and sensitivity
 
-Overall, the findings indicate that the threshold adjustment improved the model’s ability to predict both positive and negative outcomes more evenly. This highlights the importance of optimizing decision thresholds, particularly in imbalanced datasets like this one.
+Overall, the findings indicate that the threshold adjustment improved the model’s ability to predict both positive and negative outcomes more evenly. This highlights the importance of optimizing decision thresholds, particularly in imbalanced datasets like this one. Interestingly, this issue was still encountered despite balancing the initial audience data based on the response value, suggesting that an imbalance in the predictors may also influence a binary classification model's performance. 
 
 ```{=html}
 <!-- 
@@ -203,7 +203,7 @@ predprob2_log_bal <- predict(m7.log, newdata = dftest_bal, type = "response")  #
 predclass2_log_bal <- ifelse(predprob2_log_bal >= 0.5, 1, 0)  # Classify based on the threshold
 
 # Confusion matrix for the final model
-conf_matrix <- caret::confusionMatrix(as.factor(pr_class_final), as.factor(dftest_bal$y))
+conf_matrix <- caret::confusionMatrix(as.factor(pr_class_final), as.factor(dftest_bal$y), positive = '1')
 
 # Extract confusion matrix, accuracy, sensitivity, and specificity
 cm1_table <- as.data.frame.matrix(conf_matrix$table)
@@ -266,7 +266,7 @@ text(min.x_bal,0,paste("optimal threshold=",round(optimal_bal,2)), pos = 3)
 pr_class_bal = ifelse(predprob2_log_bal > optimal_bal, 1, 0)
 
 # Store the confusion matrix result in a variable without printing
-conf_matrix <- caret::confusionMatrix(as.factor(pr_class_bal), as.factor(dftest_bal$y))
+conf_matrix <- caret::confusionMatrix(as.factor(pr_class_bal), as.factor(dftest_bal$y), positive = '1')
 
 
 
@@ -275,7 +275,7 @@ conf_matrix <- caret::confusionMatrix(as.factor(pr_class_bal), as.factor(dftest_
 ```{r, echo=FALSE}
 
 # Calculate the confusion matrix
-conf_matrix <- caret::confusionMatrix(as.factor(pr_class_bal), as.factor(dftest_bal$y))
+conf_matrix <- caret::confusionMatrix(as.factor(pr_class_bal), as.factor(dftest_bal$y), positive = '1')
 
 # Extract the confusion matrix, accuracy, sensitivity, and specificity
 cm_table <- as.data.frame.matrix(conf_matrix$table)  # Convert confusion matrix to a data frame
@@ -315,7 +315,7 @@ Instructions: Conclude with the most important findings and offer suggestions fo
 
 The analysis successfully developed a logistic regression model to predict whether clients would subscribe to a term deposit following a marketing campaign. Through data preparation, exploratory analysis, and model building, key predictors such as age, contact, month, campaign, employment status (nr.employed), and previous contact (pcontact) were identified as significant factors influencing client subscription decisions. 
 
-The initial model had a higher sensitivity but lower specificity, meaning it was more effective at identifying clients who subscribed but less so for those who did not. After optimizing the decision threshold, the model achieved a more balanced performance, with improved accuracy, sensitivity, and specificity. This highlights the value of threshold adjustment in classification problems, particularly when dealing with imbalanced datasets.
+The initial model had a higher specificity but lower sensitivity, meaning it was more effective at identifying clients who did not subscribe but less so for those who did. After optimizing the decision threshold, the model achieved a more balanced performance, with improved accuracy and sensitivity. This highlights the value of threshold adjustment in classification problems, particularly when dealing with imbalanced datasets.
 
 In conclusion, the model offers actionable insights for the bank to more effectively target potential customers, allowing for better allocation of marketing resources and improved conversion rates. Further enhancements, such as testing additional models or incorporating more complex feature engineering, could further improve predictive performance.
 
@@ -326,6 +326,7 @@ In conclusion, the model offers actionable insights for the bank to more effecti
 Purpose: Include supplementary material or detailed technical results.
 Instructions: Provide code snippets, detailed model output, and data summaries.
 -->
+```
 ```
 pacman::p_load(MASS, tidyverse, here, car, corrplot, skimr, caret, ggplot2, dplyr, tidyr, ROCR,knitr)
 df1 <- read.csv(here('Case Study 1','bank-additional.csv'), sep = ';')
@@ -439,4 +440,4 @@ kable(cm_table, format = "pipe", align = "c", caption = "Confusion Matrix Optima
 kable(results_df, format = "pipe", align = "c", col.names = c("Metric", "Value"), caption = "Model Results Optimal Value")
 final_formula <- formula(m7.log)
 print(final_formula)
-
+```
