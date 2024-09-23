@@ -1,0 +1,90 @@
+---
+title: "DA 6813 Case Study "
+author: "Will Hytlin, Holly Millazo and Tim Harrison"
+date: today
+format: 
+  html:
+    theme: lumen # or flatly, lumen, united, etc.
+    toc: true # Adds a table of contents
+    toc-depth: 2 # Depth of table of contents
+    toc-location: left
+    code-fold: true # Folds code by default
+    number-sections: true # Numbered sections
+    df-print: paged # Nice table format
+    fig-align: center # Centers figures
+    fig-width: 6 # Adjust figure size
+    fig-height: 4
+    reference-location: section # Valid value for citation references
+---
+
+# Executive Summary
+
+<!-- 
+Purpose: Provide a concise overview of the key findings and results of the analysis.
+Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
+-->
+
+Content for Executive Summary goes here.
+
+# Problem Statement
+
+<!-- 
+Purpose: Explain the problem that the study aims to solve.
+Instructions: Clearly define the task at hand, which in this case is predicting customer acquisition. Outline the objectives and what solving this problem would mean for the company.
+-->
+
+Content for Problem Statement goes here.
+
+# Additional Sources
+
+<!-- 
+Purpose: Reference relevant literature or sources to support the analysis.
+Instructions: Provide citations and key insights from sources relevant to the case study or the models used.
+-->
+
+Content for Additional Sources goes here.
+
+# Methodology
+
+<!-- 
+Purpose: Describe the methods and processes used to conduct the analysis.
+Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
+-->
+
+Content for Methodology goes here.
+
+# Data
+
+<!-- 
+Purpose: Explain the data used in the analysis and any preprocessing steps.
+Instructions: Provide an overview of the dataset, variables, and any cleaning steps or transformations made. Mention variables used or excluded and why.
+-->
+
+Content for Data goes here.
+
+# Findings
+
+<!-- 
+Purpose: Present the results of the analysis.
+Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
+-->
+
+Content for Findings goes here.
+
+# Conclusion
+
+<!-- 
+Purpose: Summarize the key takeaways and provide actionable recommendations.
+Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
+-->
+
+Content for Conclusion goes here.
+
+# Appendix
+
+<!-- 
+Purpose: Include supplementary material or detailed technical results.
+Instructions: Provide code snippets, detailed model output, and data summaries.
+-->
+
+Content for Appendix goes here.
