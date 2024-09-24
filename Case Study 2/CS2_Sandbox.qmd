@@ -1,0 +1,64 @@
+---
+title: "Case Study 2 Sandbox"
+format: html
+---
+
+## Case Study 2 Sandbox
+
+```{r setup}
+pacman::p_load(tidyverse, e1071, here, readxl, skimr, corrplot)
+
+raw_train <- read_xlsx(here('Case Study 2', 'BBBC-Train.xlsx'))
+raw_test <- read_xlsx(here('Case Study 2', 'BBBC-Test.xlsx'))
+```
+
+```{r}
+str(raw_train)
+```
+```{r}
+anyNA(raw_train)
+```
+
+```{r}
+skim(raw_train)
+```
+
+```{r}
+train1 <- raw_train %>% 
+  select(-Observation) %>% 
+  mutate(
+    Choice = as.factor(Choice),
+    Gender = as.factor(Gender)
+    )
+test1 <- raw_test %>% 
+  select(-Observation) %>%
+  mutate(
+    Choice = as.factor(Choice),
+    Gender = as.factor(Gender)
+    )
+```
+
+```{r}
+train1 %>% select_if(is.numeric) %>% cor() %>% corrplot()
+```
+
+```{r}
+train1 %>% mutate(
+  Gender = ifelse(Gender == 0, 'Female', 'Male'),
+  Choice = ifelse(Choice == 0, 'Non-purchase', 'purchase')
+  ) %>% 
+  ggplot(aes(x = Gender, fill = Choice)) +
+  geom_bar() + ggtitle('Gender vs Purchase')
+```
+
+```{r}
+trainbox <- lapply(colnames(select_if(train1, is.numeric)),
+       function(col) {
+        ggplot(train1,
+                aes(y = .data[[col]], x = .data$Choice)) + geom_boxplot() + ggtitle(col)
+       }
+)
+
+trainbox[[1]] + 
+```
+
