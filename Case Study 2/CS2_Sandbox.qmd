@@ -66,6 +66,24 @@ combox[[4]] + combox[[5]] + combox[[6]]
 combox[[7]] + combox[[8]] + combox[[9]]
 ```
 
+Boxplots are a bad visual for the variables starting with "P_". Contingency table below helps, but maybe grouped bar charts for those too? I have those below, let me know what yall think.
+
+```{r}
+combbar <- lapply(colnames(select_if(combined, startsWith(names(combined), 'P_'))),
+       function(col) {
+        ggplot(combined,
+                aes(x = .data[[col]], fill = .data$Choice)) + geom_bar(position = 'dodge') + 
+           ggtitle(col) + 
+           theme(legend.position = c(0.8,0.8), legend.background = element_blank())
+       }
+)
+
+combbar[[1]] + combbar[[2]]
+combbar[[3]] + combbar[[4]]
+combbar[[5]]
+```
+
+
 ```{r}
 combined %>% group_by(Choice, P_Art) %>% 
   summarize(cnt = n()) %>% pivot_wider(id_cols = P_Art, names_from = Choice, values_from = cnt)
@@ -81,14 +99,69 @@ svmtune <- tune.svm(form1, data = train1, gamma = seq(.01,.1, by = .01), cost = 
 ```
 
 ```{r}
-svmtune$best.parameters
+# TAKES A LONG TIME TO RUN!
 
+best_params <- svmtune$best.parameters
+print(best_params)
 #best parameters: gamma 0.02, cost 0.5
 ```
 
+```{r}
+svmtune$performances
+```
+
+```{r}
+svmfit <- svm(formula = form1, data = train1, gamma = best_params$gamma, cost = best_params$cost)
+summary(svmfit)
+```
+
+```{r}
+svmpredict <- predict(svmfit, test1, type = 'response')
+caret::confusionMatrix(svmpredict, test1$Choice, positive = '1')
+```
+Sensitivity is terrible, largely due to unbalanced dataset. Balancing data should then improve our performance.
+
+```{r}
+set.seed(321)
+trn_art = train1 %>% filter(Choice == '1')
+trn_no_art = train1 %>% filter(Choice == '0')
+
+tst_art = test1 %>% filter(Choice == '1')
+tst_no_art = test1 %>% filter(Choice == '0')
+
+sample_no_art_trn = sample_n(trn_no_art, nrow(trn_art))
+train_bal = rbind(sample_no_art_trn,trn_art)
+
+sample_no_art_tst = sample_n(tst_no_art, nrow(tst_art))
+test_bal = rbind(sample_no_art_tst,tst_art)
+```
 
 
-Question for Dr. Roy
+```{r}
+set.seed(321)
+svmtune_bal <- tune.svm(form1, data = train_bal, gamma = seq(.01,.1, by = .01), cost = seq(.1, 1, by = .1))
+```
+
+```{r}
+best_params_bal <- svmtune_bal$best.parameters
+print(best_params_bal)
+#best parameters: gamma 0.01, cost 1 
+```
+
+```{r}
+svmfit_bal <- svm(formula = form1, data = train_bal, gamma = best_params_bal$gamma, cost = best_params_bal$cost)
+summary(svmfit_bal)
+```
+
+```{r}
+svmpredict_bal <- predict(svmfit_bal, test_bal, type = 'response')
+caret::confusionMatrix(svmpredict_bal, test_bal$Choice, positive = '1')
+```
+My thoughts: Sensitivity is still kind of low, but maybe that's okay? The prediction is about 160 of our 408 observations observations would be likely to buy the book, even though the number who buy would really be closer to 204. Our mailer would go out to those 160, and 34 wouldn't buy (our false positives). So that 34 would be our cost, we would get 126 people to buy, and 78 would be effectively left on the table. This assumes those 78 wouldnt buy without the mailer, and that the 34 who didn't buy wouldn't buy even if they got the mailer. Basically, the problem seems to call more for Specificity anyway.
+
+
+
+Questions for Dr. Roy (already asked in class)
 Clarity on word problem, 45%? 
 15 + 45% of $15, cost to send out mailer to everyone vs cost to send out to those we predict would purchase. Consider False Positives
 
@@ -99,3 +172,4 @@ Append Data frames for visualizations?
 Yes, done
 
 Do we need to balance SVM dataset?
+Yes, SVM is very sensitive to unbalanced data
