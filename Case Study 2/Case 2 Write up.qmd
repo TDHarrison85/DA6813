@@ -42,7 +42,10 @@ Purpose: Reference relevant literature or sources to support the analysis.
 Instructions: Provide citations and key insights from sources relevant to the case study or the models used.
 -->
 
-Content for Additional Sources goes here.
+Balanced datasets are critical for support vector machines (SVMs) because they help avoid bias toward the majority class, improving classification accuracy. When trained on imbalanced data, SVMs may favor the dominant class, reducing true positive rates for the minority class and affecting performance metrics like balanced accuracy, MCC, and AUC. Balanced training sets ensure more robust, consistent predictions across both classes, enhancing model reliability in bioinformatics tasks like mutation classification.
+
+Citation: Wei Q, Dunbrack RL Jr. PLoS One. 2013;8(7)
+. doi: 10.1371/journal.pone.0067863.
 
 # Methodology
 
