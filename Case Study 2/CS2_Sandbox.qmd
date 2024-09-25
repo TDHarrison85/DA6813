@@ -89,7 +89,24 @@ combined %>% group_by(Choice, P_Art) %>%
   summarize(cnt = n()) %>% pivot_wider(id_cols = P_Art, names_from = Choice, values_from = cnt)
 ```
 
+```{r}
+#Creating data frames that don't make Choice a factor only to run Linear Regression. This is done to show it isn't the appropriate model.
+linregtrain1 <- raw_train %>% 
+  select(-Observation) %>% 
+  mutate(
+    Gender = as.factor(Gender)
+    )
+linregtest1 <- raw_test %>% 
+  select(-Observation) %>%
+  mutate(
+    Gender = as.factor(Gender)
+    )
 
+combined <- rbind(linregtrain1, linregtest1)
+resultsLinReg <- lm(Choice ~ ., data = linregtrain1)
+summary(resultsLinReg)
+
+```
 
 
 ```{r}
