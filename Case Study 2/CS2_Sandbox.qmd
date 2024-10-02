@@ -89,6 +89,8 @@ combined %>% group_by(Choice, P_Art) %>%
   summarize(cnt = n()) %>% pivot_wider(id_cols = P_Art, names_from = Choice, values_from = cnt)
 ```
 
+### Linear Regression
+
 ```{r}
 #Creating data frames that don't make Choice a factor only to run Linear Regression. This is done to show it isn't the appropriate model.
 linregtrain1 <- raw_train %>% 
@@ -102,22 +104,36 @@ linregtest1 <- raw_test %>%
     Gender = as.factor(Gender)
     )
 
-combined <- rbind(linregtrain1, linregtest1)
+#combined <- rbind(linregtrain1, linregtest1)
 resultsLinReg <- lm(Choice ~ ., data = linregtrain1)
 summary(resultsLinReg)
-
 ```
+
+```{r}
+predict(resultsLinReg, linregtest1, type = 'response') %>% summary()
+predict(resultsLinReg, linregtest1, type = 'response') %>% head()
+```
+Linear Regression Conclusion
+Linear Regression is not appropriate as seen above. Results do not give a 0, 1 classification and instead attempt to predict a numeric value of Choice. We can not appropriately classify these numeric values to a class of Choice because it does not correspond to a probability, just that it attempts to fit the values of Choice to a non-existent line.
+
+### Logistic Regression
+
+
+### Linear Discriminant Analysis (LDA)
+
+
+### Support Vector Machines (SVM)
 
 
 ```{r}
 set.seed(321)
 form1 <- Choice ~ .
+
+# TAKES A LONG TIME TO RUN!
 svmtune <- tune.svm(form1, data = train1, gamma = seq(.01,.1, by = .01), cost = seq(.1, 1, by = .1))
 ```
 
 ```{r}
-# TAKES A LONG TIME TO RUN!
-
 best_params <- svmtune$best.parameters
 print(best_params)
 #best parameters: gamma 0.02, cost 0.5
@@ -138,6 +154,8 @@ caret::confusionMatrix(svmpredict, test1$Choice, positive = '1')
 ```
 Sensitivity is terrible, largely due to unbalanced dataset. Balancing data should then improve our performance.
 
+### Balancing Dataset
+
 ```{r}
 set.seed(321)
 trn_art = train1 %>% filter(Choice == '1')
@@ -153,6 +171,13 @@ sample_no_art_tst = sample_n(tst_no_art, nrow(tst_art))
 test_bal = rbind(sample_no_art_tst,tst_art)
 ```
 
+### Logistic Regression (Balanced)
+
+
+### Linear Discriminant Analysis (LDA) (Balanced)
+
+
+### Support Vector Machines (SVM) (Balanced)
 
 ```{r}
 set.seed(321)
@@ -174,9 +199,72 @@ summary(svmfit_bal)
 svmpredict_bal <- predict(svmfit_bal, test_bal, type = 'response')
 caret::confusionMatrix(svmpredict_bal, test_bal$Choice, positive = '1')
 ```
-My thoughts: Sensitivity is still kind of low, but maybe that's okay? The prediction is about 160 of our 408 observations observations would be likely to buy the book, even though the number who buy would really be closer to 204. Our mailer would go out to those 160, and 34 wouldn't buy (our false positives). So that 34 would be our cost, we would get 126 people to buy, and 78 would be effectively left on the table. This assumes those 78 wouldnt buy without the mailer, and that the 34 who didn't buy wouldn't buy even if they got the mailer. Basically, the problem seems to call more for Specificity anyway.
+
+My initial thoughts: Sensitivity is still kind of low, but maybe that's okay? The prediction is about 160 of our 408 observations observations would be likely to buy the book, even though the number who buy would really be closer to 204. Our mailer would go out to those 160, and 34 wouldn't buy (our false positives). So that 34 would be our cost, we would get 126 people to buy, and 78 would be effectively left on the table. This assumes those 78 wouldnt buy without the mailer, and that the 34 who didn't buy wouldn't buy even if they got the mailer. Basically, the problem seems to call more for Specificity anyway.
+
+Revised Commentary: These results are much improved over our original unbalanced SVM results. We see a greater audience of people that we predict would buy the book, resulting a greater Sensitivity score. This comes at some cost to the Specificity but it is an acceptable loss to have a better idea of who would want to purchase the book.
+The results above apply our predictions to the test dataset. However, in an attempt to be good stewards of our model and data by applying relevant transformations to both training and test data, we balanced the test set responses. The application of the model to our mailer question does not give us any known information about that audience, so we cannot assume that they would be balanced as well. As a result, we should check our results against an unbalanced dataset to ensure that, if the audience is indeed unbalanced, we are still able to apply our results:
+
+```{r}
+svmpredict_imbal <- predict(svmfit_bal, test1, type = 'response')
+SVM_CM_unbal <- caret::confusionMatrix(svmpredict_imbal, test1$Choice, positive = '1')
+SVM_CM_unbal
+#caret::confusionMatrix(svmpredict_imbal, test1$Choice, positive = '1')
+```
+
+Note that the test set used for these results is the original test, those which our balanced test set came from. Generally speaking, it's not typically appropriate to utilize test observations more than once, but we will let it slide because we did not make any changes to the model, and to make sure the results are more applicable to the original problem.
+Doing this pays off: we see the sensitivity and specificity still perform roughly as well as they did in the balanced dataset. This makes sense, because what really changed is the distribution between the Positive and Negative values of our response variable. Both Sensitivity and Specificity are robust to such changes: the numerators and denominators for each metric do not include results from both classes of the response, only one. This means we can apply the specificity and sensitivity to a hypothetical dataset of random customers.
+
+```{r}
+summary_table <- combined %>% group_by(Choice) %>% 
+  summarize(percent = n()/nrow(combined),
+            newcnt = round(percent * 50000)) %>% as.data.frame() %>% 
+  mutate(
+    est_targets = ifelse(
+      Choice == 0, round(newcnt*(1-SVM_CM_unbal$byClass[["Specificity"]])), round(newcnt*(SVM_CM_unbal$byClass[["Sensitivity"]]))
+      ),
+    mailercst = est_targets * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * est_targets, 0),
+    revenue = ifelse(Choice == 1, 31.95 * est_targets, 0),
+    profit = revenue - purchcst - mailercst
+    )
+summary_table
+```
+
+```{r}
+sum(summary_table$profit)
+```
+
+```{r}
+naive_table <- combined %>% group_by(Choice) %>% 
+  summarize(percent = n()/nrow(combined),
+            newcnt = round(percent * 50000)) %>% as.data.frame() %>% 
+  mutate(
+    mailercst = newcnt * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * newcnt, 0),
+    revenue = ifelse(Choice == 1, 31.95 * newcnt, 0),
+    profit = revenue - purchcst - mailercst
+    )
+naive_table
+```
+
+```{r}
+sum(naive_table$profit)
+```
+A little confusing, but this is what I did here:
+1. Of the 50,000 people in the audience, estimate the proportion that we anticipate to purchase the book, by using the proportion of people that actually did buy the book across the test and train datasets. The estimate becomes the "newcnt" column
+2. Of those that we estimate would or would not buy the book, estimate the number that our model would predict to buy the book. Note there will be people in both the group that buy the book and those that don't that we will predict to buy it. We estimate by taking thoseThis is column est_targets
+3. Estimate the mailer cost by multiplying the number of people we predict to buy (est_targets) by $0.65, the cost of the mailer. This is the column mailercst.
+4. Estimate the cost to purchase and mail all of the books to those that buy the book. This is done by multiplying 15 by 1.45 (book cost plus allocated overhead), then by the number of people who would by the book, from the column newcnt where Choice == 1. When Choice == 0, there is no book purchase/overhead cost. This is the column purchcst.
+5. Estimate the total revenue from all sales of the book. his is done by multiplying 31.95 by the number of people who would by the book from the column newcnt where Choice == 1. When Choice == 0, there is no purchase revenue. This is the column revenue.
+6. Profit is then calculated by subtracting the cost of the mailer and the purchase costs from the total revenue. This is the column profit.
+7. Summing up the profit column should give us total profit.
+8. The same general steps are then applied to the naive method, however in this case we do not need to estimate the number of people we would predict to buy the book since we would be sending the mailer to everyone. Therefore revenue is much higher because we reach all people who would buy the book, but mailer cost and book purchase cost + overhead is much higher as well.
+
+The results are not quite as favorable as we would like. Ideally, we would see that utilizing our model would give us a better ability to target the consumers who would buy the book, therefore saving on mailer, purchase, and overhead costs without sacrificing too much in lost revenue. Because of this we either need to increase revenue (improve sensitivity) or decrease mailer cost (improve specificity). Other models may do this, like logistic regression or LDA, or perhaps simple solutions like variable selection, tuning? Or what if we un-balance it? Like over-sample on those that purchase the book, then Sensitivity could improve at a hopefully less significant cost to Specificity.
 
 
+## In class questions
 
 Questions for Dr. Roy (already asked in class)
 Clarity on word problem, 45%? 
@@ -190,3 +278,13 @@ Yes, done
 
 Do we need to balance SVM dataset?
 Yes, SVM is very sensitive to unbalanced data
+
+
+SESSION 2 Questions
+
+1. Kernel? 
+  We are welcome to try linear kernel, but he won't take off points if we don't. Default is RBF.
+2. How do we apply to the 50,000 people that we don't have data for? 
+  Decide how many will buy. Of those, how many will we predict so that we can send mailers. Of those who won't buy, how many will we incorrectly predict to buy and therefore send mailers?
+3. Why **is** linear regression wrong? Isn't applying linreg the same as LDA? 
+  I was just wrong about LDA, it is not just linear regression applied to a categorical. Therefore it is simple answer, linear regression does not classify, predicts numeric/ continuous.
