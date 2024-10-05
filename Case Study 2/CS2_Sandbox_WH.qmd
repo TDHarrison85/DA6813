@@ -8,8 +8,8 @@ format: html
 ```{r setup}
 pacman::p_load(MASS, tidyverse, e1071, here, readxl, skimr, corrplot, patchwork)
 
-raw_train <- read_xlsx(here('DA6813', 'Case Study 2', 'BBBC-Train.xlsx'))
-raw_test <- read_xlsx(here('DA6813', 'Case Study 2', 'BBBC-Test.xlsx'))
+raw_train <- read_xlsx(here('Case Study 2', 'BBBC-Train.xlsx'))
+raw_test <- read_xlsx(here('Case Study 2', 'BBBC-Test.xlsx'))
 ```
 
 ```{r}
@@ -61,9 +61,8 @@ combox <- lapply(colnames(select_if(combined, is.numeric)),
        }
 )
 
-combox[[1]] + combox[[2]] + combox[[3]]
-combox[[4]] + combox[[5]] + combox[[6]]
-combox[[7]] + combox[[8]] + combox[[9]]
+combox[[1]] + combox[[2]]
+combox[[3]] + combox[[4]]
 ```
 
 Boxplots are a bad visual for the variables starting with "P_". Contingency table below helps, but maybe grouped bar charts for those too? I have those below, let me know what yall think.
@@ -130,8 +129,34 @@ summary(logfit)
 ```
 
 ```{r}
-predprob_log <- predict(logfit, newdata = test1, type = "response")
-pr_class_log <- ifelse(predprob_log > 0.5, 1, 0)
+car::vif(logfit)
+```
+
+```{r}
+set.seed(321)
+logfit2 <- step(glm(Choice ~ . -Last_purchase, 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+car::vif(logfit2)
+```
+
+```{r}
+set.seed(321)
+logfit3 <- step(glm(Choice ~ . -Last_purchase -First_purchase, 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+car::vif(logfit3)
+```
+
+```{r}
+predprob_log <- predict(logfit3, newdata = test1, type = "response")
+pr_class_log <- ifelse(predprob_log > 0.2, 1, 0)
 
 log_CM_unbal <- caret::confusionMatrix(as.factor(pr_class_log), as.factor(test1$Choice), positive = '1')
 log_CM_unbal
@@ -229,7 +254,7 @@ log_CM_unbal_bal
 
 ```{r}
 predprob_log_imbal <- predict(logfit_bal, newdata = test1, type = "response")
-pr_class_log_imbal <- ifelse(predprob_log_imbal > 0.35, 1, 0)
+pr_class_log_imbal <- ifelse(predprob_log_imbal > 0.22, 1, 0)
 
 log_CM_imbal <- caret::confusionMatrix(as.factor(pr_class_log_imbal), as.factor(test1$Choice), positive = '1')
 log_CM_imbal
@@ -264,7 +289,7 @@ lda_CM_imbal
 
 ```{r}
 set.seed(321)
-svmtune_bal <- tune.svm(form1, data = train_bal, gamma = seq(.01,.1, by = .01), cost = seq(.1, 1, by = .1))
+svmtune_bal <- tune.svm(form1, data = train_bal, gamma = seq(.005,.1, by = .005), cost = seq(.1, 1.5, by = .05))
 ```
 
 ```{r}
@@ -338,7 +363,7 @@ summ_tab_fun <- function(base_data, hcount, CM) {
 
 
 ```{r}
-summary_table_log <- summ_tab_fun(combined, 50000, log_CM_imbal)
+summary_table_log <- summ_tab_fun(combined, 50000, log_CM_unbal)
 summary_table_log
 ```
 
@@ -385,17 +410,42 @@ The results are not quite as favorable as we would like. Ideally, we would see t
 Post Logit and LDA:
 Adding in the logit and lda models, they both perform better than SVM, but still not as good as the Naive model. However, toying with the threshold for the logit model allows us to increase our specificity, thereby increasing the amount of revenue and profit from those who buy the book. This comes at the expense of specificity, however this only means we send the mailer out to more people. Utilizing the model in this manner, we can find bout half of the total population to send the mailer out to, which in turn captures a greater proportion of customers who would buy the book, enough to earn a greater profit than our naive model does.
 
+After toying with Threshold:
+Adjusting the threshold improves the performance of the logistic model significantly. Note that, per our instructors suggestion, I switched back to the unbalance logistic model prior to doing so. I brought the threshold down to .2 by guessing, but it would help to find the optimal. To do that, i'm going to iterate through different threshold values and see what gives the best profit.
+
 
 ```{r}
-for (i in seq(0, .22, by = 0.01)) {
-  preds <- ifelse(predprob_log_imbal > i, 1, 0)
+thresh <- data.frame(threshold = -0.01, profit = 0)
+for (i in seq(0, 1, by = 0.01)) {
+  preds <- ifelse(predprob_log >= i, 1, 0)
   CM_for <- caret::confusionMatrix(as.factor(preds), as.factor(test1$Choice), positive = '1')
   summ_for <- summ_tab_fun(combined, 50000, CM_for)
-  print(paste(i, sum(summ_for$profit)))
+  thresh = rbind(thresh, data.frame(threshold = i, profit = sum(summ_for$profit)))
 }
+
+thresh <- thresh %>% filter(threshold >= 0)
+thresh
 ```
+
 ```{r}
-CM_for
+thresh %>% ggplot(aes(x = threshold, y = profit)) +
+  geom_line() +
+  geom_point() +
+  annotate('text', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit + 1800, label = paste0('Max Profit: $', thresh[which(thresh$profit == max(thresh$profit)),]$profit), size = 3) +
+  annotate('point', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit, color = 'green', shape = 'diamond', size = 3) +
+  theme_minimal() +
+  ggtitle('Book Sales Profit Changes by Model Probability Threshold') +
+  xlab('Logistic Model Probability Threshold') +
+  ylab('Profit from Book Sales')
+
+  
+thresh[which(thresh$profit == max(thresh$profit)),]
+```
+
+```{r}
+predslog_best <- ifelse(predprob_log >= thresh[which(thresh$profit == max(thresh$profit)),]$threshold, 1, 0)
+  CMlog_best <- caret::confusionMatrix(as.factor(predslog_best), as.factor(test1$Choice), positive = '1')
+CMlog_best
 ```
 
 ## In class questions
