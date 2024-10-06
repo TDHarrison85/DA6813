@@ -6,7 +6,7 @@ format: html
 ## Case Study 2 Sandbox
 
 ```{r setup}
-pacman::p_load(tidyverse, e1071, here, readxl, skimr, corrplot, patchwork)
+pacman::p_load(MASS, tidyverse, e1071, here, readxl, skimr, corrplot, patchwork)
 
 raw_train <- read_xlsx(here('Case Study 2', 'BBBC-Train.xlsx'))
 raw_test <- read_xlsx(here('Case Study 2', 'BBBC-Test.xlsx'))
@@ -61,12 +61,10 @@ combox <- lapply(colnames(select_if(combined, is.numeric)),
        }
 )
 
-combox[[1]] + combox[[2]] + combox[[3]]
-combox[[4]] + combox[[5]] + combox[[6]]
-combox[[7]] + combox[[8]] + combox[[9]]
+combox[[1]] + combox[[2]]
+combox[[3]] + combox[[4]]
 ```
 
-Boxplots are a bad visual for the variables starting with "P_". Contingency table below helps, but maybe grouped bar charts for those too? I have those below, let me know what yall think.
 
 ```{r}
 combbar <- lapply(colnames(select_if(combined, startsWith(names(combined), 'P_'))),
@@ -118,9 +116,69 @@ Linear Regression is not appropriate as seen above. Results do not give a 0, 1 c
 
 ### Logistic Regression
 
+```{r}
+set.seed(321)
+logfit <- step(glm(Choice ~ ., 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+summary(logfit)
+```
+
+```{r}
+car::vif(logfit)
+```
+
+```{r}
+set.seed(321)
+logfit2 <- step(glm(Choice ~ . -Last_purchase, 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+car::vif(logfit2)
+```
+
+```{r}
+set.seed(321)
+logfit3 <- step(glm(Choice ~ . -Last_purchase -First_purchase, 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+car::vif(logfit3)
+```
+
+```{r}
+predprob_log <- predict(logfit3, newdata = test1, type = "response")
+pr_class_log <- ifelse(predprob_log > 0.2, 1, 0)
+
+log_CM_unbal <- caret::confusionMatrix(as.factor(pr_class_log), as.factor(test1$Choice), positive = '1')
+log_CM_unbal
+```
+
+Logistic regression actually does perform better than the SVM model prior to balancing. This may be the result of the stepwise removal, so we can potentially consider applying the relevant variables to the remaining models when the time comes. Regardless, Sensitivity is still too low to be really valuable, so we'll have to try other methods/ changes.
 
 ### Linear Discriminant Analysis (LDA)
+```{r}
+set.seed(321)
+ldafit <- lda(Choice ~ ., data = train1)
 
+ldafit
+```
+
+```{r}
+pr_class_lda <- predict(ldafit, test1)
+
+lda_CM_unbal <- caret::confusionMatrix(as.factor(pr_class_lda$class), as.factor(test1$Choice), positive = "1")
+lda_CM_unbal
+```
+
+The LDA model performs remarkably similar to the logit model. So naturally has many of the same advantages/ disadvantages mentioned above.
 
 ### Support Vector Machines (SVM)
 
@@ -173,15 +231,62 @@ test_bal = rbind(sample_no_art_tst,tst_art)
 
 ### Logistic Regression (Balanced)
 
+```{r}
+set.seed(321)
+logfit_bal <- step(glm(Choice ~ ., 
+                   data = train_bal, family = binomial), 
+               direction = "both", trace = 0)
+```
+
+```{r}
+summary(logfit_bal)
+```
+
+```{r}
+predprob_log_bal <- predict(logfit_bal, newdata = test_bal, type = "response")
+pr_class_log_bal <- ifelse(predprob_log_bal > 0.5, 1, 0)
+
+log_CM_unbal_bal <- caret::confusionMatrix(as.factor(pr_class_log_bal), as.factor(test_bal$Choice), positive = '1')
+log_CM_unbal_bal
+```
+
+```{r}
+predprob_log_imbal <- predict(logfit_bal, newdata = test1, type = "response")
+pr_class_log_imbal <- ifelse(predprob_log_imbal > 0.22, 1, 0)
+
+log_CM_imbal <- caret::confusionMatrix(as.factor(pr_class_log_imbal), as.factor(test1$Choice), positive = '1')
+log_CM_imbal
+```
+
 
 ### Linear Discriminant Analysis (LDA) (Balanced)
 
+```{r}
+set.seed(321)
+ldafit_bal <- lda(Choice ~ ., data = train_bal)
+
+ldafit_bal
+```
+
+```{r}
+pr_class_lda_bal <- predict(ldafit_bal, test_bal)
+
+lda_CM_unbal_bal <- caret::confusionMatrix(as.factor(pr_class_lda_bal$class), as.factor(test_bal$Choice), positive = "1")
+lda_CM_unbal_bal
+```
+
+```{r}
+pr_class_lda_imbal <- predict(ldafit_bal, test1)
+
+lda_CM_imbal <- caret::confusionMatrix(as.factor(pr_class_lda_imbal$class), as.factor(test1$Choice), positive = "1")
+lda_CM_imbal
+```
 
 ### Support Vector Machines (SVM) (Balanced)
 
 ```{r}
 set.seed(321)
-svmtune_bal <- tune.svm(form1, data = train_bal, gamma = seq(.01,.1, by = .01), cost = seq(.1, 1, by = .1))
+svmtune_bal <- tune.svm(form1, data = train_bal, gamma = seq(.005,.1, by = .005), cost = seq(.1, 1.5, by = .05))
 ```
 
 ```{r}
@@ -207,8 +312,8 @@ The results above apply our predictions to the test dataset. However, in an atte
 
 ```{r}
 svmpredict_imbal <- predict(svmfit_bal, test1, type = 'response')
-SVM_CM_unbal <- caret::confusionMatrix(svmpredict_imbal, test1$Choice, positive = '1')
-SVM_CM_unbal
+SVM_CM_imbal <- caret::confusionMatrix(svmpredict_imbal, test1$Choice, positive = '1')
+SVM_CM_imbal
 #caret::confusionMatrix(svmpredict_imbal, test1$Choice, positive = '1')
 ```
 
@@ -216,23 +321,50 @@ Note that the test set used for these results is the original test, those which 
 Doing this pays off: we see the sensitivity and specificity still perform roughly as well as they did in the balanced dataset. This makes sense, because what really changed is the distribution between the Positive and Negative values of our response variable. Both Sensitivity and Specificity are robust to such changes: the numerators and denominators for each metric do not include results from both classes of the response, only one. This means we can apply the specificity and sensitivity to a hypothetical dataset of random customers.
 
 ```{r}
-summary_table <- combined %>% group_by(Choice) %>% 
+summary_table_svm <- combined %>% group_by(Choice) %>% 
   summarize(percent = n()/nrow(combined),
             newcnt = round(percent * 50000)) %>% as.data.frame() %>% 
   mutate(
     est_targets = ifelse(
-      Choice == 0, round(newcnt*(1-SVM_CM_unbal$byClass[["Specificity"]])), round(newcnt*(SVM_CM_unbal$byClass[["Sensitivity"]]))
+      Choice == 0, round(newcnt*(1-SVM_CM_imbal$byClass[["Specificity"]])), round(newcnt*(SVM_CM_imbal$byClass[["Sensitivity"]]))
       ),
     mailercst = est_targets * 0.65,
     purchcst = ifelse(Choice == 1, 15 * 1.45 * est_targets, 0),
     revenue = ifelse(Choice == 1, 31.95 * est_targets, 0),
     profit = revenue - purchcst - mailercst
     )
-summary_table
+summary_table_svm
 ```
 
 ```{r}
-sum(summary_table$profit)
+sum(summary_table_svm$profit)
+```
+
+```{r}
+summ_tab_fun <- function(base_data, hcount, CM) {
+  base_data %>% group_by(Choice) %>% 
+  summarize(percent = n()/nrow(base_data),
+            newcnt = round(percent * hcount)) %>% as.data.frame() %>% 
+  mutate(
+    est_targets = ifelse(
+      Choice == 0, round(newcnt*(1-CM$byClass[["Specificity"]])), round(newcnt*(CM$byClass[["Sensitivity"]]))
+      ),
+    mailercst = est_targets * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * est_targets, 0),
+    revenue = ifelse(Choice == 1, 31.95 * est_targets, 0),
+    profit = revenue - purchcst - mailercst
+    )
+}
+```
+
+```{r}
+summary_table_log <- summ_tab_fun(combined, 50000, log_CM_unbal)
+summary_table_log
+```
+
+```{r}
+summary_table_lda <- summ_tab_fun(combined, 50000, lda_CM_imbal)
+summary_table_lda
 ```
 
 ```{r}
@@ -249,8 +381,16 @@ naive_table
 ```
 
 ```{r}
-sum(naive_table$profit)
+data.frame(Model = c('Naive', 'LDA', 'Logit', 'SVM'), 
+  Profit = c(
+    sum(naive_table$profit),
+    sum(summary_table_lda$profit),
+    sum(summary_table_log$profit),
+    sum(summary_table_svm$profit)
+    )
+  )
 ```
+
 A little confusing, but this is what I did here:
 1. Of the 50,000 people in the audience, estimate the proportion that we anticipate to purchase the book, by using the proportion of people that actually did buy the book across the test and train datasets. The estimate becomes the "newcnt" column
 2. Of those that we estimate would or would not buy the book, estimate the number that our model would predict to buy the book. Note there will be people in both the group that buy the book and those that don't that we will predict to buy it. We estimate by taking thoseThis is column est_targets
@@ -263,28 +403,47 @@ A little confusing, but this is what I did here:
 
 The results are not quite as favorable as we would like. Ideally, we would see that utilizing our model would give us a better ability to target the consumers who would buy the book, therefore saving on mailer, purchase, and overhead costs without sacrificing too much in lost revenue. Because of this we either need to increase revenue (improve sensitivity) or decrease mailer cost (improve specificity). Other models may do this, like logistic regression or LDA, or perhaps simple solutions like variable selection, tuning? Or what if we un-balance it? Like over-sample on those that purchase the book, then Sensitivity could improve at a hopefully less significant cost to Specificity.
 
+Post Logit and LDA:
+Adding in the logit and lda models, they both perform better than SVM, but still not as good as the Naive model. However, toying with the threshold for the logit model allows us to increase our specificity, thereby increasing the amount of revenue and profit from those who buy the book. This comes at the expense of specificity, however this only means we send the mailer out to more people. Utilizing the model in this manner, we can find bout half of the total population to send the mailer out to, which in turn captures a greater proportion of customers who would buy the book, enough to earn a greater profit than our naive model does.
 
-## In class questions
+After toying with Threshold:
+Adjusting the threshold improves the performance of the logistic model significantly. Note that, per our instructors suggestion, I switched back to the unbalance logistic model prior to doing so. I brought the threshold down to .2 by guessing, but it would help to find the optimal. To do that, i'm going to iterate through different threshold values and see what gives the best profit.
 
-Questions for Dr. Roy (already asked in class)
-Clarity on word problem, 45%? 
-15 + 45% of $15, cost to send out mailer to everyone vs cost to send out to those we predict would purchase. Consider False Positives
+```{r}
+thresh <- data.frame(threshold = -0.01, profit = 0)
+for (i in seq(0, 1, by = 0.01)) {
+  preds <- ifelse(predprob_log >= i, 1, 0)
+  CM_for <- caret::confusionMatrix(as.factor(preds), as.factor(test1$Choice), positive = '1')
+  summ_for <- summ_tab_fun(combined, 50000, CM_for)
+  thresh = rbind(thresh, data.frame(threshold = i, profit = sum(summ_for$profit)))
+}
 
-Subtract 1 from P_Art since Art history book would be included?
-doesn't work, see contingency table
+thresh <- thresh %>% filter(threshold >= 0)
+thresh
+```
 
-Append Data frames for visualizations?
-Yes, done
+```{r}
+thresh %>% ggplot(aes(x = threshold, y = profit)) +
+  geom_line() +
+  geom_point() +
+  annotate('text', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit + 1800, label = paste0('Max Profit: $', thresh[which(thresh$profit == max(thresh$profit)),]$profit), size = 3) +
+  annotate('point', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit, color = 'green', shape = 'diamond', size = 3) +
+  theme_minimal() +
+  ggtitle('Book Sales Profit Changes by Model Probability Threshold') +
+  xlab('Logistic Model Probability Threshold') +
+  ylab('Profit from Book Sales')
 
-Do we need to balance SVM dataset?
-Yes, SVM is very sensitive to unbalanced data
+  
+thresh[which(thresh$profit == max(thresh$profit)),]
+```
+```{r}
+predslog_best <- ifelse(predprob_log >= thresh[which(thresh$profit == max(thresh$profit)),]$threshold, 1, 0)
+  CMlog_best <- caret::confusionMatrix(as.factor(predslog_best), as.factor(test1$Choice), positive = '1')
+CMlog_best
+```
 
+```{r}
+dim(raw_train)
+dim(raw_test)
+```
 
-SESSION 2 Questions
-
-1. Kernel? 
-  We are welcome to try linear kernel, but he won't take off points if we don't. Default is RBF.
-2. How do we apply to the 50,000 people that we don't have data for? 
-  Decide how many will buy. Of those, how many will we predict so that we can send mailers. Of those who won't buy, how many will we incorrectly predict to buy and therefore send mailers?
-3. Why **is** linear regression wrong? Isn't applying linreg the same as LDA? 
-  I was just wrong about LDA, it is not just linear regression applied to a categorical. Therefore it is simple answer, linear regression does not classify, predicts numeric/ continuous.
