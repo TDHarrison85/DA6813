@@ -442,8 +442,4 @@ predslog_best <- ifelse(predprob_log >= thresh[which(thresh$profit == max(thresh
 CMlog_best
 ```
 
-```{r}
-dim(raw_train)
-dim(raw_test)
-```
 
