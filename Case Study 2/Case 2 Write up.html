@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.4.554">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -22,40 +22,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -69,9 +35,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="Case 2 Write up_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Case 2 Write up_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="Case 2 Write up_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-
 <link href="Case 2 Write up_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+
 <script src="Case 2 Write up_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
+
 
 
 </head>
@@ -126,24 +93,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
 
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(MASS, tidyverse, e1071, here, readxl, skimr, corrplot, patchwork)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>raw_train <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="fu">here</span>(<span class="st">'Case Study 2'</span>, <span class="st">'BBBC-Train.xlsx'</span>))</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>raw_test <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="fu">here</span>(<span class="st">'Case Study 2'</span>, <span class="st">'BBBC-Test.xlsx'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+
 <section id="executive-summary" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Executive Summary</h1>
 <!-- 
 Purpose: Provide a concise overview of the key findings and results of the analysis.
 Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
 -->
-<p>Content for Executive Summary goes here.</p>
+<p>This study aimed to develop a predictive model for the Bookbinders Book Club (BBBC) to determine which customers were likely to purchase The Art History of Florence following a direct mail campaign. The analysis was conducted on a dataset containing customer demographics, purchasing behavior, and preferences for different book genres. The key variables considered included gender, amount spent on BBBC books, frequency of purchases, and the number of specific genres purchased (e.g., children’s books, cookbooks, art books).</p>
+<p>Four different modeling techniques were evaluated: Linear Regression, LDA, Logit, and support vector machines (SVM). Given that the dependent variable was binary (purchase or no purchase), linear regression was found to be unsuitable as it attempts to predict a continuous outcome rather than a classification, leading to misleading results. Logistic regression and SVM were thus compared for their predictive performance on the unbalanced and balanced datasets.</p>
+<p>Initial logistic regression results on the unbalanced data showed moderate accuracy (65.61%) and balanced accuracy (71.84%) but low sensitivity (17.78%). However, balancing the dataset improved sensitivity and overall predictive performance. Similarly, the SVM model initially underperformed due to the unbalanced nature of the data but saw significant improvement after balancing, with a final accuracy of 73.77%, sensitivity of 65.69%, and specificity of 81.86%.</p>
+<p>The logit model, while having a lower overall accuracy (65.61%) compared to the LDA model (88.91%), shows a much higher sensitivity in detecting the minority class (79.41% vs.&nbsp;37.75% for LDA). However, the LDA model excels in specificity (93.89% vs.&nbsp;64.27% for logit) and achieves a higher Kappa value, indicating better agreement overall. Despite this, the logit model has a higher balanced accuracy (71.84% vs.&nbsp;65.82%), suggesting a better trade-off between detecting both classes. Ultimately, the logit model is more effective at identifying the minority class, while the LDA model performs better for the majority class and overall accuracy.</p>
+<p>A key insight was that improving sensitivity, even at the cost of specificity, was critical for maximizing revenue. By lowering the decision threshold in the logistic regression model, the sensitivity increased, resulting in a higher proportion of correctly identified purchasers. Despite the reduction in specificity, the model captured a larger number of likely buyers, ultimately leading to greater profit potential compared to a naïve approach.Capturing more buyers is crucial because the low cost of sending mailers is far outweighed by the potential revenue from correctly identifying additional purchasers. Increasing sensitivity ensures that more potential buyers receive offers, boosting the chances of converting them into sales. Even with some false positives, the higher number of actual buyers leads to greater overall profit compared to a more conservative approach that risks missing out on revenue opportunities.</p>
+<p>The profitability analysis showed that while the logistic regression and SVM models performed better than random guessing, there is still room for improvement. Adjusting model parameters such as the decision threshold and considering alternative models, like LDA, could further enhance profitability by improving the balance between targeting the right customers and controlling campaign costs.</p>
+<p>The logistic regression model with an optimized threshold provided a solid proof of concept by delivering the best balance of revenue and costs, demonstrating its potential for profitability.</p>
 </section>
 <section id="problem-statement" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Problem Statement</h1>
@@ -151,7 +117,9 @@ Instructions: Summarize the performance of the models (e.g., random forest, deci
 Purpose: Explain the problem that the study aims to solve.
 Instructions: Clearly define the task at hand, which in this case is predicting customer acquisition. Outline the objectives and what solving this problem would mean for the company.
 -->
-<p>Content for Problem Statement goes here.</p>
+<p>The task of this case study is to develop a predictive model to classify whether customers of the Bookbinders Book Club (BBBC) will purchase The Art History of Florence following a direct mail marketing campaign. The campaign involved sending a specially produced brochure to selected customers in Pennsylvania, New York, and Ohio, aiming to assess the likelihood of each customer making a purchase (‘yes’) or not (‘no’).</p>
+<p>The goal is to accurately (or rather accurate enough to maximize profit) predict their likelihood of purchasing ‘The Art History of Florence’ based on various input variables, including demographic factors (such as gender) and past purchasing behaviors, including the total amount spent on BBBC books, the frequency of past purchases, and preferences for different book genres (such as children’s books, cookbooks, do-it-yourself, and art books). These factors are believed to significantly influence the decision to purchase the featured book.</p>
+<p>The primary objective is to build a classification model that can accurately predict customer purchases, enabling BBBC to target its marketing efforts more effectively. By identifying the most likely purchasers, BBBC can optimize resource allocation, reduce unnecessary mailer costs, and improve the overall conversion rate of its marketing campaigns.</p>
 </section>
 <section id="additional-sources" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Additional Sources</h1>
@@ -159,7 +127,8 @@ Instructions: Clearly define the task at hand, which in this case is predicting 
 Purpose: Reference relevant literature or sources to support the analysis.
 Instructions: Provide citations and key insights from sources relevant to the case study or the models used.
 -->
-<p>Content for Additional Sources goes here.</p>
+<p>Aldelemy, A., &amp; Abd-Alhameed, R. A. (2023). Binary classification of customer’s online purchasing behavior using machine learning. Journal of Techniques, 5(2), 163–186. https://doi.org/10.51173/jt.v5i2.1226</p>
+<p>This reference highlights the strong performance of logistic regression compared to other models, which supports our conclusion where logistic regression ultimately outperformed other methods</p>
 </section>
 <section id="methodology" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Methodology</h1>
@@ -167,7 +136,12 @@ Instructions: Provide citations and key insights from sources relevant to the ca
 Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
-<p>Content for Methodology goes here.</p>
+<p>The analysis began with data preparation, where the dataset of 12 variables, both categorical and numeric, was cleaned and transformed. The categorical variable Gender was converted to a binary factor, and the target variable, Choice, which indicated whether a customer purchased The Art History of Florence, was transformed into a binary indicator (1 for purchase, 0 for no purchase). Variables representing different genres of books purchased, such as P_Child, P_Youth, P_Cook, P_DIY, and P_Art, were retained as numeric variables reflecting the number of books purchased in each category.</p>
+<p>Exploratory data analysis (EDA) was conducted to examine the distribution and relationships within the data. Histograms and box plots were generated to visualize the distribution of numeric variables such as Amount_purchased, Frequency, and Last_purchase based on the outcome variable Choice. Bar plots were used to explore the frequency of categorical variables like Gender. A correlation matrix was constructed to identify relationships among numeric variables and to detect potential multicollinearity issues.</p>
+<p>The dataset initially provided was two pre-split sets: one for training and one for testing. However, these datasets were later combined for exploratory data analysis (EDA), correlation analysis, and visualization. The training set contained 80% of the data, and the test set comprised 20%. The combination allowed for comprehensive analysis while ensuring that model evaluation was still conducted on unseen data.</p>
+<p>Several modeling techniques were explored, including logistic regression, linear discriminant analysis (LDA), and support vector machines (SVM). Logistic regression was selected as the primary technique due to its suitability for binary classification and its flexibility in optimizing sensitivity and specificity. A stepwise backward selection method, based on the Akaike Information Criterion (AIC), was used to remove insignificant variables and select the most relevant predictors. To address potential multicollinearity, variables with high variance inflation factor (VIF) values were removed.</p>
+<p>Model performance was evaluated using accuracy, sensitivity, and specificity, with results summarized in a confusion matrix. To further address class imbalance in the test set, the decision threshold for classifying customers was adjusted to optimize model performance. By iterating over different threshold values, an optimal cutoff was determined that balanced sensitivity and specificity, enhancing the model’s ability to predict both purchasers and non-purchasers effectively.</p>
+<p>Finally, a profitability analysis was conducted to evaluate the financial impact of the model. The cost of sending mailers and the revenue from book purchases were calculated to determine the overall profit for each modeling approach.</p>
 </section>
 <section id="data" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Data</h1>
@@ -175,7 +149,300 @@ Instructions: Detail the models used and the reasoning behind them. Include spec
 Purpose: Explain the data used in the analysis and any preprocessing steps.
 Instructions: Provide an overview of the dataset, variables, and any cleaning steps or transformations made. Mention variables used or excluded and why.
 -->
-<p>Content for Data goes here.</p>
+<p>The dataset used for this analysis contains a total of 12 variables across both training and testing sets. These variables represent customer demographics, purchasing behavior, and preferences for various book genres at the Bookbinders Book Club (BBBC). The key target variable is Choice, which indicates whether a customer purchased The Art History of Florence. The data consists of both categorical and numeric variables.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">combined</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">3900</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">factor</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: factor</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 11%">
+<col style="width: 12%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: left;">ordered</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: left;">top_counts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Choice</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0: 3296, 1: 604</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gender</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">1: 2633, 0: 1267</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 12%">
+<col style="width: 17%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Amount_purchased</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">197.59</td>
+<td style="text-align: right;">95.78</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">122</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">270</td>
+<td style="text-align: right;">474</td>
+<td style="text-align: left;">▅▇▇▃▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Frequency</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">12.90</td>
+<td style="text-align: right;">8.09</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: left;">▇▇▅▁▂</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Last_purchase</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3.12</td>
+<td style="text-align: right;">2.94</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">First_purchase</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">22.74</td>
+<td style="text-align: right;">15.90</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: left;">▇▃▂▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P_Child</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.73</td>
+<td style="text-align: right;">1.03</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P_Youth</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;">0.63</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P_Cook</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.78</td>
+<td style="text-align: right;">1.05</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P_DIY</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.40</td>
+<td style="text-align: right;">0.70</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">▇▃▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P_Art</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>A check for missing values was performed (anyNA()), and no missing data was detected, so no further imputation or cleaning steps were necessary in that regard.</p>
+<p>The variable Observation was removed not due to multicollinearity but because it served as a unique identifier for each record and did not provide any predictive value for the analysis.We then converted categorical variables (Choice and Gender) into factors, and combined the training and testing datasets for further analysis or visualization.</p>
+<p>During our exploratory data analysis (EDA), various visualizations were used to examine the distributions and relationships within the dataset. A correlation plot was created to assess the relationships among numeric variables such as Amount_purchased, Frequency, Last_purchase, First_purchase, and the number of different types of books purchased (e.g., P_Child, P_Youth, P_Cook, P_DIY, P_Art). This helped to identify any strong correlations or multicollinearity between the numeric features.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-2-Write-up_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-2-Write-up_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-2-Write-up_files/figure-html/unnamed-chunk-34-2.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Bar plots were used to explore the distribution of categorical variables such as Gender and Choice (purchase or non-purchase). For example, a bar plot was generated to visualize the relationship between gender and purchase behavior, displaying the frequency of purchases and non-purchases among males and females. These visualizations provided insights into the key factors that might influence the likelihood of a customer purchasing a book.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-2-Write-up_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-2-Write-up_files/figure-html/unnamed-chunk-35-2.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-2-Write-up_files/figure-html/unnamed-chunk-35-3.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-2-Write-up_files/figure-html/unnamed-chunk-35-4.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="findings" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Findings</h1>
@@ -183,7 +450,137 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
-<p>Content for Findings goes here.</p>
+<p>Upon initial assesment of our SVM on balanced data, the sensitivity of the model was relatively low, but this wasn’t a significant issue given our objective. The model predicted that 160 out of 408 observations would likely purchase the book. To ensure the integrity of our model and data, we applied appropriate transformations and balanced the responses in both the training and test sets. However, since we have no knowledge of the distribution of responses in the actual mailing list audience, we cannot assume that it will be balanced. Therefore, it was important to validate our model’s performance on an unbalanced dataset to ensure it remained effective in real-world scenarios, where the distribution of purchasers and non-purchasers may differ.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 2060  171
+         1   36   33
+                                          
+               Accuracy : 0.91            
+                 95% CI : (0.8976, 0.9214)
+    No Information Rate : 0.9113          
+    P-Value [Acc &gt; NIR] : 0.6049          
+                                          
+                  Kappa : 0.2062          
+                                          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.16176         
+            Specificity : 0.98282         
+         Pos Pred Value : 0.47826         
+         Neg Pred Value : 0.92335         
+             Prevalence : 0.08870         
+         Detection Rate : 0.01435         
+   Detection Prevalence : 0.03000         
+      Balanced Accuracy : 0.57229         
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>After applying the SVM model to the original unbalanced test dataset, the sensitivity and specificity metrics remained consistent with those observed in the balanced dataset. This outcome is logical because the distribution between positive (purchasers) and negative (non-purchasers) cases only affects the overall prevalence, not the fundamental calculations of sensitivity and specificity. Each metric remained robust regardless of changes in class distribution because they were calculated independently within each class. As a result, we could apply these performance metrics to a hypothetical, unbalanced dataset of random customers.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1660   70
+         1  436  134
+                                          
+               Accuracy : 0.78            
+                 95% CI : (0.7625, 0.7968)
+    No Information Rate : 0.9113          
+    P-Value [Acc &gt; NIR] : 1               
+                                          
+                  Kappa : 0.248           
+                                          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.65686         
+            Specificity : 0.79198         
+         Pos Pred Value : 0.23509         
+         Neg Pred Value : 0.95954         
+             Prevalence : 0.08870         
+         Detection Rate : 0.05826         
+   Detection Prevalence : 0.24783         
+      Balanced Accuracy : 0.72442         
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>However, our overall analysis revealed that the logistic regression outperformed the other models in terms of overall prediction accuracy, particularly after the decision threshold was optimized. By adjusting the threshold, the model’s sensitivity significantly improved, allowing it to correctly identify a larger number of customers who were likely to purchase the featured book. While the support vector machine (SVM) model initially demonstrated poor sensitivity due to the unbalanced nature of the dataset, its performance improved once the data was balanced. The SVM model showed strong specificity, meaning it effectively reduced false positives, but this came at the cost of lower sensitivity. Linear discriminant analysis (LDA) performed similarly to logistic regression but did not achieve the same level of sensitivity as the threshold-optimized logistic model.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction    0    1
+         0 1347   42
+         1  749  162
+                                          
+               Accuracy : 0.6561          
+                 95% CI : (0.6363, 0.6755)
+    No Information Rate : 0.9113          
+    P-Value [Acc &gt; NIR] : 1               
+                                          
+                  Kappa : 0.1703          
+                                          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.79412         
+            Specificity : 0.64265         
+         Pos Pred Value : 0.17783         
+         Neg Pred Value : 0.96976         
+             Prevalence : 0.08870         
+         Detection Rate : 0.07043         
+   Detection Prevalence : 0.39609         
+      Balanced Accuracy : 0.71839         
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>How we gathered these findings were by first using data from the training and test sets, the proportion of people who are expected to purchase the book out of the 50,000 people in the mailing audience is calculated then storing this estimate in a column called ‘newcnt’. We then used the model to estimate how many of the individuals in both the purchasing and non-purchasing groups would be predicted to buy the book called ‘est_targets’.</p>
+<p>The cost of sending mailers was calculated by multiplying the number of predicted buyers (“est_targets”) by $0.65 (the cost of each mailer) and called ‘mailercst’.</p>
+<p>For those who are predicted to buy the book, the total cost of the books and overhead (calculated as $15 x 1.45) was estimated. These costs are only applied to those predicted to purchase the book (“newcnt” where Choice == 1), “purchcst” variable. The total revenue from book sales is calculated by multiplying the number of predicted buyers by $31.95 (the price of the book). ‘Revenue’ is only generated when Choice == 1, and ‘Profit’ is calculated by subtracting both the mailer and book purchase costs from the total revenue.</p>
+<p>We see by summing up the values in the “profit” we get a total expected profit from the mailer campaign. We see the comparison results here:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Model"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Profit"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Naive","2":"46488.80"},{"1":"LDA","2":"44004.35"},{"1":"Logit","2":"48917.50"},{"1":"SVM","2":"42867.35"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>One of the primary challenges in the dataset was the inherent class imbalance, with significantly more non-purchasers than purchasers. To address this, the dataset was balanced by oversampling the minority class (purchasers), which improved the performance of both logistic regression and SVM models, particularly in terms of sensitivity. Even when tested on the original unbalanced dataset, the sensitivity and specificity metrics for both models remained consistent, indicating that the models were robust against changes in class distribution.</p>
+<p>The analysis also highlighted a trade-off between sensitivity and specificity. Improving sensitivity was crucial for identifying a greater proportion of potential purchasers, which is the primary goal of the direct mail campaign. However, this improvement came at the cost of specificity, meaning that some mailers would be sent to non-purchasers, resulting in false positives. Despite this, the increased sensitivity was considered an acceptable trade-off, as the cost of sending mailers to non-purchasers is relatively low compared to the revenue generated from correctly identified purchasers.</p>
+<p>Finally, the profitability analysis showed that the logistic regression model with an optimized threshold provided the best balance between sensitivity and specificity, leading to the highest potential profit for the campaign. The SVM model, while strong in terms of specificity, identified fewer purchasers overall, limiting its potential revenue generation. This analysis demonstrated that balancing the dataset and fine-tuning the decision threshold were critical steps in maximizing the effectiveness and profitability of the direct mail campaign.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-2-Write-up_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["threshold"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["profit"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.11","2":"50860.55","_rn_":"12"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>In a similar study on “Binary Classification of Customer’s Online Purchasing Behavior Using Machine Learning”, the strength of logistic regression compared to other models was also found: “A comparative study of ten classifiers is presented in [18]. Their accuracy indicator, i.e., the area under the curve (AUC), highlighted logistic regression as the best classifier. Naive Bayes, neural network, and support vector machine classifiers followed as runners-up, while decision tree-based classifiers tended to underperform.”</p>
 </section>
 <section id="conclusion" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Conclusion</h1>
@@ -191,7 +588,8 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 Purpose: Summarize the key takeaways and provide actionable recommendations.
 Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
 -->
-<p>Content for Conclusion goes here.</p>
+<p>In conclusion, the logistic regression model ultimately performed the best in predicting customer purchases for the mailer campaign.</p>
+<p>By iterating through different decision thresholds, we identified the optimal threshold that maximized profit, adjusting the threshold down to 0.2 for the logistic model. While the naive method yielded higher revenue by reaching all potential buyers, using a predictive model like logistic regression or LDA with an optimized threshold helped balance mailer costs and capture more actual purchasers. This approach resulted in higher overall profitability by efficiently targeting customers most likely to buy the book, demonstrating that a carefully tuned predictive model provides a more cost-effective solution than the naive approach.</p>
 </section>
 <section id="appendix" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Appendix</h1>
@@ -199,7 +597,394 @@ Instructions: Conclude with the most important findings and offer suggestions fo
 Purpose: Include supplementary material or detailed technical results.
 Instructions: Provide code snippets, detailed model output, and data summaries.
 -->
-<p>Content for Appendix goes here.</p>
+<pre><code>
+pacman::p_load(MASS, tidyverse, e1071, here, readxl, skimr, corrplot, patchwork)
+
+raw_train &lt;- read_xlsx(here('Case Study 2', 'BBBC-Train.xlsx'))
+raw_test &lt;- read_xlsx(here('Case Study 2', 'BBBC-Test.xlsx'))
+
+
+
+str(raw_train)
+
+
+anyNA(raw_train)
+
+
+
+skim(raw_train)
+
+
+
+train1 &lt;- raw_train %&gt;% 
+  select(-Observation) %&gt;% 
+  mutate(
+    Choice = as.factor(Choice),
+    Gender = as.factor(Gender)
+    )
+test1 &lt;- raw_test %&gt;% 
+  select(-Observation) %&gt;%
+  mutate(
+    Choice = as.factor(Choice),
+    Gender = as.factor(Gender)
+    )
+
+combined &lt;- rbind(train1, test1)
+
+
+combined %&gt;% select_if(is.numeric) %&gt;% cor() %&gt;% corrplot(method = 'number')
+
+
+combined %&gt;% mutate(
+  Gender = ifelse(Gender == 0, 'Female', 'Male'),
+  Choice = ifelse(Choice == 0, 'Non-purchase', 'purchase')
+  ) %&gt;% 
+  ggplot(aes(x = Gender, fill = Choice)) +
+  geom_bar() + ggtitle('Gender vs Purchase')
+
+
+
+combox &lt;- lapply(colnames(select_if(combined, is.numeric)),
+       function(col) {
+        ggplot(combined,
+                aes(y = .data[[col]], x = .data$Choice)) + geom_boxplot() + ggtitle(col)
+       }
+)
+
+combox[[1]] + combox[[2]]
+combox[[3]] + combox[[4]]
+
+
+Boxplots are a bad visual for the variables starting with "P_". Contingency table below helps, but maybe grouped bar charts for those too? I have those below, let me know what yall think.
+
+
+combbar &lt;- lapply(colnames(select_if(combined, startsWith(names(combined), 'P_'))),
+       function(col) {
+        ggplot(combined,
+                aes(x = .data[[col]], fill = .data$Choice)) + geom_bar(position = 'dodge') + 
+           ggtitle(col) + 
+           theme(legend.position = c(0.8,0.8), legend.background = element_blank())
+       }
+)
+
+combbar[[1]] + combbar[[2]]
+combbar[[3]] + combbar[[4]]
+combbar[[5]]
+
+
+
+combined %&gt;% group_by(Choice, P_Art) %&gt;% 
+  summarize(cnt = n()) %&gt;% pivot_wider(id_cols = P_Art, names_from = Choice, values_from = cnt)
+
+
+### Linear Regression
+
+
+#Creating data frames that don't make Choice a factor only to run Linear Regression. This is done to show it isn't the appropriate model.
+linregtrain1 &lt;- raw_train %&gt;% 
+  select(-Observation) %&gt;% 
+  mutate(
+    Gender = as.factor(Gender)
+    )
+linregtest1 &lt;- raw_test %&gt;% 
+  select(-Observation) %&gt;%
+  mutate(
+    Gender = as.factor(Gender)
+    )
+
+#combined &lt;- rbind(linregtrain1, linregtest1)
+resultsLinReg &lt;- lm(Choice ~ ., data = linregtrain1)
+summary(resultsLinReg)
+
+
+
+predict(resultsLinReg, linregtest1, type = 'response') %&gt;% summary()
+predict(resultsLinReg, linregtest1, type = 'response') %&gt;% head()
+
+
+
+### Logistic Regression
+
+
+set.seed(321)
+logfit &lt;- step(glm(Choice ~ ., 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+
+summary(logfit)
+
+
+car::vif(logfit)
+
+
+
+set.seed(321)
+logfit2 &lt;- step(glm(Choice ~ . -Last_purchase, 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+
+
+
+car::vif(logfit2)
+
+
+set.seed(321)
+logfit3 &lt;- step(glm(Choice ~ . -Last_purchase -First_purchase, 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+
+
+
+car::vif(logfit3)
+
+
+
+predprob_log &lt;- predict(logfit3, newdata = test1, type = "response")
+pr_class_log &lt;- ifelse(predprob_log &gt; 0.2, 1, 0)
+
+log_CM_unbal &lt;- caret::confusionMatrix(as.factor(pr_class_log), as.factor(test1$Choice), positive = '1')
+log_CM_unbal
+
+
+### Linear Discriminant Analysis (LDA)
+
+set.seed(321)
+ldafit &lt;- lda(Choice ~ ., data = train1)
+
+ldafit
+
+
+
+pr_class_lda &lt;- predict(ldafit, test1)
+
+lda_CM_unbal &lt;- caret::confusionMatrix(as.factor(pr_class_lda$class), as.factor(test1$Choice), positive = "1")
+lda_CM_unbal
+
+
+### Support Vector Machines (SVM)
+
+
+
+set.seed(321)
+form1 &lt;- Choice ~ .
+
+# TAKES A LONG TIME TO RUN!
+svmtune &lt;- tune.svm(form1, data = train1, gamma = seq(.01,.1, by = .01), cost = seq(.1, 1, by = .1))
+
+
+best_params &lt;- svmtune$best.parameters
+print(best_params)
+#best parameters: gamma 0.02, cost 0.5
+
+
+
+svmtune$performances
+
+
+svmfit &lt;- svm(formula = form1, data = train1, gamma = best_params$gamma, cost = best_params$cost)
+summary(svmfit)
+
+
+
+svmpredict &lt;- predict(svmfit, test1, type = 'response')
+caret::confusionMatrix(svmpredict, test1$Choice, positive = '1')
+
+
+### Balancing Dataset
+
+
+set.seed(321)
+trn_art = train1 %&gt;% filter(Choice == '1')
+trn_no_art = train1 %&gt;% filter(Choice == '0')
+
+tst_art = test1 %&gt;% filter(Choice == '1')
+tst_no_art = test1 %&gt;% filter(Choice == '0')
+
+sample_no_art_trn = sample_n(trn_no_art, nrow(trn_art))
+train_bal = rbind(sample_no_art_trn,trn_art)
+
+sample_no_art_tst = sample_n(tst_no_art, nrow(tst_art))
+test_bal = rbind(sample_no_art_tst,tst_art)
+
+
+### Logistic Regression (Balanced)
+
+
+set.seed(321)
+logfit_bal &lt;- step(glm(Choice ~ ., 
+                   data = train_bal, family = binomial), 
+               direction = "both", trace = 0)
+
+
+summary(logfit_bal)
+
+
+
+predprob_log_bal &lt;- predict(logfit_bal, newdata = test_bal, type = "response")
+pr_class_log_bal &lt;- ifelse(predprob_log_bal &gt; 0.5, 1, 0)
+
+log_CM_unbal_bal &lt;- caret::confusionMatrix(as.factor(pr_class_log_bal), as.factor(test_bal$Choice), positive = '1')
+log_CM_unbal_bal
+
+
+
+predprob_log_imbal &lt;- predict(logfit_bal, newdata = test1, type = "response")
+pr_class_log_imbal &lt;- ifelse(predprob_log_imbal &gt; 0.22, 1, 0)
+
+log_CM_imbal &lt;- caret::confusionMatrix(as.factor(pr_class_log_imbal), as.factor(test1$Choice), positive = '1')
+log_CM_imbal
+
+
+
+### Linear Discriminant Analysis (LDA) (Balanced)
+
+
+set.seed(321)
+ldafit_bal &lt;- lda(Choice ~ ., data = train_bal)
+
+ldafit_bal
+
+
+
+pr_class_lda_bal &lt;- predict(ldafit_bal, test_bal)
+
+lda_CM_unbal_bal &lt;- caret::confusionMatrix(as.factor(pr_class_lda_bal$class), as.factor(test_bal$Choice), positive = "1")
+lda_CM_unbal_bal
+
+
+
+pr_class_lda_imbal &lt;- predict(ldafit_bal, test1)
+
+lda_CM_imbal &lt;- caret::confusionMatrix(as.factor(pr_class_lda_imbal$class), as.factor(test1$Choice), positive = "1")
+lda_CM_imbal
+
+
+
+### Support Vector Machines (SVM) (Balanced)
+
+
+set.seed(321)
+svmtune_bal &lt;- tune.svm(form1, data = train_bal, gamma = seq(.005,.1, by = .005), cost = seq(.1, 1.5, by = .05))
+
+
+
+best_params_bal &lt;- svmtune_bal$best.parameters
+print(best_params_bal)
+#best parameters: gamma 0.01, cost 1 
+
+
+
+svmfit_bal &lt;- svm(formula = form1, data = train_bal, gamma = best_params_bal$gamma, cost = best_params_bal$cost)
+summary(svmfit_bal)
+
+
+svmpredict_bal &lt;- predict(svmfit_bal, test_bal, type = 'response')
+caret::confusionMatrix(svmpredict_bal, test_bal$Choice, positive = '1')
+
+
+
+svmpredict_imbal &lt;- predict(svmfit_bal, test1, type = 'response')
+SVM_CM_imbal &lt;- caret::confusionMatrix(svmpredict_imbal, test1$Choice, positive = '1')
+SVM_CM_imbal
+#caret::confusionMatrix(svmpredict_imbal, test1$Choice, positive = '1')
+
+
+summary_table_svm &lt;- combined %&gt;% group_by(Choice) %&gt;% 
+  summarize(percent = n()/nrow(combined),
+            newcnt = round(percent * 50000)) %&gt;% as.data.frame() %&gt;% 
+  mutate(
+    est_targets = ifelse(
+      Choice == 0, round(newcnt*(1-SVM_CM_imbal$byClass[["Specificity"]])), round(newcnt*(SVM_CM_imbal$byClass[["Sensitivity"]]))
+      ),
+    mailercst = est_targets * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * est_targets, 0),
+    revenue = ifelse(Choice == 1, 31.95 * est_targets, 0),
+    profit = revenue - purchcst - mailercst
+    )
+summary_table_svm
+
+
+
+sum(summary_table_svm$profit)
+
+
+summ_tab_fun &lt;- function(base_data, hcount, CM) {
+  base_data %&gt;% group_by(Choice) %&gt;% 
+  summarize(percent = n()/nrow(base_data),
+            newcnt = round(percent * hcount)) %&gt;% as.data.frame() %&gt;% 
+  mutate(
+    est_targets = ifelse(
+      Choice == 0, round(newcnt*(1-CM$byClass[["Specificity"]])), round(newcnt*(CM$byClass[["Sensitivity"]]))
+      ),
+    mailercst = est_targets * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * est_targets, 0),
+    revenue = ifelse(Choice == 1, 31.95 * est_targets, 0),
+    profit = revenue - purchcst - mailercst
+    )
+}
+
+
+summary_table_log &lt;- summ_tab_fun(combined, 50000, log_CM_unbal)
+summary_table_log
+
+
+summary_table_lda &lt;- summ_tab_fun(combined, 50000, lda_CM_imbal)
+summary_table_lda
+
+
+naive_table &lt;- combined %&gt;% group_by(Choice) %&gt;% 
+  summarize(percent = n()/nrow(combined),
+            newcnt = round(percent * 50000)) %&gt;% as.data.frame() %&gt;% 
+  mutate(
+    mailercst = newcnt * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * newcnt, 0),
+    revenue = ifelse(Choice == 1, 31.95 * newcnt, 0),
+    profit = revenue - purchcst - mailercst
+    )
+naive_table
+
+
+data.frame(Model = c('Naive', 'LDA', 'Logit', 'SVM'), 
+  Profit = c(
+    sum(naive_table$profit),
+    sum(summary_table_lda$profit),
+    sum(summary_table_log$profit),
+    sum(summary_table_svm$profit)
+    )
+  )
+
+.
+
+
+thresh &lt;- data.frame(threshold = -0.01, profit = 0)
+for (i in seq(0, 1, by = 0.01)) {
+  preds &lt;- ifelse(predprob_log &gt;= i, 1, 0)
+  CM_for &lt;- caret::confusionMatrix(as.factor(preds), as.factor(test1$Choice), positive = '1')
+  summ_for &lt;- summ_tab_fun(combined, 50000, CM_for)
+  thresh = rbind(thresh, data.frame(threshold = i, profit = sum(summ_for$profit)))
+}
+
+thresh &lt;- thresh %&gt;% filter(threshold &gt;= 0)
+thresh
+
+thresh %&gt;% ggplot(aes(x = threshold, y = profit)) +
+  geom_line() +
+  geom_point() +
+  annotate('text', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit + 1800, label = paste0('Max Profit: $', thresh[which(thresh$profit == max(thresh$profit)),]$profit), size = 3) +
+  annotate('point', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit, color = 'green', shape = 'diamond', size = 3) +
+  theme_minimal() +
+  ggtitle('Book Sales Profit Changes by Model Probability Threshold') +
+  xlab('Logistic Model Probability Threshold') +
+  ylab('Profit from Book Sales')
+
+  
+thresh[which(thresh$profit == max(thresh$profit)),]
+
+
+
+predslog_best &lt;- ifelse(predprob_log &gt;= thresh[which(thresh$profit == max(thresh$profit)),]$threshold, 1, 0)
+  CMlog_best &lt;- caret::confusionMatrix(as.factor(predslog_best), as.factor(test1$Choice), positive = '1')
+CMlog_best</code></pre>
 </section>
 
 </main>
@@ -283,10 +1068,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -296,8 +1098,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -309,7 +1120,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -353,6 +1287,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -378,6 +1313,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -438,6 +1399,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 

@@ -17,31 +17,253 @@ format:
     reference-location: section # Valid value for citation references
 ---
 
-```{r}
+```{r, echo=FALSE}
 pacman::p_load(MASS, tidyverse, e1071, here, readxl, skimr, corrplot, patchwork)
 
-df_train1 <- read_xlsx(here('Case Study 2', 'BBBC-Train.xlsx'))
-df_test1 <- read_xlsx(here('Case Study 2', 'BBBC-Test.xlsx'))
+raw_train <- read_xlsx(here('Case Study 2', 'BBBC-Train.xlsx'))
+raw_test <- read_xlsx(here('Case Study 2', 'BBBC-Test.xlsx'))
 ```
 
-```{r}
-df_train1 <- df_train1 %>%
+```{r, echo=FALSE}
+train1 <- raw_train %>%
   select(-Observation) %>%
   mutate(
     Choice = as.factor(Choice),
     Gender = as.factor(Gender)
   )
 
-df_test1 <- df_test1 %>%
+test1 <- raw_test %>%
   select(-Observation) %>%
   mutate(
     Choice = as.factor(Choice),
     Gender = as.factor(Gender)
   )
 
-df_combined <- rbind(df_train1, df_test1)
+combined <- rbind(train1, test1)
 ```
 
+```{r, echo=FALSE}
+combox <- lapply(colnames(select_if(combined, is.numeric)),
+       function(col) {
+        ggplot(combined,
+                aes(y = .data[[col]], x = .data$Choice)) + geom_boxplot() + ggtitle(col)
+       }
+)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+combbar <- lapply(colnames(select_if(combined, startsWith(names(combined), 'P_'))),
+       function(col) {
+        ggplot(combined,
+                aes(x = .data[[col]], fill = .data$Choice)) + geom_bar(position = 'dodge') + 
+           ggtitle(col) + 
+           theme(legend.position = c(0.8,0.8), legend.background = element_blank())
+       }
+)
+```
+
+```{r, echo=FALSE}
+set.seed(321)
+logfit3 <- step(glm(Choice ~ . -Last_purchase -First_purchase, 
+                   data = train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r, echo=FALSE}
+predprob_log <- predict(logfit3, newdata = test1, type = "response")
+pr_class_log <- ifelse(predprob_log > 0.2, 1, 0)
+
+log_CM_unbal <- caret::confusionMatrix(as.factor(pr_class_log), as.factor(test1$Choice), positive = '1')
+```
+
+```{r, echo=FALSE}
+set.seed(321)
+ldafit <- lda(Choice ~ ., data = train1)
+```
+
+```{r, echo=FALSE}
+pr_class_lda <- predict(ldafit, test1)
+
+lda_CM_unbal <- caret::confusionMatrix(as.factor(pr_class_lda$class), as.factor(test1$Choice), positive = "1")
+```
+
+```{r, echo=FALSE}
+form1 <- Choice ~ .
+```
+
+```{r, echo=FALSE}
+set.seed(321)
+svmfit <- svm(formula = form1, data = train1, gamma = 0.02, cost = 0.5)
+```
+
+```{r, echo=FALSE}
+svmpredict <- predict(svmfit, test1, type = 'response')
+```
+
+```{r, echo=FALSE}
+SVM_CM <- caret::confusionMatrix(svmpredict, test1$Choice, positive = '1')
+```
+
+```{r, echo=FALSE}
+set.seed(321)
+trn_art = train1 %>% filter(Choice == '1')
+trn_no_art = train1 %>% filter(Choice == '0')
+
+tst_art = test1 %>% filter(Choice == '1')
+tst_no_art = test1 %>% filter(Choice == '0')
+
+sample_no_art_trn = sample_n(trn_no_art, nrow(trn_art))
+train_bal = rbind(sample_no_art_trn,trn_art)
+
+sample_no_art_tst = sample_n(tst_no_art, nrow(tst_art))
+test_bal = rbind(sample_no_art_tst,tst_art)
+```
+
+```{r, echo=FALSE}
+set.seed(321)
+logfit_bal <- step(glm(Choice ~ ., 
+                   data = train_bal, family = binomial), 
+               direction = "both", trace = 0)
+```
+
+```{r, echo=FALSE}
+predprob_log_bal <- predict(logfit_bal, newdata = test_bal, type = "response")
+pr_class_log_bal <- ifelse(predprob_log_bal > 0.5, 1, 0)
+
+log_CM_unbal_bal <- caret::confusionMatrix(as.factor(pr_class_log_bal), as.factor(test_bal$Choice), positive = '1')
+```
+
+```{r, echo=FALSE}
+predprob_log_imbal <- predict(logfit_bal, newdata = test1, type = "response")
+pr_class_log_imbal <- ifelse(predprob_log_imbal > 0.22, 1, 0)
+
+log_CM_imbal <- caret::confusionMatrix(as.factor(pr_class_log_imbal), as.factor(test1$Choice), positive = '1')
+```
+
+```{r, echo=FALSE}
+set.seed(321)
+ldafit_bal <- lda(Choice ~ ., data = train_bal)
+```
+
+```{r, echo=FALSE}
+pr_class_lda_bal <- predict(ldafit_bal, test_bal)
+
+lda_CM_unbal_bal <- caret::confusionMatrix(as.factor(pr_class_lda_bal$class), as.factor(test_bal$Choice), positive = "1")
+```
+
+```{r, echo=FALSE}
+pr_class_lda_imbal <- predict(ldafit_bal, test1)
+
+lda_CM_imbal <- caret::confusionMatrix(as.factor(pr_class_lda_imbal$class), as.factor(test1$Choice), positive = "1")
+```
+
+```{r, echo=FALSE}
+svmfit_bal <- svm(formula = form1, data = train_bal, gamma = 0.02, cost = 1.45)
+```
+
+```{r, echo=FALSE}
+svmpredict_bal <- predict(svmfit_bal, test_bal, type = 'response')
+```
+
+```{r, echo=FALSE}
+svmpredict_imbal <- predict(svmfit_bal, test1, type = 'response')
+SVM_CM_imbal <- caret::confusionMatrix(svmpredict_imbal, test1$Choice, positive = '1')
+```
+
+```{r, echo=FALSE}
+summary_table_svm <- combined %>% group_by(Choice) %>% 
+  summarize(percent = n()/nrow(combined),
+            newcnt = round(percent * 50000)) %>% as.data.frame() %>% 
+  mutate(
+    est_targets = ifelse(
+      Choice == 0, round(newcnt*(1-SVM_CM_imbal$byClass[["Specificity"]])), round(newcnt*(SVM_CM_imbal$byClass[["Sensitivity"]]))
+      ),
+    mailercst = est_targets * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * est_targets, 0),
+    revenue = ifelse(Choice == 1, 31.95 * est_targets, 0),
+    profit = revenue - purchcst - mailercst
+    )
+```
+
+```{r, echo=FALSE}
+summ_tab_fun <- function(base_data, hcount, CM) {
+  base_data %>% group_by(Choice) %>% 
+  summarize(percent = n()/nrow(base_data),
+            newcnt = round(percent * hcount)) %>% as.data.frame() %>% 
+  mutate(
+    est_targets = ifelse(
+      Choice == 0, round(newcnt*(1-CM$byClass[["Specificity"]])), round(newcnt*(CM$byClass[["Sensitivity"]]))
+      ),
+    mailercst = est_targets * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * est_targets, 0),
+    revenue = ifelse(Choice == 1, 31.95 * est_targets, 0),
+    profit = revenue - purchcst - mailercst
+    )
+}
+```
+
+```{r, echo=FALSE}
+summary_table_log <- summ_tab_fun(combined, 50000, log_CM_unbal)
+```
+
+```{r, echo=FALSE}
+summary_table_lda <- summ_tab_fun(combined, 50000, lda_CM_imbal)
+```
+
+```{r, echo=FALSE}
+naive_table <- combined %>% group_by(Choice) %>% 
+  summarize(percent = n()/nrow(combined),
+            newcnt = round(percent * 50000)) %>% as.data.frame() %>% 
+  mutate(
+    mailercst = newcnt * 0.65,
+    purchcst = ifelse(Choice == 1, 15 * 1.45 * newcnt, 0),
+    revenue = ifelse(Choice == 1, 31.95 * newcnt, 0),
+    profit = revenue - purchcst - mailercst
+    )
+```
+
+```{r, echo=FALSE}
+prof_table <- data.frame(Model = c('Naive', 'LDA', 'Logit', 'SVM'), 
+  Profit = c(
+    sum(naive_table$profit),
+    sum(summary_table_lda$profit),
+    sum(summary_table_log$profit),
+    sum(summary_table_svm$profit)
+    )
+  )
+```
+
+```{r, echo=FALSE, warning=FALSE}
+thresh <- data.frame(threshold = -0.01, profit = 0)
+for (i in seq(0, 1, by = 0.01)) {
+  preds <- ifelse(predprob_log >= i, 1, 0)
+  CM_for <- caret::confusionMatrix(as.factor(preds), as.factor(test1$Choice), positive = '1')
+  summ_for <- summ_tab_fun(combined, 50000, CM_for)
+  thresh = rbind(thresh, data.frame(threshold = i, profit = sum(summ_for$profit)))
+}
+
+thresh <- thresh %>% filter(threshold >= 0)
+```
+
+```{r, echo=FALSE}
+thresh_plot <- thresh %>% ggplot(aes(x = threshold, y = profit)) +
+  geom_line() +
+  geom_point() +
+  annotate('text', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit + 1800, label = paste0('Max Profit: $', thresh[which(thresh$profit == max(thresh$profit)),]$profit), size = 3) +
+  annotate('point', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit, color = 'green', shape = 'diamond', size = 3) +
+  theme_minimal() +
+  ggtitle('Book Sales Profit Changes by Model Probability Threshold') +
+  xlab('Logistic Model Probability Threshold') +
+  ylab('Profit from Book Sales')
+
+  
+max_thresh <- thresh[which(thresh$profit == max(thresh$profit)),]
+```
+
+```{r, echo=FALSE}
+predslog_best <- ifelse(predprob_log >= thresh[which(thresh$profit == max(thresh$profit)),]$threshold, 1, 0)
+CMlog_best <- caret::confusionMatrix(as.factor(predslog_best), as.factor(test1$Choice), positive = '1')
+```
 
 # Executive Summary
 
@@ -118,7 +340,7 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 The dataset used for this analysis contains a total of 12 variables across both training and testing sets. These variables represent customer demographics, purchasing behavior, and preferences for various book genres at the Bookbinders Book Club (BBBC). The key target variable is Choice, which indicates whether a customer purchased The Art History of Florence. The data consists of both categorical and numeric variables.
 
 ```{r, echo=FALSE}
-skim(df_combined)
+skim(combined)
 ```
 
 A check for missing values was performed (anyNA()), and no missing data was detected, so no further imputation or cleaning steps were necessary in that regard.
@@ -127,11 +349,28 @@ The variable Observation was removed not due to multicollinearity but because it
 
 During our exploratory data analysis (EDA), various visualizations were used to examine the distributions and relationships within the dataset. A correlation plot was created to assess the relationships among numeric variables such as Amount_purchased, Frequency, Last_purchase, First_purchase, and the number of different types of books purchased (e.g., P_Child, P_Youth, P_Cook, P_DIY, P_Art). This helped to identify any strong correlations or multicollinearity between the numeric features.
 
-```{r}
-df_combined %>% select_if(is.numeric) %>% cor() %>% corrplot(method = 'number')
+```{r, echo=FALSE}
+combined %>% select_if(is.numeric) %>% cor() %>% corrplot(method = 'number')
+```
+
+```{r, echo=FALSE}
+combox[[1]] + combox[[2]]
+combox[[3]] + combox[[4]]
 ```
 
 Bar plots were used to explore the distribution of categorical variables such as Gender and Choice (purchase or non-purchase). For example, a bar plot was generated to visualize the relationship between gender and purchase behavior, displaying the frequency of purchases and non-purchases among males and females. These visualizations provided insights into the key factors that might influence the likelihood of a customer purchasing a book.
+
+```{r, echo=FALSE}
+combbar[[1]] + combbar[[2]]
+combbar[[3]] + combbar[[4]]
+combbar[[5]]
+combined %>% mutate(
+  Gender = ifelse(Gender == 0, 'Female', 'Male'),
+  Choice = ifelse(Choice == 0, 'Non-purchase', 'purchase')
+  ) %>% 
+  ggplot(aes(x = Gender, fill = Choice)) +
+  geom_bar() + ggtitle('Gender vs Purchase')
+```
 
 
 # Findings
@@ -143,14 +382,22 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 
 Upon initial assesment of our SVM on balanced data, the sensitivity of the model was relatively low, but this wasn't a significant issue given our objective. The model predicted that 160 out of 408 observations would likely purchase the book. To ensure the integrity of our model and data, we applied appropriate transformations and balanced the responses in both the training and test sets. However, since we have no knowledge of the distribution of responses in the actual mailing list audience, we cannot assume that it will be balanced. Therefore, it was important to validate our model's performance on an unbalanced dataset to ensure it remained effective in real-world scenarios, where the distribution of purchasers and non-purchasers may differ.
 
+```{r, echo=FALSE}
+SVM_CM
+```
+
 After applying the SVM model to the original unbalanced test dataset, the sensitivity and specificity metrics remained consistent with those observed in the balanced dataset. This outcome is logical because the distribution between positive (purchasers) and negative (non-purchasers) cases only affects the overall prevalence, not the fundamental calculations of sensitivity and specificity. Each metric remained robust regardless of changes in class distribution because they were calculated independently within each class. As a result, we could apply these performance metrics to a hypothetical, unbalanced dataset of random customers.
 
-```{r}
-
+```{r, echo=FALSE}
+SVM_CM_imbal
 ```
 
 
 However, our overall analysis revealed that the logistic regression outperformed the other models in terms of overall prediction accuracy, particularly after the decision threshold was optimized. By adjusting the threshold, the model's sensitivity significantly improved, allowing it to correctly identify a larger number of customers who were likely to purchase the featured book. While the support vector machine (SVM) model initially demonstrated poor sensitivity due to the unbalanced nature of the dataset, its performance improved once the data was balanced. The SVM model showed strong specificity, meaning it effectively reduced false positives, but this came at the cost of lower sensitivity. Linear discriminant analysis (LDA) performed similarly to logistic regression but did not achieve the same level of sensitivity as the threshold-optimized logistic model.
+
+```{r, echo=FALSE}
+log_CM_unbal
+```
 
 How we gathered these findings were by first using data from the training and test sets, the proportion of people who are expected to purchase the book out of the 50,000 people in the mailing audience is calculated then storing this estimate in a column called 'newcnt'. We then used the model to estimate how many of the individuals in both the purchasing and non-purchasing groups would be predicted to buy the book called 'est_targets'.
 
@@ -160,7 +407,7 @@ For those who are predicted to buy the book, the total cost of the books and ove
 
 We see by summing up the values in the "profit" we get a total expected profit from the mailer campaign. We see the comparison results here:
 
-```{r}
+```{r, echo=FALSE}
 data.frame(Model = c('Naive', 'LDA', 'Logit', 'SVM'), 
   Profit = c(
     sum(naive_table$profit),
@@ -178,32 +425,11 @@ The analysis also highlighted a trade-off between sensitivity and specificity. I
 
 Finally, the profitability analysis showed that the logistic regression model with an optimized threshold provided the best balance between sensitivity and specificity, leading to the highest potential profit for the campaign. The SVM model, while strong in terms of specificity, identified fewer purchasers overall, limiting its potential revenue generation. This analysis demonstrated that balancing the dataset and fine-tuning the decision threshold were critical steps in maximizing the effectiveness and profitability of the direct mail campaign.
 
-```{r}
-df_thresh <- data.frame(threshold = -0.01, profit = 0)
-for (i in seq(0, 1, by = 0.01)) {
-  df_preds <- ifelse(predprob_log >= i, 1, 0)
-  df_CM_for <- caret::confusionMatrix(as.factor(preds), as.factor(test1$Choice), positive = '1')
-  df_summ_for <- summ_tab_fun(combined, 50000, CM_for)
-  df_thresh = rbind(df_thresh, data.frame(threshold = i, profit = sum(df_summ_for$profit)))
-}
-
-df_thresh <- df_thresh %>% filter(threshold >= 0)
-df_thresh
+```{r, echo=FALSE}
+thresh_plot
 ```
 
-
-```{r}
-thresh %>% ggplot(aes(x = threshold, y = profit)) +
-  geom_line() +
-  geom_point() +
-  annotate('text', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit + 1800, label = paste0('Max Profit: $', thresh[which(thresh$profit == max(thresh$profit)),]$profit), size = 3) +
-  annotate('point', x = thresh[which(thresh$profit == max(thresh$profit)),]$threshold, y = thresh[which(thresh$profit == max(thresh$profit)),]$profit, color = 'green', shape = 'diamond', size = 3) +
-  theme_minimal() +
-  ggtitle('Book Sales Profit Changes by Model Probability Threshold') +
-  xlab('Logistic Model Probability Threshold') +
-  ylab('Profit from Book Sales')
-
-  
+```{r, echo=FALSE}
 thresh[which(thresh$profit == max(thresh$profit)),]
 ```
 In a similar study on "Binary Classification of Customer’s Online Purchasing Behavior Using Machine Learning", the strength of logistic regression compared to other models was also found: "A comparative study of ten classifiers is presented in [18]. Their accuracy indicator, i.e., the area under the curve (AUC), highlighted logistic regression as the best classifier. Naive Bayes, neural network, and support vector machine classifiers followed as runners-up, while decision tree-based classifiers tended to underperform."
