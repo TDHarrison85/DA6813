@@ -65,6 +65,7 @@ combox[[1]] + combox[[2]]
 combox[[3]] + combox[[4]]
 ```
 
+Boxplots are a bad visual for the variables starting with "P_". Contingency table below helps, but maybe grouped bar charts for those too? I have those below, let me know what yall think.
 
 ```{r}
 combbar <- lapply(colnames(select_if(combined, startsWith(names(combined), 'P_'))),
@@ -160,10 +161,10 @@ pr_class_log <- ifelse(predprob_log > 0.2, 1, 0)
 log_CM_unbal <- caret::confusionMatrix(as.factor(pr_class_log), as.factor(test1$Choice), positive = '1')
 log_CM_unbal
 ```
-
 Logistic regression actually does perform better than the SVM model prior to balancing. This may be the result of the stepwise removal, so we can potentially consider applying the relevant variables to the remaining models when the time comes. Regardless, Sensitivity is still too low to be really valuable, so we'll have to try other methods/ changes.
 
 ### Linear Discriminant Analysis (LDA)
+
 ```{r}
 set.seed(321)
 ldafit <- lda(Choice ~ ., data = train1)
@@ -250,6 +251,7 @@ log_CM_unbal_bal <- caret::confusionMatrix(as.factor(pr_class_log_bal), as.facto
 log_CM_unbal_bal
 ```
 
+
 ```{r}
 predprob_log_imbal <- predict(logfit_bal, newdata = test1, type = "response")
 pr_class_log_imbal <- ifelse(predprob_log_imbal > 0.22, 1, 0)
@@ -282,6 +284,7 @@ lda_CM_imbal <- caret::confusionMatrix(as.factor(pr_class_lda_imbal$class), as.f
 lda_CM_imbal
 ```
 
+
 ### Support Vector Machines (SVM) (Balanced)
 
 ```{r}
@@ -308,6 +311,7 @@ caret::confusionMatrix(svmpredict_bal, test_bal$Choice, positive = '1')
 My initial thoughts: Sensitivity is still kind of low, but maybe that's okay? The prediction is about 160 of our 408 observations observations would be likely to buy the book, even though the number who buy would really be closer to 204. Our mailer would go out to those 160, and 34 wouldn't buy (our false positives). So that 34 would be our cost, we would get 126 people to buy, and 78 would be effectively left on the table. This assumes those 78 wouldnt buy without the mailer, and that the 34 who didn't buy wouldn't buy even if they got the mailer. Basically, the problem seems to call more for Specificity anyway.
 
 Revised Commentary: These results are much improved over our original unbalanced SVM results. We see a greater audience of people that we predict would buy the book, resulting a greater Sensitivity score. This comes at some cost to the Specificity but it is an acceptable loss to have a better idea of who would want to purchase the book.
+
 The results above apply our predictions to the test dataset. However, in an attempt to be good stewards of our model and data by applying relevant transformations to both training and test data, we balanced the test set responses. The application of the model to our mailer question does not give us any known information about that audience, so we cannot assume that they would be balanced as well. As a result, we should check our results against an unbalanced dataset to ensure that, if the audience is indeed unbalanced, we are still able to apply our results:
 
 ```{r}
@@ -336,6 +340,7 @@ summary_table_svm <- combined %>% group_by(Choice) %>%
 summary_table_svm
 ```
 
+
 ```{r}
 sum(summary_table_svm$profit)
 ```
@@ -356,6 +361,7 @@ summ_tab_fun <- function(base_data, hcount, CM) {
     )
 }
 ```
+
 
 ```{r}
 summary_table_log <- summ_tab_fun(combined, 50000, log_CM_unbal)
@@ -390,7 +396,6 @@ data.frame(Model = c('Naive', 'LDA', 'Logit', 'SVM'),
     )
   )
 ```
-
 A little confusing, but this is what I did here:
 1. Of the 50,000 people in the audience, estimate the proportion that we anticipate to purchase the book, by using the proportion of people that actually did buy the book across the test and train datasets. The estimate becomes the "newcnt" column
 2. Of those that we estimate would or would not buy the book, estimate the number that our model would predict to buy the book. Note there will be people in both the group that buy the book and those that don't that we will predict to buy it. We estimate by taking thoseThis is column est_targets
@@ -408,6 +413,7 @@ Adding in the logit and lda models, they both perform better than SVM, but still
 
 After toying with Threshold:
 Adjusting the threshold improves the performance of the logistic model significantly. Note that, per our instructors suggestion, I switched back to the unbalance logistic model prior to doing so. I brought the threshold down to .2 by guessing, but it would help to find the optimal. To do that, i'm going to iterate through different threshold values and see what gives the best profit.
+
 
 ```{r}
 thresh <- data.frame(threshold = -0.01, profit = 0)
@@ -436,10 +442,34 @@ thresh %>% ggplot(aes(x = threshold, y = profit)) +
   
 thresh[which(thresh$profit == max(thresh$profit)),]
 ```
+
 ```{r}
 predslog_best <- ifelse(predprob_log >= thresh[which(thresh$profit == max(thresh$profit)),]$threshold, 1, 0)
   CMlog_best <- caret::confusionMatrix(as.factor(predslog_best), as.factor(test1$Choice), positive = '1')
 CMlog_best
 ```
 
+## In class questions
 
+Questions for Dr. Roy (already asked in class)
+Clarity on word problem, 45%? 
+15 + 45% of $15, cost to send out mailer to everyone vs cost to send out to those we predict would purchase. Consider False Positives
+
+Subtract 1 from P_Art since Art history book would be included?
+doesn't work, see contingency table
+
+Append Data frames for visualizations?
+Yes, done
+
+Do we need to balance SVM dataset?
+Yes, SVM is very sensitive to unbalanced data
+
+
+SESSION 2 Questions
+
+1. Kernel? 
+  We are welcome to try linear kernel, but he won't take off points if we don't. Default is RBF.
+2. How do we apply to the 50,000 people that we don't have data for? 
+  Decide how many will buy. Of those, how many will we predict so that we can send mailers. Of those who won't buy, how many will we incorrectly predict to buy and therefore send mailers?
+3. Why **is** linear regression wrong? Isn't applying linreg the same as LDA? 
+  I was just wrong about LDA, it is not just linear regression applied to a categorical. Therefore it is simple answer, linear regression does not classify, predicts numeric/ continuous.
