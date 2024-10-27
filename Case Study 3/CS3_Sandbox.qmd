@@ -1,0 +1,162 @@
+---
+title: "Case Study 3 Sandbox"
+format: html
+---
+
+## Case Study 3 Sandbox
+
+```{r setup}
+pacman::p_load(here, skimr, rpart, dplyr, VIM, corrplot, car, quantmod, ggplot2)
+```
+
+```{r}
+raw_index_data <- read.csv(here('Case Study 3', 'dow_jones_index.data'))
+raw_index_names <- read.csv(here('Case Study 3', 'dow_jones_index.names'))
+```
+
+
+```{r}
+str(raw_index_data)
+```
+```{r}
+skim(raw_index_data)
+```
+
+
+```{r}
+anyNA(raw_index_data)
+```
+#It appears we have missing values, We will need to address this in some of our next steps but first we'll divide the data into train and test
+
+```{r}
+missing_values <- colSums(is.na(raw_index_data))
+
+missing_values
+```
+#Splitting data into training (Q1) and testing (Q2)
+
+```{r}
+
+train_data <- subset(raw_index_data, quarter == 1)  # Training data (Q1: Jan-Mar)
+test_data <- subset(raw_index_data, quarter == 2)   # Testing data (Q2: Apr-Jun)
+
+```
+
+#Running correlation check among the numeric variables
+
+```{r}
+
+cor_matrix <- cor(train_data[, sapply(train_data, is.numeric)], use = "complete.obs")
+
+cor_matrix
+```
+#There appears to be correlation between 'volume' and keep 'previous_weeks_volume'-these two had >.8 (high correlation). Which one would be important to keep for predicting our target variable [percent_change_next_weeks_price]?
+
+#I've decided to parse out the data variables I believe will be most useful moving forward
+
+```{r}
+
+selected_vars <- c("percent_change_next_weeks_price", "percent_change_price", 
+                   "percent_change_volume_over_last_wk", "previous_weeks_volume", 
+                   "days_to_next_dividend", "percent_return_next_dividend", 
+                   "open", "high", "low", "close")
+
+train_data_filtered <- train_data %>%
+  select(all_of(selected_vars))
+
+```
+
+#Convert necessary columns to numeric
+
+```{r}
+
+train_data_filtered <- train_data_filtered %>%
+  mutate(across(c(open, high, low, close), ~ as.numeric(gsub("[$,]", "", .))))  # Clean and convert
+
+```
+
+#impute missing values using KNN in order to maintain integrity of any data patterns
+
+```{r}
+
+# KNN imputation on the training data
+train_data_imputed <- kNN(train_data, variable = c("percent_change_volume_over_last_wk", "previous_weeks_volume"), 
+                          k = 5)  # Adjust k (number of neighbors) as necessary
+
+# Should return 'FALSE' if no missing values
+anyNA(train_data_imputed)
+
+```
+
+#Apply scaling in prep for modeling
+
+```{r}
+
+normalize_min_max <- function(x) {
+  (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+}
+
+train_data_scaled <- train_data_imputed %>%
+  mutate(across(where(is.numeric), normalize_min_max))
+
+```
+
+#Create lagged Variables on scaled data
+
+```{r}
+train_data_scaled <- train_data_scaled %>%
+  arrange(date) %>%  
+  mutate(
+    percent_change_price_lag1 = lag(percent_change_price) 
+  )
+```
+
+#Plotting the lagged variables to visualize correlation
+
+```{r}
+
+ggplot(train_data_scaled, aes(x = percent_change_price_lag1, y = percent_change_price)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(
+    title = "Lagged Variable Plot: Percentage Change in Price (t) vs (t-1)",
+    x = "Percentage Change in Price (t-1)",
+    y = "Percentage Change in Price (t)"
+  ) +
+  theme_minimal()
+
+```
+
+#Now applying data subset variables to a regression tree, our target variable is [percent_change_next_weeks_price] so we're going to use this regression tree to assess our features importance (which ones are most predictive?)
+
+```{r}
+
+tree_model <- rpart(percent_change_next_weeks_price ~ ., data = train_data_scaled, method = "anova")
+
+print(tree_model)
+printcp(tree_model)  
+
+plot(tree_model, uniform = TRUE, main = "Regression Tree for Stock Price Prediction")
+text(tree_model, use.n = TRUE, all = TRUE, cex = 0.8)
+
+```
+
+#this looks nuts, not sure what to change to make it better
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
