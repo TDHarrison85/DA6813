@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Case Study 3 Sandbox</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="CS3_Sandbox_files/libs/clipboard/clipboard.min.js"></script>
+<script src="CS3_Sandbox_files/libs/quarto-html/quarto.js"></script>
+<script src="CS3_Sandbox_files/libs/quarto-html/popper.min.js"></script>
+<script src="CS3_Sandbox_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="CS3_Sandbox_files/libs/quarto-html/anchor.min.js"></script>
+<link href="CS3_Sandbox_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="CS3_Sandbox_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="CS3_Sandbox_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="CS3_Sandbox_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="CS3_Sandbox_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Case Study 3 Sandbox</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="case-study-3-sandbox" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-3-sandbox">Case Study 3 Sandbox</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(here, skimr, rpart, dplyr, VIM, corrplot, car, quantmod, ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>raw_index_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">'Case Study 3'</span>, <span class="st">'dow_jones_index.data'</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>raw_index_names <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">'Case Study 3'</span>, <span class="st">'dow_jones_index.names'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(raw_index_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   750 obs. of  16 variables:
+ $ quarter                           : int  1 1 1 1 1 1 1 1 1 1 ...
+ $ stock                             : chr  "AA" "AA" "AA" "AA" ...
+ $ date                              : chr  "1/7/2011" "1/14/2011" "1/21/2011" "1/28/2011" ...
+ $ open                              : chr  "$15.82" "$16.71" "$16.19" "$15.87" ...
+ $ high                              : chr  "$16.72" "$16.71" "$16.38" "$16.63" ...
+ $ low                               : chr  "$15.78" "$15.64" "$15.60" "$15.82" ...
+ $ close                             : chr  "$16.42" "$15.97" "$15.79" "$16.13" ...
+ $ volume                            : int  239655616 242963398 138428495 151379173 154387761 114691279 80023895 132981863 109493077 114332562 ...
+ $ percent_change_price              : num  3.79 -4.43 -2.47 1.64 5.93 ...
+ $ percent_change_volume_over_last_wk: num  NA 1.38 -43.02 9.36 1.99 ...
+ $ previous_weeks_volume             : int  NA 239655616 242963398 138428495 151379173 154387761 114691279 80023895 132981863 109493077 ...
+ $ next_weeks_open                   : chr  "$16.71" "$16.19" "$15.87" "$16.18" ...
+ $ next_weeks_close                  : chr  "$15.97" "$15.79" "$16.13" "$17.14" ...
+ $ percent_change_next_weeks_price   : num  -4.428 -2.471 1.638 5.933 0.231 ...
+ $ days_to_next_dividend             : int  26 19 12 5 97 90 83 76 69 62 ...
+ $ percent_return_next_dividend      : num  0.183 0.188 0.19 0.186 0.175 ...</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(raw_index_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">raw_index_data</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">750</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">16</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">empty</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: right;">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">stock</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">date</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">open</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">722</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">high</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">713</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">low</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">711</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">close</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">711</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">next_weeks_open</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">720</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">next_weeks_close</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">715</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">quarter</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.52</td>
+<td style="text-align: right;">0.50</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">2.00</td>
+<td style="text-align: right;">2.000000e+00</td>
+<td style="text-align: left;">▇▁▁▁▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">volume</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">117547801.41</td>
+<td style="text-align: right;">158438089.36</td>
+<td style="text-align: right;">9718851.00</td>
+<td style="text-align: right;">30866243.25</td>
+<td style="text-align: right;">53060885.00</td>
+<td style="text-align: right;">132721823.75</td>
+<td style="text-align: right;">1.453439e+09</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">percent_change_price</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">2.52</td>
+<td style="text-align: right;">-15.42</td>
+<td style="text-align: right;">-1.29</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1.65</td>
+<td style="text-align: right;">9.880000e+00</td>
+<td style="text-align: left;">▁▁▆▇▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">percent_change_volume_over_last_wk</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">0.96</td>
+<td style="text-align: right;">5.59</td>
+<td style="text-align: right;">40.54</td>
+<td style="text-align: right;">-61.43</td>
+<td style="text-align: right;">-19.80</td>
+<td style="text-align: right;">0.51</td>
+<td style="text-align: right;">21.80</td>
+<td style="text-align: right;">3.274100e+02</td>
+<td style="text-align: left;">▇▃▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">previous_weeks_volume</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">0.96</td>
+<td style="text-align: right;">117387644.83</td>
+<td style="text-align: right;">159232228.00</td>
+<td style="text-align: right;">9718851.00</td>
+<td style="text-align: right;">30678320.00</td>
+<td style="text-align: right;">52945558.00</td>
+<td style="text-align: right;">133322975.25</td>
+<td style="text-align: right;">1.453439e+09</td>
+<td style="text-align: left;">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">percent_change_next_weeks_price</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.24</td>
+<td style="text-align: right;">2.68</td>
+<td style="text-align: right;">-15.42</td>
+<td style="text-align: right;">-1.22</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">1.85</td>
+<td style="text-align: right;">9.880000e+00</td>
+<td style="text-align: left;">▁▁▆▇▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">days_to_next_dividend</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">52.53</td>
+<td style="text-align: right;">46.34</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">24.00</td>
+<td style="text-align: right;">47.00</td>
+<td style="text-align: right;">69.00</td>
+<td style="text-align: right;">3.360000e+02</td>
+<td style="text-align: left;">▇▃▁▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">percent_return_next_dividend</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.69</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">0.68</td>
+<td style="text-align: right;">0.85</td>
+<td style="text-align: right;">1.560000e+00</td>
+<td style="text-align: left;">▃▇▇▂▂</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anyNA</span>(raw_index_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>#It appears we have missing values, We will need to address this in some of our next steps but first we’ll divide the data into train and test</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>missing_values <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(raw_index_data))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>missing_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                           quarter                              stock 
+                                 0                                  0 
+                              date                               open 
+                                 0                                  0 
+                              high                                low 
+                                 0                                  0 
+                             close                             volume 
+                                 0                                  0 
+              percent_change_price percent_change_volume_over_last_wk 
+                                 0                                 30 
+             previous_weeks_volume                    next_weeks_open 
+                                30                                  0 
+                  next_weeks_close    percent_change_next_weeks_price 
+                                 0                                  0 
+             days_to_next_dividend       percent_return_next_dividend 
+                                 0                                  0 </code></pre>
+</div>
+</div>
+<p>#Splitting data into training (Q1) and testing (Q2)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>train_data <span class="ot">&lt;-</span> <span class="fu">subset</span>(raw_index_data, quarter <span class="sc">==</span> <span class="dv">1</span>)  <span class="co"># Training data (Q1: Jan-Mar)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">subset</span>(raw_index_data, quarter <span class="sc">==</span> <span class="dv">2</span>)   <span class="co"># Testing data (Q2: Apr-Jun)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>#Running correlation check among the numeric variables</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(train_data[, <span class="fu">sapply</span>(train_data, is.numeric)], <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in cor(train_data[, sapply(train_data, is.numeric)], use =
+"complete.obs"): the standard deviation is zero</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>cor_matrix</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                   quarter      volume percent_change_price
+quarter                                  1          NA                   NA
+volume                                  NA  1.00000000         -0.221694454
+percent_change_price                    NA -0.22169445          1.000000000
+percent_change_volume_over_last_wk      NA  0.19768437         -0.358896850
+previous_weeks_volume                   NA  0.86432993         -0.045258948
+percent_change_next_weeks_price         NA -0.13167362          0.010374354
+days_to_next_dividend                   NA -0.06414402          0.035086236
+percent_return_next_dividend            NA -0.27603768         -0.005173395
+                                   percent_change_volume_over_last_wk
+quarter                                                            NA
+volume                                                     0.19768437
+percent_change_price                                      -0.35889685
+percent_change_volume_over_last_wk                         1.00000000
+previous_weeks_volume                                     -0.14112278
+percent_change_next_weeks_price                            0.04455945
+days_to_next_dividend                                     -0.01836656
+percent_return_next_dividend                              -0.01906340
+                                   previous_weeks_volume
+quarter                                               NA
+volume                                        0.86432993
+percent_change_price                         -0.04525895
+percent_change_volume_over_last_wk           -0.14112278
+previous_weeks_volume                         1.00000000
+percent_change_next_weeks_price              -0.15477083
+days_to_next_dividend                        -0.06300760
+percent_return_next_dividend                 -0.27870205
+                                   percent_change_next_weeks_price
+quarter                                                         NA
+volume                                                -0.131673616
+percent_change_price                                   0.010374354
+percent_change_volume_over_last_wk                     0.044559445
+previous_weeks_volume                                 -0.154770828
+percent_change_next_weeks_price                        1.000000000
+days_to_next_dividend                                 -0.005275484
+percent_return_next_dividend                           0.109565562
+                                   days_to_next_dividend
+quarter                                               NA
+volume                                      -0.064144021
+percent_change_price                         0.035086236
+percent_change_volume_over_last_wk          -0.018366565
+previous_weeks_volume                       -0.063007605
+percent_change_next_weeks_price             -0.005275484
+days_to_next_dividend                        1.000000000
+percent_return_next_dividend                 0.100206077
+                                   percent_return_next_dividend
+quarter                                                      NA
+volume                                             -0.276037679
+percent_change_price                               -0.005173395
+percent_change_volume_over_last_wk                 -0.019063402
+previous_weeks_volume                              -0.278702047
+percent_change_next_weeks_price                     0.109565562
+days_to_next_dividend                               0.100206077
+percent_return_next_dividend                        1.000000000</code></pre>
+</div>
+</div>
+<p>#There appears to be correlation between ‘volume’ and keep ‘previous_weeks_volume’-these two had &gt;.8 (high correlation). Which one would be important to keep for predicting our target variable [percent_change_next_weeks_price]?</p>
+<p>#I’ve decided to parse out the data variables I believe will be most useful moving forward</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>selected_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"percent_change_next_weeks_price"</span>, <span class="st">"percent_change_price"</span>, </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"percent_change_volume_over_last_wk"</span>, <span class="st">"previous_weeks_volume"</span>, </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"days_to_next_dividend"</span>, <span class="st">"percent_return_next_dividend"</span>, </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"open"</span>, <span class="st">"high"</span>, <span class="st">"low"</span>, <span class="st">"close"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>train_data_filtered <span class="ot">&lt;-</span> train_data <span class="sc">%&gt;%</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(selected_vars))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>#Convert necessary columns to numeric</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>train_data_filtered <span class="ot">&lt;-</span> train_data_filtered <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(open, high, low, close), <span class="sc">~</span> <span class="fu">as.numeric</span>(<span class="fu">gsub</span>(<span class="st">"[$,]"</span>, <span class="st">""</span>, .))))  <span class="co"># Clean and convert</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>#impute missing values using KNN in order to maintain integrity of any data patterns</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># KNN imputation on the training data</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>train_data_imputed <span class="ot">&lt;-</span> <span class="fu">kNN</span>(train_data, <span class="at">variable =</span> <span class="fu">c</span>(<span class="st">"percent_change_volume_over_last_wk"</span>, <span class="st">"previous_weeks_volume"</span>), </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">k =</span> <span class="dv">5</span>)  <span class="co"># Adjust k (number of neighbors) as necessary</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Should return 'FALSE' if no missing values</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">anyNA</span>(train_data_imputed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p>#Apply scaling in prep for modeling</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>normalize_min_max <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  (x <span class="sc">-</span> <span class="fu">min</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">/</span> (<span class="fu">max</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">-</span> <span class="fu">min</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>train_data_scaled <span class="ot">&lt;-</span> train_data_imputed <span class="sc">%&gt;%</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), normalize_min_max))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>#Create lagged Variables on scaled data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>train_data_scaled <span class="ot">&lt;-</span> train_data_scaled <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date) <span class="sc">%&gt;%</span>  </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_change_price_lag1 =</span> <span class="fu">lag</span>(percent_change_price) </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>#Plotting the lagged variables to visualize correlation</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(train_data_scaled, <span class="fu">aes</span>(<span class="at">x =</span> percent_change_price_lag1, <span class="at">y =</span> percent_change_price)) <span class="sc">+</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Lagged Variable Plot: Percentage Change in Price (t) vs (t-1)"</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Percentage Change in Price (t-1)"</span>,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage Change in Price (t)"</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing non-finite outside the scale range
+(`stat_smooth()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="CS3_Sandbox_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>#Now applying data subset variables to a regression tree, our target variable is [percent_change_next_weeks_price] so we’re going to use this regression tree to assess our features importance (which ones are most predictive?)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>tree_model <span class="ot">&lt;-</span> <span class="fu">rpart</span>(percent_change_next_weeks_price <span class="sc">~</span> ., <span class="at">data =</span> train_data_scaled, <span class="at">method =</span> <span class="st">"anova"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(tree_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>n= 360 
+
+node), split, n, deviance, yval
+      * denotes terminal node
+
+ 1) root 360 4.214900000 0.6817216  
+   2) open=$102.28,$102.72,$103.56,$14.17,$14.18,$14.20,$14.26,$14.38,$14.51,$14.77,$15.08,$15.82,$159.18,$16.71,$16.81,$16.98,$161.60,$163.57,$164.18,$17.33,$17.34,$17.39,$17.81,$18.19,$18.22,$18.35,$18.36,$18.62,$18.73,$18.82,$18.84,$18.95,$19.90,$20.32,$20.40,$20.71,$20.77,$20.88,$20.93,$20.94,$20.95,$21.51,$21.55,$21.63,$21.69,$21.75,$21.95,$22.11,$25.18,$26.13,$26.69,$26.78,$27.20,$27.77,$27.80,$27.95,$28.02,$28.16,$28.20,$28.32,$28.40,$28.54,$28.55,$29.68,$30.53,$30.72,$30.91,$31.41,$31.56,$32.20,$32.94,$32.97,$33.00,$33.99,$34.07,$36.06,$36.24,$36.29,$36.31,$36.46,$36.55,$37.15,$37.26,$37.47,$39.07,$41.46,$41.85,$42.90,$43.02,$43.06,$43.53,$43.96,$44.20,$44.94,$45.02,$45.42,$46.00,$46.03,$46.05,$46.14,$46.42,$47.20,$47.57,$48.30,$48.45,$51.73,$52.26,$54.10,$54.22,$54.44,$54.95,$55.26,$55.39,$56.45,$58.84,$59.26,$59.60,$59.93,$60.16,$60.60,$60.69,$61.04,$61.09,$62.00,$62.21,$62.70,$62.80,$63.21,$63.73,$63.95,$64.17,$64.80,$65.32,$65.65,$65.90,$70.86,$71.60,$72.35,$72.47,$72.70,$74.13,$74.65,$76.07,$76.38,$77.10,$79.92,$82.85,$83.03,$83.58,$84.54,$84.97,$85.07,$85.84,$85.87,$87.84,$91.72,$91.90,$92.58,$92.94,$93.21,$93.85 165 1.111373000 0.5944994  
+     4) high=$104.43,$104.99,$14.35,$15.16,$15.25,$16.72,$16.94,$167.72,$18.37,$20.60,$20.79,$21.74,$22.08,$22.15,$28.59,$37.35,$37.70,$38.48,$43.28,$43.61,$46.71,$46.93,$49.12,$55.38,$63.25,$72.50,$72.99,$77.25,$86.56 29 0.360336400 0.4664944  
+       8) open=$14.17,$14.26,$20.93,$36.29,$37.47,$46.03,$48.45 7 0.162636600 0.3233531 *
+       9) open=$102.28,$102.72,$15.08,$15.82,$16.81,$161.60,$18.36,$19.90,$20.40,$21.69,$21.75,$28.55,$36.06,$41.85,$43.53,$46.42,$55.26,$62.21,$70.86,$71.60,$76.38,$85.87 22 0.008638217 0.5120394 *
+     5) high=$105.86,$14.22,$14.52,$14.70,$14.87,$14.95,$16.71,$164.20,$164.26,$164.84,$17.15,$17.48,$17.64,$17.68,$17.88,$18.48,$18.49,$18.74,$18.79,$18.95,$19.39,$19.90,$20.50,$21.17,$21.21,$21.23,$21.33,$21.44,$21.65,$21.71,$22.14,$22.19,$22.34,$25.95,$26.27,$26.86,$27.10,$27.37,$28.11,$28.34,$28.42,$28.50,$28.57,$28.61,$28.74,$28.89,$29.46,$30.10,$31.22,$31.52,$31.72,$31.79,$32.20,$33.19,$33.30,$33.36,$33.48,$33.99,$34.30,$36.32,$36.58,$36.62,$36.94,$37.61,$37.78,$37.82,$37.86,$38.12,$39.94,$43.05,$43.24,$43.85,$44.34,$45.12,$45.54,$46.18,$46.25,$46.27,$46.79,$47.27,$47.64,$48.00,$48.55,$49.80,$52.95,$53.88,$54.49,$54.95,$55.30,$55.98,$56.58,$57.90,$59.72,$60.02,$60.92,$60.99,$61.10,$61.11,$61.15,$61.39,$61.50,$62.30,$63.65,$63.86,$63.92,$64.40,$64.80,$64.97,$65.84,$65.87,$65.95,$66.95,$72.90,$73.04,$74.29,$75.75,$76.32,$76.45,$77.59,$83.98,$84.05,$84.24,$84.69,$85.44,$85.46,$86.08,$88.23,$89.39,$92.96,$93.40,$93.94,$94.16,$94.70,$97.44 136 0.174539600 0.6217946  
+      10) close=$105.86,$14.38,$15.97,$16.68,$17.28,$18.40,$19.30,$20.82,$21.21,$25.68,$25.95,$26.55,$27.77,$28.46,$31.19,$31.35,$31.70,$32.73,$32.85,$33.90,$37.14,$39.74,$42.61,$43.55,$45.29,$46.68,$46.75,$47.23,$49.80,$52.59,$53.87,$55.98,$59.69,$60.92,$61.06,$61.11,$64.30,$64.81,$65.91,$76.13,$82.86,$85.01,$89.29,$91.61,$92.96,$94.01 47 0.020144920 0.5796667 *
+      11) close=$13.34,$14.20,$14.75,$14.77,$162.28,$164.00,$164.84,$17.14,$17.37,$18.34,$18.36,$18.64,$18.70,$18.85,$19.19,$19.66,$20.35,$20.37,$21.08,$21.33,$21.44,$21.68,$21.86,$22.14,$25.62,$27.06,$27.25,$27.75,$27.94,$28.02,$28.13,$28.30,$28.43,$28.57,$28.85,$31.34,$31.71,$33.06,$33.07,$34.23,$35.46,$35.97,$36.08,$36.62,$36.70,$37.22,$37.42,$41.73,$42.68,$42.97,$43.53,$43.86,$45.74,$46.25,$48.00,$52.35,$52.90,$54.07,$56.03,$56.70,$58.88,$59.18,$59.60,$60.60,$60.84,$61.49,$62.03,$62.77,$62.84,$63.13,$64.20,$64.73,$65.21,$71.80,$72.30,$73.04,$74.37,$75.01,$76.14,$81.28,$82.12,$83.28,$83.37,$85.20,$85.34,$92.19,$93.78,$97.11 89 0.026931330 0.6440419 *
+   3) open=$102.59,$103.42,$103.86,$104.12,$104.86,$106.90,$13.71,$13.85,$14.25,$14.27,$147.00,$147.21,$149.82,$15.87,$15.95,$155.42,$157.64,$16.18,$16.19,$16.38,$16.58,$161.16,$162.36,$164.08,$17.70,$18.33,$18.49,$18.61,$18.88,$18.98,$19.27,$19.45,$19.64,$19.68,$19.93,$19.96,$20.13,$20.45,$20.66,$20.84,$21.01,$21.03,$21.22,$21.74,$25.49,$27.42,$27.97,$28.05,$28.25,$28.46,$28.77,$30.67,$30.78,$31.18,$31.39,$31.51,$31.76,$31.82,$32.09,$32.50,$32.75,$33.29,$34.16,$34.88,$35.20,$35.38,$35.64,$35.74,$35.97,$36.13,$36.30,$36.66,$36.80,$36.92,$37.13,$37.74,$39.01,$39.04,$39.30,$39.64,$40.80,$41.31,$42.22,$42.64,$42.83,$43.00,$43.19,$43.27,$43.30,$43.73,$43.86,$44.13,$44.41,$44.75,$44.86,$45.21,$45.41,$45.62,$46.28,$46.69,$46.81,$47.71,$48.44,$49.53,$50.05,$50.15,$51.75,$52.35,$52.62,$53.12,$53.18,$53.65,$53.80,$53.81,$54.23,$54.62,$55.11,$55.14,$55.81,$56.07,$56.09,$57.32,$58.44,$58.47,$58.67,$59.49,$60.68,$60.88,$60.96,$62.29,$62.32,$62.56,$62.63,$62.67,$62.87,$63.13,$63.36,$63.67,$64.34,$64.35,$64.39,$64.40,$65.88,$66.15,$69.26,$69.42,$70.29,$71.17,$71.43,$71.52,$73.50,$73.72,$73.80,$74.25,$74.51,$75.13,$75.95,$76.10,$77.79,$78.27,$78.85,$79.19,$79.28,$80.26,$80.74,$81.30,$81.67,$81.80,$81.87,$82.00,$83.45,$85.70,$86.75,$87.93,$88.17,$89.21,$90.27,$90.95,$91.21,$91.66,$92.71,$92.73,$93.89,$94.16,$94.38,$95.50,$96.13,$97.28,$99.16,$99.23,$99.62 195 0.786098900 0.7555251  
+     6) close=$100.02,$102.00,$102.10,$103.54,$105.06,$106.78,$14.12,$14.29,$147.93,$15.79,$155.50,$16.03,$161.83,$162.18,$163.85,$17.09,$17.14,$18.34,$18.43,$18.83,$19.25,$19.74,$19.93,$20.18,$20.20,$20.66,$20.72,$20.82,$20.97,$21.46,$21.76,$24.80,$27.49,$27.92,$27.97,$28.47,$28.60,$30.53,$30.66,$30.99,$31.19,$31.26,$31.58,$31.91,$32.57,$32.89,$34.95,$35.63,$35.84,$35.85,$35.89,$36.31,$36.39,$36.51,$36.80,$37.08,$39.29,$39.45,$41.32,$42.95,$43.41,$43.56,$43.72,$44.17,$44.28,$44.54,$44.91,$45.52,$45.59,$45.74,$45.86,$46.25,$47.43,$48.64,$51.52,$51.75,$52.07,$52.99,$54.08,$54.10,$54.63,$54.81,$55.00,$55.69,$55.73,$58.06,$58.57,$58.98,$59.64,$60.01,$60.70,$60.88,$62.21,$62.55,$62.56,$62.60,$62.92,$63.57,$63.61,$64.31,$64.50,$64.55,$65.53,$69.38,$70.07,$71.38,$72.14,$72.99,$73.28,$73.34,$74.06,$74.44,$75.25,$76.03,$77.84,$78.98,$79.08,$80.20,$80.85,$81.43,$83.52,$83.62,$84.50,$87.44,$88.10,$88.98,$90.25,$91.19,$91.80,$92.27,$92.83,$93.73 134 0.115913600 0.7200830  
+      12) close=$102.00,$16.03,$161.83,$163.85,$17.14,$18.34,$18.43,$19.25,$20.18,$20.72,$21.46,$28.47,$28.60,$30.66,$31.26,$31.58,$32.89,$35.85,$36.31,$36.39,$36.51,$37.08,$39.45,$42.95,$43.41,$43.56,$43.72,$44.28,$44.54,$44.91,$45.52,$45.59,$45.74,$45.86,$48.64,$51.52,$51.75,$52.07,$52.99,$54.63,$54.81,$55.00,$55.69,$58.06,$58.57,$58.98,$60.01,$60.70,$62.21,$62.55,$62.60,$62.92,$63.61,$65.53,$69.38,$70.07,$71.38,$72.14,$73.28,$73.34,$74.06,$75.25,$76.03,$78.98,$79.08,$81.43,$83.62,$84.50,$87.44,$90.25,$92.27,$92.83,$93.73 75 0.014626230 0.6970632 *
+      13) close=$100.02,$102.10,$103.54,$105.06,$106.78,$14.12,$14.29,$147.93,$15.79,$155.50,$162.18,$17.09,$18.83,$19.74,$19.93,$20.20,$20.66,$20.82,$20.97,$21.76,$24.80,$27.49,$27.92,$27.97,$30.53,$30.99,$31.19,$31.91,$32.57,$34.95,$35.63,$35.84,$35.89,$36.80,$39.29,$41.32,$44.17,$46.25,$47.43,$54.08,$54.10,$55.73,$59.64,$60.88,$62.56,$63.57,$64.31,$64.50,$64.55,$72.99,$74.44,$77.84,$80.20,$80.85,$83.52,$88.10,$88.98,$91.19,$91.80 59 0.011022440 0.7493455 *
+     7) close=$102.80,$109.09,$13.60,$14.25,$150.00,$155.89,$159.21,$16.11,$16.13,$18.15,$18.82,$18.86,$19.47,$19.75,$20.56,$20.93,$28.85,$30.91,$32.19,$34.38,$36.00,$37.29,$37.48,$38.85,$40.71,$41.23,$43.64,$43.82,$44.36,$44.59,$45.09,$45.51,$46.57,$48.35,$49.76,$50.29,$52.53,$53.33,$54.58,$55.81,$57.41,$58.99,$62.70,$65.22,$69.10,$69.23,$74.05,$75.59,$78.99,$80.16,$82.52,$82.82,$86.23,$88.29,$92.75,$93.37,$95.68,$96.45,$98.72,$99.59,$99.93 61 0.132104700 0.8333814  
+      14) open=$104.12,$106.90,$14.25,$147.00,$15.95,$155.42,$161.16,$18.61,$18.88,$19.64,$19.68,$20.13,$30.67,$32.75,$36.66,$36.80,$36.92,$39.64,$42.22,$42.64,$43.00,$44.41,$44.75,$46.69,$49.53,$50.05,$50.15,$52.62,$55.14,$55.81,$56.09,$57.32,$63.13,$64.34,$71.17,$71.52,$73.72,$73.80,$78.85,$80.74,$81.80,$83.45,$86.75,$87.93,$92.71,$93.89,$94.16,$95.50,$96.13,$97.28,$99.16 51 0.029113590 0.8164551 *
+      15) open=$13.85,$15.87,$18.33,$20.84,$28.77,$35.20,$39.04,$43.30,$44.13,$48.44 10 0.013861660 0.9197052 *</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">printcp</span>(tree_model)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Regression tree:
+rpart(formula = percent_change_next_weeks_price ~ ., data = train_data_scaled, 
+    method = "anova")
+
+Variables actually used in tree construction:
+[1] close high  open 
+
+Root node error: 4.2149/360 = 0.011708
+
+n= 360 
+
+        CP nsplit rel error xerror    xstd
+1 0.549818      0  1.000000 1.0068 0.13768
+2 0.136776      1  0.450182 1.5070 0.18160
+3 0.127662      2  0.313406 1.4956 0.18864
+4 0.044856      3  0.185744 1.3482 0.17114
+5 0.030241      4  0.140889 1.3678 0.18914
+6 0.021416      5  0.110648 1.3768 0.18994
+7 0.021146      6  0.089232 1.3895 0.19074
+8 0.010000      7  0.068086 1.4377 0.19021</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tree_model, <span class="at">uniform =</span> <span class="cn">TRUE</span>, <span class="at">main =</span> <span class="st">"Regression Tree for Stock Price Prediction"</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(tree_model, <span class="at">use.n =</span> <span class="cn">TRUE</span>, <span class="at">all =</span> <span class="cn">TRUE</span>, <span class="at">cex =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in labels.rpart(x, minlength = minlength): more than 52 levels in a
+predicting factor, truncated for printout</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="CS3_Sandbox_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>#this looks nuts, not sure what to change to make it better</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
