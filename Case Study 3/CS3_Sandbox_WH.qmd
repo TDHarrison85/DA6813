@@ -6,7 +6,7 @@ format: html
 ## Case Study 3 Sandbox
 
 ```{r setup}
-pacman::p_load(here, skimr, rpart, dplyr, VIM, corrplot, car, quantmod, ggplot2, tidyverse, tree, e1071, MASS)
+pacman::p_load(tidyverse, here, skimr, rpart, dplyr, VIM, corrplot, car, quantmod, ggplot2, tree, e1071, MASS)
 ```
 
 ```{r}
@@ -61,11 +61,11 @@ selected_vars <- c('date', 'stock', "percent_change_next_weeks_price", "percent_
                    "days_to_next_dividend", "percent_return_next_dividend", 
                    "open", "high", "low", "close")
 
-train_data_filtered <- train_data %>%
-  select(all_of(selected_vars))
+train_data_filtered <- train_data[,selected_vars]
 
-test_data_filtered <- test_data %>%
-  select(all_of(selected_vars))
+
+test_data_filtered <- test_data[,selected_vars]
+  
 
 ```
 
@@ -113,7 +113,6 @@ test_data_scaled <- test_data_filtered %>%
   mutate(across(where(is.numeric), normalize_min_max))
 
 ```
-
 
 
 #Chage Date variable to true date
@@ -176,6 +175,8 @@ ggplot(train_data_scaled, aes(x = percent_change_price_lag1, y = percent_change_
 ```
 
 #Now applying data subset variables to a regression tree, our target variable is [percent_change_next_weeks_price] so we're going to use this regression tree to assess our features importance (which ones are most predictive?)
+
+#wrapper outside of tree model/use for loop == stock name/store rmse/mape into frame
 
 ```{r}
 
