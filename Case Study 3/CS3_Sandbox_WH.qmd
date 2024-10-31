@@ -145,14 +145,14 @@ train_data_scaled <- train_data_scaled %>%
   group_by(stock) %>% 
   arrange(date) %>%  
   mutate(
-    percent_change_price_lag1 = lag(percent_change_price, n = 4) 
+    percent_change_price_lag1 = lag(percent_change_price, n = 1) 
   ) %>% ungroup()
 
 test_data_scaled <- test_data_scaled %>%
   group_by(stock) %>% 
   arrange(date) %>%  
   mutate(
-    percent_change_price_lag1 = lag(percent_change_price, n = 4) 
+    percent_change_price_lag1 = lag(percent_change_price, n = 1) 
   ) %>% ungroup()
 ```
 
@@ -167,7 +167,7 @@ ggplot(train_data_scaled, aes(x = percent_change_price_lag1, y = percent_change_
   geom_smooth(method = "lm", color = "blue", se = FALSE) +
   labs(
     title = "Lagged Variable Plot: Percentage Change in Price (t) vs (t-1)",
-    x = "Percentage Change in Price (t-4)",
+    x = "Percentage Change in Price (t-1)",
     y = "Percentage Change in Price (t)"
   ) +
   theme_minimal()
@@ -234,7 +234,7 @@ Mape will always be Inf because of zero values for response. Probably don't even
 # Linear model
 
 ```{r}
-lmfit1 <- step(lm(percent_change_next_weeks_price ~ ., data = na.omit(train_data_scaled)), method = 'both')
+lmfit1 <- step(lm(percent_change_next_weeks_price ~ . - percent_change_price_lag1, data = na.omit(train_data_scaled)), method = 'both')
 summary(lmfit1)
 lmpreds <- predict(lmfit1, test_data_scaled)
 
@@ -259,13 +259,80 @@ plot(lmfit1)
 # SVR
 
 ```{r}
-form1 <- percent_change_next_weeks_price ~ .
-svr_tune1 <- tune.svm(form1, data = train_data_scaled, gamma = seq(.01,.1, by = .01), cost = seq(.1, 1, by = .1), scale = T)
+unique(train_data_scaled$stock)
+```
+
+Getting idea of parameters without for loop since it wouldn't behave on its own. This was primarily just research and does need to be repeated for other models.
+```{r}
+#form1 <- percent_change_next_weeks_price ~ . - percent_change_price_lag1
+#
+#svr_tune_lists <- list() 
+#best_Params_list <- list()
+#
+#set.seed(123)
+#svr_tune_lists[['AA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'AA')[, names(train_data_scaled) != 'stock'],
+#                                   gamma = seq(.01,.1, by = .01), cost = seq(2.2, 2.5, by = .01), scale = T
+#                                   )
+#print(svr_tune_lists[['AA']])
+#
+#set.seed(123)
+#svr_tune_lists[['AXP']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'AXP')[, names(train_data_scaled) != 'stock'],
+#                                   gamma = seq(.001,.01, by = .001), cost = seq(9, 10, by = .05), scale = T
+#                                   )
+#print(svr_tune_lists[['AXP']])
+#
+#set.seed(123)
+#svr_tune_lists[['BA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'BA')[, names(train_data_scaled) != 'stock'],
+#                                   gamma = seq(.01,.1, by = .01), cost = seq(1.5, 2.5, by = .1), scale = T
+#                                   )
+#print(svr_tune_lists[['BA']])
+#
+#set.seed(123)
+#svr_tune_lists[['BA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'BA')[, names(train_data_scaled) != 'stock'],
+#                                   gamma = seq(.01,.1, by = .01), cost = seq(1.5, 2.5, by = .1), scale = T
+#                                   )
+#print(svr_tune_lists[['BA']])
 ```
 
 ```{r}
-bestParams <- svr_tune1$best.parameters
-print(bestParams)
+form1 <- percent_change_next_weeks_price ~ . - percent_change_price_lag1
+
+svr_tune_lists <- list() # initiate models list
+best_Params_list <- list() # initiate list of best parameters for SVR for each stock
+for (i in c(unique(train_data_scaled$stock))) {
+  set.seed(123)
+  svr_tune_lists[[i]] <-  tune.svm(form1, data = filter(train_data_scaled, stock == i)[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.005,.1, by = .005), cost = seq(1, 10, by = 1), scale = T
+                                   )
+  best_Params_list[[i]] <- svr_tune_lists[[i]]$best.parameters
+}
+```
+
+
+
+```{r}
+for (i in c(unique(train_data_scaled$stock))) {
+    print(best_Params_list[[i]])
+}
+
+```
+
+```{r}
+svr_fit_list <- list()
+
+for (i in c(unique(train_data_scaled$stock))) {
+  set.seed(123)
+  svr_fit_list[[i]] <-  svm(form1, data = filter(train_data_scaled, stock == i)[, names(train_data_scaled) != 'stock'],
+                                   gamma = best_Params_list[[i]]$gamma, cost = best_Params_list[[i]]$cost, scale = T
+                                   )
+}
+```
+
+```{r}
+for (i in c(unique(train_data_scaled$stock))) {
+    print(summary(svr_fit_list[[i]]))
+}
+
 ```
 
 
