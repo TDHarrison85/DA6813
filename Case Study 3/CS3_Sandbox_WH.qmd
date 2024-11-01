@@ -6,7 +6,8 @@ format: html
 ## Case Study 3 Sandbox
 
 ```{r setup}
-pacman::p_load(tidyverse, here, skimr, rpart, dplyr, VIM, corrplot, car, quantmod, ggplot2, tree, e1071, MASS)
+pacman::p_load(MASS, tidyverse, here, skimr, rpart, dplyr, VIM, corrplot, car, quantmod, ggplot2, tree, e1071)
+select <- dplyr::select
 ```
 
 ```{r}
@@ -258,47 +259,55 @@ plot(lmfit1)
 
 # SVR
 
+SVR is omitting the rows with the NA for percent_change_price_lag1, so removing that variable here.
+```{r}
+train_data_scaled <- train_data_scaled[ , names(train_data_scaled) != 'percent_change_price_lag1']
+test_data_scaled <- test_data_scaled[ , names(test_data_scaled) != 'percent_change_price_lag1']
+```
+
+
 ```{r}
 unique(train_data_scaled$stock)
 ```
 
 Getting idea of parameters without for loop since it wouldn't behave on its own. This was primarily just research and does need to be repeated for other models.
-```{r}
-#form1 <- percent_change_next_weeks_price ~ . - percent_change_price_lag1
-#
-#svr_tune_lists <- list() 
-#best_Params_list <- list()
-#
-#set.seed(123)
-#svr_tune_lists[['AA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'AA')[, names(train_data_scaled) != 'stock'],
-#                                   gamma = seq(.01,.1, by = .01), cost = seq(2.2, 2.5, by = .01), scale = T
-#                                   )
-#print(svr_tune_lists[['AA']])
-#
-#set.seed(123)
-#svr_tune_lists[['AXP']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'AXP')[, names(train_data_scaled) != 'stock'],
-#                                   gamma = seq(.001,.01, by = .001), cost = seq(9, 10, by = .05), scale = T
-#                                   )
-#print(svr_tune_lists[['AXP']])
-#
-#set.seed(123)
-#svr_tune_lists[['BA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'BA')[, names(train_data_scaled) != 'stock'],
-#                                   gamma = seq(.01,.1, by = .01), cost = seq(1.5, 2.5, by = .1), scale = T
-#                                   )
-#print(svr_tune_lists[['BA']])
-#
-#set.seed(123)
-#svr_tune_lists[['BA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'BA')[, names(train_data_scaled) != 'stock'],
-#                                   gamma = seq(.01,.1, by = .01), cost = seq(1.5, 2.5, by = .1), scale = T
-#                                   )
-#print(svr_tune_lists[['BA']])
+```
+form1 <- percent_change_next_weeks_price ~ . - percent_change_price_lag1
+
+svr_tune_lists <- list() 
+best_Params_list <- list()
+
+set.seed(123)
+svr_tune_lists[['AA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'AA')[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.01,.1, by = .01), cost = seq(2.2, 2.5, by = .01), scale = T
+                                   )
+print(svr_tune_lists[['AA']])
+
+set.seed(123)
+svr_tune_lists[['AXP']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'AXP')[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.001,.01, by = .001), cost = seq(9, 10, by = .05), scale = T
+                                   )
+print(svr_tune_lists[['AXP']])
+
+set.seed(123)
+svr_tune_lists[['BA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'BA')[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.01,.1, by = .01), cost = seq(1.5, 2.5, by = .1), scale = T
+                                   )
+print(svr_tune_lists[['BA']])
+
+set.seed(123)
+svr_tune_lists[['BA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'BA')[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.01,.1, by = .01), cost = seq(1.5, 2.5, by = .1), scale = T
+                                   )
+print(svr_tune_lists[['BA']])
 ```
 
 ```{r}
-form1 <- percent_change_next_weeks_price ~ . - percent_change_price_lag1
+form1 <- percent_change_next_weeks_price ~ .
 
 svr_tune_lists <- list() # initiate models list
 best_Params_list <- list() # initiate list of best parameters for SVR for each stock
+
 for (i in c(unique(train_data_scaled$stock))) {
   set.seed(123)
   svr_tune_lists[[i]] <-  tune.svm(form1, data = filter(train_data_scaled, stock == i)[, names(train_data_scaled) != 'stock'],
@@ -309,15 +318,16 @@ for (i in c(unique(train_data_scaled$stock))) {
 ```
 
 
-
+checks for any models that did not predict because of bad tuning parameters.
 ```{r}
 for (i in c(unique(train_data_scaled$stock))) {
-    print(best_Params_list[[i]])
+    print(is.na(best_Params_list[[i]]$gamma))
 }
 
 ```
 
 ```{r}
+# this is the part to copy for the other models
 svr_fit_list <- list()
 
 for (i in c(unique(train_data_scaled$stock))) {
@@ -328,43 +338,52 @@ for (i in c(unique(train_data_scaled$stock))) {
 }
 ```
 
-```{r}
+this is used to print the summary of each model. Useful if you want to look, but the output is huge and blows up the view a bit.
+```
 for (i in c(unique(train_data_scaled$stock))) {
     print(summary(svr_fit_list[[i]]))
 }
 
 ```
-
-
-```{r}
-svrfit1 <- svm(form1, data = train_data_scaled, gamma = bestParams$gamma, cost = bestParams$cost, scale = T)
-summary(svrfit1)
-```
+stores predictions and other identifying variables into a list of dataframes. This is flattened later into one dataframeb, but must start as a list in order to more easily iterate through the stocks.
 
 ```{r}
-svrpreds <- predict(svrfit1, test_data_scaled)
-#testpreds$svr <- svrpreds
-
-mse_svr = mean((na.omit(testpreds$response) - svrpreds)^2)
-mae_svr = mean(abs(na.omit(testpreds$response) - svrpreds))
-me_svr = mean(na.omit(testpreds$response) - svrpreds)
-mape_svr = mean(abs(na.omit(testpreds$response) - svrpreds)*100/na.omit(testpreds$response))
-
-testperfs <- rbind(testperfs, svr = c(mse_svr, mae_svr, me_svr, mape_svr))
-print('')
-print(testperfs)
+newpreds <- list()
+for (i in c(unique(train_data_scaled$stock))) {
+  newpreds[[i]] <- test_data_scaled %>% filter(stock == i) %>% select(date, stock, percent_change_next_weeks_price) # first model needs this line, all others can skip
+  newpreds[[i]]$svr <- predict(svr_fit_list[[i]], filter(test_data_scaled, stock == i)[, names(test_data_scaled) != 'stock'])
+}
 ```
 
-SVR won't accept the missing values in the lag variable so it just omits them. This means it won't let me add the SVR predictions to the preds dataset. We can still calculate our performance metrics it's just ugly getting there.
-This might be a case for adding the lag variable prior to the split, but that's also iffy because that would mean there would be response observations from the training data in the predictors of the test data, which seems wrong.
+we do this step only once we have all predictions for all models saved to the list like we do above
+```{r}
+predsdf <- bind_rows(newpreds, .id = "column_label")
+```
+
+gets MSE for just SVR for now.
+```{r}
+predsdf %>% group_by(stock) %>% 
+  summarize(
+    SVR = mean((na.omit(percent_change_next_weeks_price) - svr)^2)
+  )
+```
+
+Overall MSE
+```{r}
+predsdf %>% 
+  summarize(
+    SVR = mean((na.omit(percent_change_next_weeks_price) - svr)^2)
+  )
+```
+
 
 
 Questions for Dr. Roy:
-1. Create Lag variable before or after test train split? Same for lag plots? Creates loss of observations in test when done after.
-2. Group by for lag variable calculation?
-3. Lag variable keeps getting eliminated in step function for lm, should it be?
-4. KNN imputation appropriate for missing values?
-5. Tree pruning returns 1 node?
+1. Create Lag variable before or after test train split? Same for lag plots? Creates loss of observations in test when done after. create after, don't want training data in your test dataset
+2. Group by for lag variable calculation? yes
+3. Lag variable keeps getting eliminated in step function for lm, should it be? Since we are using percent instead of one of the open or close prices, lag is pretty useless.
+4. KNN imputation appropriate for missing values? yes
+5. Tree pruning returns 1 node? didn't get to this question, but may be very different once we start fitting models the right way for dt anyway.
 
 
 
