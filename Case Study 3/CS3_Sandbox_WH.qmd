@@ -386,3 +386,83 @@ Questions for Dr. Roy:
 
 
 
+# PICKING UP WHERE WILL LEFT OFF FROM HERE. THIS PART ADDS FOR LM - HOLLY
+
+#Have to define the formula when using LM since it doesn't perform the same as SVR when it comes to feature selection
+
+```{r}
+# Defining the formula for LM dynamically to use all existing variables except 'percent_change_next_weeks_price'
+lm_formula <- as.formula(paste("percent_change_next_weeks_price ~ ."))
+
+lm_fit_list <- list()
+
+for (i in unique(train_data_scaled$stock)) {
+  set.seed(123)
+  stock_data <- filter(train_data_scaled, stock == i) %>% select(-stock)
+  lm_fit_list[[i]] <- lm(lm_formula, data = stock_data)
+}
+
+```
+
+#Adding my LM predictions to the 'newpreds' list
+
+```{r}
+
+for (i in unique(test_data_scaled$stock)) {
+  newpreds[[i]]$lm_pred <- predict(lm_fit_list[[i]], newdata = filter(test_data_scaled, stock == i))
+}
+
+combined_preds_df <- bind_rows(newpreds, .id = "stock")
+
+```
+
+#Comparing what we have so far with LM and SVR using MSE/MAE/MAPE for each model and stock
+
+```{r}
+
+performance_metrics <- combined_preds_df %>%
+  group_by(stock) %>%
+  summarize(
+    MSE_LM = mean((percent_change_next_weeks_price - lm_pred)^2, na.rm = TRUE),
+    MAE_LM = mean(abs(percent_change_next_weeks_price - lm_pred), na.rm = TRUE),
+    MAPE_LM = mean(abs(percent_change_next_weeks_price - lm_pred) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE),
+    
+    MSE_SVR = mean((percent_change_next_weeks_price - svr)^2, na.rm = TRUE),
+    MAE_SVR = mean(abs(percent_change_next_weeks_price - svr), na.rm = TRUE),
+    MAPE_SVR = mean(abs(percent_change_next_weeks_price - svr) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE)
+  )
+
+print(performance_metrics)
+
+```
+
+#Interpretation of output:
+#LM does not seem to be performing well compared to SVR (this could be do to it not handling outliers well?).SVR Outperforms LM in MSE and MAE- has lower MSE and MAE values across most stocks, indicating it may have a better fit to the data than LM. For example, for stock AA, MSE_SVR is 0.0546 compared to MSE_LM of 353.17. This pattern holds for many stocks, showing SVR may be a better choice here.Additionally, MAPE values for LM are significantly higher than those for SVR in most cases, which suggests that SVR’s predictions are relatively closer to actual values as a percentage. Some of the MAPE values for LM are very large (like 5168.89 for AA), which might indicate that LM struggles with certain stocks, potentially due to variability or outliers in the data.
+
+
+```{r}
+
+# Plotting Actual vs. Predicted for LM and SVR
+ggplot(combined_preds_df, aes(x = percent_change_next_weeks_price)) +
+  geom_point(aes(y = lm_pred, color = "LM"), alpha = 0.5) +
+  geom_point(aes(y = svr, color = "SVR"), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  labs(
+    title = "Actual vs Predicted Values for LM and SVR",
+    x = "Actual Percent Change Next Week's Price",
+    y = "Predicted Percent Change Next Week's Price"
+  ) +
+  facet_wrap(~ stock) +
+  scale_color_manual(name = "Model", values = c("LM" = "blue", "SVR" = "red")) +
+  theme_minimal()
+
+```
+
+
+Holly Comments/observations:
+Regression Tree and Pruning
+pruning resulting in only one node suggests that the tree might not capture much complexity in the data, possibly due to:
+Limited predictive strength of the features relative to the target
+This may be good to consider alternate models, as we will do with Linear Regression (LM) and SVR, to assess if these might capture the patterns better
+
+
