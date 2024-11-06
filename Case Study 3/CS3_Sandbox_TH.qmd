@@ -1,0 +1,454 @@
+---
+title: "Case Study 3 Sandbox"
+format: html
+---
+
+## Case Study 3 Sandbox
+
+```{r setup}
+pacman::p_load(MASS, tidyverse, here, skimr, rpart, dplyr, VIM, corrplot, car, quantmod, ggplot2, tree, e1071)
+select <- dplyr::select
+```
+
+```{r}
+raw_index_data <- read.csv(here('Case Study 3', 'dow_jones_index.data'))
+raw_index_names <- read.csv(here('Case Study 3', 'dow_jones_index.names'))
+```
+
+
+```{r}
+str(raw_index_data)
+```
+```{r}
+skim(raw_index_data)
+```
+
+
+```{r}
+anyNA(raw_index_data)
+```
+#It appears we have missing values, We will need to address this in some of our next steps but first we'll divide the data into train and test
+
+```{r}
+missing_values <- colSums(is.na(raw_index_data))
+
+missing_values
+```
+#Splitting data into training (Q1) and testing (Q2)
+
+```{r}
+
+train_data <- subset(raw_index_data, quarter == 1)  # Training data (Q1: Jan-Mar)
+test_data <- subset(raw_index_data, quarter == 2)   # Testing data (Q2: Apr-Jun)
+
+```
+
+#Running correlation check among the numeric variables
+
+```{r}
+
+cor_matrix <- cor(train_data[, sapply(train_data, is.numeric)], use = "complete.obs")
+
+cor_matrix
+```
+#There appears to be correlation between 'volume' and keep 'previous_weeks_volume'-these two had >.8 (high correlation). Which one would be important to keep for predicting our target variable [percent_change_next_weeks_price]?
+
+#I've decided to parse out the data variables I believe will be most useful moving forward
+
+```{r}
+
+selected_vars <- c('date', 'stock', "percent_change_next_weeks_price", "percent_change_price", 
+                   "percent_change_volume_over_last_wk", "previous_weeks_volume", 
+                   "days_to_next_dividend", "percent_return_next_dividend", 
+                   "open", "high", "low", "close")
+
+train_data_filtered <- train_data[,selected_vars]
+
+
+test_data_filtered <- test_data[,selected_vars]
+  
+
+```
+
+No issue with the variables selected except no date or stock variable?
+
+#Convert necessary columns to numeric
+
+```{r}
+
+train_data_filtered <- train_data_filtered %>%
+  mutate(across(c(open, high, low, close), ~ as.numeric(gsub("[$,]", "", .))))  # Clean and convert
+
+test_data_filtered <- test_data_filtered %>%
+  mutate(across(c(open, high, low, close), ~ as.numeric(gsub("[$,]", "", .)))) 
+
+```
+
+#impute missing values using KNN in order to maintain integrity of any data patterns
+
+```{r}
+
+# KNN imputation on the training data
+train_data_imputed <- kNN(train_data_filtered, variable = c("percent_change_volume_over_last_wk", "previous_weeks_volume"), 
+                          k = 5, imp_var = F)  # Adjust k (number of neighbors) as necessary
+
+# Should return 'FALSE' if no missing values
+
+
+```
+
+Variables were selected before but here you went back to your original un-selected training dataset. Adjusted to go with the datset with variable selections. I'm pretty neutral on imputing the data, my only concern here is that we may need to explain reasoning for choosing KNN imputation, and check assumptions for using this method. My original gut check with this is too assume the same volume change, so percent_change_over_last_week would be zero for imputed values, and previous_weeks_volume would equal volume.
+
+#Apply scaling in prep for modeling
+
+```{r}
+
+normalize_min_max <- function(x) {
+  (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+}
+
+train_data_scaled <- train_data_imputed %>%
+  mutate(across(where(is.numeric), normalize_min_max))
+
+test_data_scaled <- test_data_filtered %>%
+  mutate(across(where(is.numeric), normalize_min_max))
+
+```
+
+
+#Chage Date variable to true date
+
+```{r}
+train_data_scaled <- train_data_scaled %>% 
+  mutate(date = parse_date_time(date, '%m/%d/%Y'))
+
+test_data_scaled <- test_data_scaled %>% 
+  mutate(date = parse_date_time(date, '%m/%d/%Y'))
+anyNA(train_data_scaled)
+```
+
+
+#Create lagged Variables on scaled data
+
+```{r}
+train_data_scaled %>%
+  arrange(date) %>%  
+  mutate(
+    percent_change_price_lag1 = lag(percent_change_price) 
+  ) %>% head()
+anyNA(train_data_scaled)
+```
+
+Previous method to lag variables does not account for the stock itself. So lag value when ordered by date will pull the values for same date across different stocks.
+
+#Create lagged variables on scaled data version 2
+
+```{r}
+#Need to make train/test data without lags for decision tree
+train_data_scaled_dt <- train_data_scaled %>%
+  group_by(stock) %>% 
+  arrange(date)
+
+test_data_scaled_dt <- test_data_scaled %>%
+  group_by(stock) %>% 
+  arrange(date)
+
+train_data_scaled <- train_data_scaled %>%
+  group_by(stock) %>% 
+  arrange(date) %>%  
+  mutate(
+    percent_change_price_lag1 = lag(percent_change_price, n = 1) 
+  ) %>% ungroup()
+
+test_data_scaled <- test_data_scaled %>%
+  group_by(stock) %>% 
+  arrange(date) %>%  
+  mutate(
+    percent_change_price_lag1 = lag(percent_change_price, n = 1) 
+  ) %>% ungroup()
+
+
+
+anyNA(train_data_scaled_dt)
+anyNA(test_data_scaled_dt)
+```
+
+Group by should solve earlier issue
+
+#Plotting the lagged variables to visualize correlation
+
+```{r}
+
+ggplot(train_data_scaled, aes(x = percent_change_price_lag1, y = percent_change_price)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(
+    title = "Lagged Variable Plot: Percentage Change in Price (t) vs (t-1)",
+    x = "Percentage Change in Price (t-1)",
+    y = "Percentage Change in Price (t)"
+  ) +
+  theme_minimal()
+
+```
+
+
+
+
+
+# Linear model
+
+
+
+
+# SVR
+
+SVR is omitting the rows with the NA for percent_change_price_lag1, so removing that variable here.
+```{r}
+train_data_scaled <- train_data_scaled[ , names(train_data_scaled) != 'percent_change_price_lag1']
+test_data_scaled <- test_data_scaled[ , names(test_data_scaled) != 'percent_change_price_lag1']
+```
+
+
+```{r}
+unique(train_data_scaled$stock)
+```
+
+Getting idea of parameters without for loop since it wouldn't behave on its own. This was primarily just research and does need to be repeated for other models.
+```
+form1 <- percent_change_next_weeks_price ~ . - percent_change_price_lag1
+
+svr_tune_lists <- list() 
+best_Params_list <- list()
+
+set.seed(123)
+svr_tune_lists[['AA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'AA')[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.01,.1, by = .01), cost = seq(2.2, 2.5, by = .01), scale = T
+                                   )
+print(svr_tune_lists[['AA']])
+
+set.seed(123)
+svr_tune_lists[['AXP']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'AXP')[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.001,.01, by = .001), cost = seq(9, 10, by = .05), scale = T
+                                   )
+print(svr_tune_lists[['AXP']])
+
+set.seed(123)
+svr_tune_lists[['BA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'BA')[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.01,.1, by = .01), cost = seq(1.5, 2.5, by = .1), scale = T
+                                   )
+print(svr_tune_lists[['BA']])
+
+set.seed(123)
+svr_tune_lists[['BA']] <- tune.svm(form1, data = filter(train_data_scaled, stock == 'BA')[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.01,.1, by = .01), cost = seq(1.5, 2.5, by = .1), scale = T
+                                   )
+print(svr_tune_lists[['BA']])
+```
+
+```{r}
+form1 <- percent_change_next_weeks_price ~ .
+
+svr_tune_lists <- list() # initiate models list
+best_Params_list <- list() # initiate list of best parameters for SVR for each stock
+
+for (i in c(unique(train_data_scaled$stock))) {
+  set.seed(123)
+  svr_tune_lists[[i]] <-  tune.svm(form1, data = filter(train_data_scaled, stock == i)[, names(train_data_scaled) != 'stock'],
+                                   gamma = seq(.005,.1, by = .005), cost = seq(1, 10, by = 1), scale = T
+                                   )
+  best_Params_list[[i]] <- svr_tune_lists[[i]]$best.parameters
+}
+```
+
+
+checks for any models that did not predict because of bad tuning parameters.
+```{r}
+for (i in c(unique(train_data_scaled$stock))) {
+    print(is.na(best_Params_list[[i]]$gamma))
+}
+
+```
+
+```{r}
+# this is the part to copy for the other models
+svr_fit_list <- list()
+
+for (i in c(unique(train_data_scaled$stock))) {
+  set.seed(123)
+  svr_fit_list[[i]] <-  svm(form1, data = filter(train_data_scaled, stock == i)[, names(train_data_scaled) != 'stock'],
+                                   gamma = best_Params_list[[i]]$gamma, cost = best_Params_list[[i]]$cost, scale = T
+                                   )
+}
+```
+
+this is used to print the summary of each model. Useful if you want to look, but the output is huge and blows up the view a bit.
+```
+for (i in c(unique(train_data_scaled$stock))) {
+    print(summary(svr_fit_list[[i]]))
+}
+
+```
+stores predictions and other identifying variables into a list of dataframes. This is flattened later into one dataframe, but must start as a list in order to more easily iterate through the stocks.
+
+```{r}
+newpreds <- list()
+for (i in c(unique(train_data_scaled$stock))) {
+  newpreds[[i]] <- test_data_scaled %>% filter(stock == i) %>% select(date, stock, percent_change_next_weeks_price) # first model needs this line, all others can skip
+  newpreds[[i]]$svr <- predict(svr_fit_list[[i]], filter(test_data_scaled, stock == i)[, names(test_data_scaled) != 'stock'])
+}
+```
+
+we do this step only once we have all predictions for all models saved to the list like we do above
+```{r}
+predsdf <- bind_rows(newpreds, .id = "column_label")
+```
+
+gets MSE for just SVR for now.
+```{r}
+predsdf %>% group_by(stock) %>% 
+  summarize(
+    SVR = mean((na.omit(percent_change_next_weeks_price) - svr)^2)
+  )
+```
+
+Overall MSE
+```{r}
+predsdf %>% 
+  summarize(
+    SVR = mean((na.omit(percent_change_next_weeks_price) - svr)^2)
+  )
+```
+
+# PICKING UP WHERE WILL LEFT OFF FROM HERE. THIS PART ADDS FOR LM - HOLLY
+
+#Have to define the formula when using LM since it doesn't perform the same as SVR when it comes to feature selection
+
+```{r}
+# Defining the formula for LM dynamically to use all existing variables except 'percent_change_next_weeks_price'
+lm_formula <- as.formula(paste("percent_change_next_weeks_price ~ ."))
+
+lm_fit_list <- list()
+
+for (i in unique(train_data_scaled$stock)) {
+  set.seed(123)
+  stock_data <- filter(train_data_scaled, stock == i) %>% select(-stock)
+  lm_fit_list[[i]] <- lm(lm_formula, data = stock_data)
+}
+
+```
+
+#Adding my LM predictions to the 'newpreds' list
+
+```{r}
+
+for (i in unique(test_data_scaled$stock)) {
+  newpreds[[i]]$lm_pred <- predict(lm_fit_list[[i]], newdata = filter(test_data_scaled, stock == i))
+}
+
+combined_preds_df <- bind_rows(newpreds, .id = "stock")
+
+```
+
+```{r}
+# Define formula for the decision tree model
+tree_formula <- as.formula("percent_change_next_weeks_price ~ .")
+
+# Initialize a list to store the decision tree fits for each stock
+tree_fit_list <- list()
+
+# Loop through each unique stock and fit a decision tree model
+for (i in unique(train_data_scaled_dt$stock)) {
+  set.seed(123)
+  
+  # Filter data for the current stock, excluding the 'stock' column
+  #stock_data_dt <- filter(train_data_scaled_dt, stock == i) %>% select(-stock)
+  
+  # Fit the decision tree model for the current stock
+  tree_fit_list[[i]] <- tree(tree_formula, data = stock_data)
+}
+
+# Example: Access the decision tree model for a specific stock, e.g., "AA"
+summary(tree_fit_list[["AA"]])  # Provides a summary of the tree for stock "AA"
+plot(tree_fit_list[["AA"]])     # Plots the decision tree for stock "AA"
+text(tree_fit_list[["AA"]], pretty = 0) # Adds text to the tree plot
+
+# Initialize a list to store predictions
+treepreds <- list()
+
+# Loop through each unique stock and get predictions from the decision tree model
+for (i in unique(test_data_scaled_dt$stock)) {
+  # Make predictions using the decision tree model for the specific stock
+  treepreds[[i]] <- filter(test_data_scaled_dt, stock == i)
+  newpreds[[i]]$tree_pred <- predict(tree_fit_list[[i]], newdata = treepreds[[i]])
+}
+
+# Combine all predictions into a single data frame
+combined_preds_df <- bind_rows(newpreds, .id = "stock")
+
+# View the combined predictions
+print(combined_preds_df)
+
+
+
+
+
+
+```
+
+
+#Comparing what we have so far with LM and SVR using MSE/MAE/MAPE for each model and stock
+
+```{r}
+
+performance_metrics <- combined_preds_df %>%
+  group_by(stock) %>%
+  summarize(
+    MSE_LM = mean((percent_change_next_weeks_price - lm_pred)^2, na.rm = TRUE),
+    MAE_LM = mean(abs(percent_change_next_weeks_price - lm_pred), na.rm = TRUE),
+    MAPE_LM = mean(abs(percent_change_next_weeks_price - lm_pred) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE),
+    
+    MSE_SVR = mean((percent_change_next_weeks_price - svr)^2, na.rm = TRUE),
+    MAE_SVR = mean(abs(percent_change_next_weeks_price - svr), na.rm = TRUE),
+    MAPE_SVR = mean(abs(percent_change_next_weeks_price - svr) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE),
+    
+    MSE_Tree = mean((percent_change_next_weeks_price - tree_pred)^2, na.rm = TRUE),
+    MAE_Tree = mean(abs(percent_change_next_weeks_price - tree_pred), na.rm = TRUE),
+    MAPE_Tree = mean(abs(percent_change_next_weeks_price - tree_pred) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE)
+  )
+
+print(performance_metrics)
+
+
+```
+
+#Interpretation of output:
+#LM does not seem to be performing well compared to SVR (this could be do to it not handling outliers well?).SVR Outperforms LM in MSE and MAE- has lower MSE and MAE values across most stocks, indicating it may have a better fit to the data than LM. For example, for stock AA, MSE_SVR is 0.0546 compared to MSE_LM of 353.17. This pattern holds for many stocks, showing SVR may be a better choice here.Additionally, MAPE values for LM are significantly higher than those for SVR in most cases, which suggests that SVR’s predictions are relatively closer to actual values as a percentage. Some of the MAPE values for LM are very large (like 5168.89 for AA), which might indicate that LM struggles with certain stocks, potentially due to variability or outliers in the data.
+
+
+```{r}
+
+# Plotting Actual vs. Predicted for LM and SVR
+ggplot(combined_preds_df, aes(x = percent_change_next_weeks_price)) +
+  geom_point(aes(y = lm_pred, color = "LM"), alpha = 0.5) +
+  geom_point(aes(y = svr, color = "SVR"), alpha = 0.5) +
+  geom_point(aes(y = tree_pred, color = "TREE"), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  labs(
+    title = "Actual vs Predicted Values for LM and SVR",
+    x = "Actual Percent Change Next Week's Price",
+    y = "Predicted Percent Change Next Week's Price"
+  ) +
+  facet_wrap(~ stock) +
+  scale_color_manual(name = "Model", values = c("LM" = "blue", "SVR" = "red", "TREE" = "green")) +
+  theme_minimal()
+
+```
+
+
+Holly Comments/observations:
+Regression Tree and Pruning
+pruning resulting in only one node suggests that the tree might not capture much complexity in the data, possibly due to:
+Limited predictive strength of the features relative to the target
+This may be good to consider alternate models, as we will do with Linear Regression (LM) and SVR, to assess if these might capture the patterns better
+
+
