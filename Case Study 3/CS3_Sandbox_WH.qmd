@@ -13,6 +13,7 @@ select <- dplyr::select
 ```{r}
 raw_index_data <- read.csv(here('Case Study 3', 'dow_jones_index.data'))
 raw_index_names <- read.csv(here('Case Study 3', 'dow_jones_index.names'))
+SP500_raw <- read.csv(here('Case Study 3', 'SP500.csv'), sep = ',', fileEncoding = 'latin1')
 ```
 
 
@@ -416,28 +417,106 @@ combined_preds_df <- bind_rows(newpreds, .id = "stock")
 
 ```
 
-#Comparing what we have so far with LM and SVR using MSE/MAE/MAPE for each model and stock
+
+# Decision Trees
+```{r}
+# Define formula for the decision tree model
+tree_formula <- as.formula("percent_change_next_weeks_price ~ .")
+
+# Initialize a list to store the decision tree fits for each stock
+tree_fit_list <- list()
+
+# Loop through each unique stock and fit a decision tree model
+for (i in unique(test_data_scaled$stock)) {
+  set.seed(123)
+  
+  # Filter data for the current stock, excluding the 'stock' column
+  #stock_data_dt <- filter(train_data_scaled_dt, stock == i) %>% select(-stock)
+  
+  # Fit the decision tree model for the current stock
+  tree_fit_list[[i]] <- tree(tree_formula, data = stock_data)
+}
+
+# Example: Access the decision tree model for a specific stock, e.g., "AA"
+summary(tree_fit_list[["AA"]])  # Provides a summary of the tree for stock "AA"
+plot(tree_fit_list[["AA"]])     # Plots the decision tree for stock "AA"
+text(tree_fit_list[["AA"]], pretty = 0) # Adds text to the tree plot
+
+# Initialize a list to store predictions
+treepreds <- list()
+
+# Loop through each unique stock and get predictions from the decision tree model
+for (i in unique(test_data_scaled$stock)) {
+  # Make predictions using the decision tree model for the specific stock
+  treepreds[[i]] <- filter(test_data_scaled, stock == i)
+  newpreds[[i]]$tree_pred <- predict(tree_fit_list[[i]], newdata = treepreds[[i]])
+}
+
+# Combine all predictions into a single data frame
+combined_preds_df <- bind_rows(newpreds, .id = "stock")
+
+# View the combined predictions
+print(combined_preds_df)
+
+
+
+
+
+
+```
+
+
+#Comparing what we have so far with LM, SVR, and Decision Trees using MSE/MAE/MAPE for each model and stock
 
 ```{r}
 
 performance_metrics <- combined_preds_df %>%
   group_by(stock) %>%
   summarize(
-    MSE_LM = mean((percent_change_next_weeks_price - lm_pred)^2, na.rm = TRUE),
-    MAE_LM = mean(abs(percent_change_next_weeks_price - lm_pred), na.rm = TRUE),
-    MAPE_LM = mean(abs(percent_change_next_weeks_price - lm_pred) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE),
+    RMSE_LM = sqrt(mean((percent_change_next_weeks_price - lm_pred)^2, na.rm = TRUE)),
+    #MAE_LM = mean(abs(percent_change_next_weeks_price - lm_pred), na.rm = TRUE),
+    #MAPE_LM = mean(abs(percent_change_next_weeks_price - lm_pred) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE),
     
-    MSE_SVR = mean((percent_change_next_weeks_price - svr)^2, na.rm = TRUE),
-    MAE_SVR = mean(abs(percent_change_next_weeks_price - svr), na.rm = TRUE),
-    MAPE_SVR = mean(abs(percent_change_next_weeks_price - svr) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE)
+    RMSE_SVR = sqrt(mean((percent_change_next_weeks_price - svr)^2, na.rm = TRUE)),
+    #MAE_SVR = mean(abs(percent_change_next_weeks_price - svr), na.rm = TRUE),
+    #MAPE_SVR = mean(abs(percent_change_next_weeks_price - svr) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE),
+    
+    RMSE_Tree = sqrt(mean((percent_change_next_weeks_price - tree_pred)^2, na.rm = TRUE)),
+    #MAE_Tree = mean(abs(percent_change_next_weeks_price - tree_pred), na.rm = TRUE),
+    #MAPE_Tree = mean(abs(percent_change_next_weeks_price - tree_pred) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE)
   )
 
 print(performance_metrics)
 
 ```
 
+Isolated down to RMSE only to make it more consumable. Dr. Roy suggested RMSE or MAPE, MAPE would have problems with models where there is a value of 0 for the actual value.
+
+# Two thought processes for overall RMSE: taking mean across stocks
+
+```{r}
+performance_metrics %>% summarize(
+  RMSE_LM = mean(RMSE_LM),
+  RMSE_SVR = mean(RMSE_SVR),
+  RMSE_Tree = mean(RMSE_Tree)
+  )
+```
+
+# calculating RMSE across all predictions without stock groupings
+
+```{r}
+combined_preds_df %>%
+  summarize(
+    RMSE_LM = sqrt(mean((percent_change_next_weeks_price - lm_pred)^2, na.rm = TRUE)),
+    RMSE_SVR = sqrt(mean((percent_change_next_weeks_price - svr)^2, na.rm = TRUE)),
+    RMSE_Tree = sqrt(mean((percent_change_next_weeks_price - tree_pred)^2, na.rm = TRUE))
+  )
+```
+
+
 #Interpretation of output:
 #LM does not seem to be performing well compared to SVR (this could be do to it not handling outliers well?).SVR Outperforms LM in MSE and MAE- has lower MSE and MAE values across most stocks, indicating it may have a better fit to the data than LM. For example, for stock AA, MSE_SVR is 0.0546 compared to MSE_LM of 353.17. This pattern holds for many stocks, showing SVR may be a better choice here.Additionally, MAPE values for LM are significantly higher than those for SVR in most cases, which suggests that SVR’s predictions are relatively closer to actual values as a percentage. Some of the MAPE values for LM are very large (like 5168.89 for AA), which might indicate that LM struggles with certain stocks, potentially due to variability or outliers in the data.
+
 
 
 ```{r}
@@ -446,14 +525,15 @@ print(performance_metrics)
 ggplot(combined_preds_df, aes(x = percent_change_next_weeks_price)) +
   geom_point(aes(y = lm_pred, color = "LM"), alpha = 0.5) +
   geom_point(aes(y = svr, color = "SVR"), alpha = 0.5) +
+  geom_point(aes(y = tree_pred, color = "Tree"), alpha = 0.5) +
   geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
   labs(
-    title = "Actual vs Predicted Values for LM and SVR",
+    title = "Actual vs Predicted Values for LM, SVR, and Decision Trees",
     x = "Actual Percent Change Next Week's Price",
     y = "Predicted Percent Change Next Week's Price"
   ) +
   facet_wrap(~ stock) +
-  scale_color_manual(name = "Model", values = c("LM" = "blue", "SVR" = "red")) +
+  scale_color_manual(name = "Model", values = c("LM" = "blue", "SVR" = "red", "Tree" = 'green')) +
   theme_minimal()
 
 ```
@@ -465,4 +545,73 @@ pruning resulting in only one node suggests that the tree might not capture much
 Limited predictive strength of the features relative to the target
 This may be good to consider alternate models, as we will do with Linear Regression (LM) and SVR, to assess if these might capture the patterns better
 
+# CAPM
 
+data obtained from Yahoo finance [here](https://finance.yahoo.com/quote/%5EGSPC/history/?period1=1294358400&period2=1308873600&frequency=1wk)
+
+```{r}
+SP500_raw
+```
+
+```{r}
+SP500 <- SP500_raw %>% mutate(
+  Date = parse_date_time(Date, '%d-%b-%y'),
+  Date = Date + days(4)
+) %>% mutate_at(
+  2:7, parse_number
+) %>% mutate(
+  percent_change = (Close. - Open)/Open
+) %>% select(Date, percent_change)
+```
+
+
+Example for calculation
+
+```{r}
+train_data_filtered %>% mutate(pct = (close-open)/open) %>% select(pct, percent_change_price) %>% head()
+```
+
+```{r}
+risk_data <- raw_index_data %>% select(date, stock, percent_change_price) %>% 
+  mutate(
+    date = parse_date_time(date, '%m/%d/%Y'),
+    percent_change_price = percent_change_price/100
+  )
+```
+
+```{r}
+rd_joined <- left_join(risk_data, SP500, join_by(date == Date))
+```
+
+```{r}
+risk_fit_list <- list()
+
+for (i in unique(rd_joined$stock)) {
+  set.seed(123)
+  stock_risk <- filter(rd_joined, stock == i)
+  risk_fit_list[[i]] <- lm(percent_change_price ~ percent_change, data = stock_risk)
+}
+
+```
+
+
+```{r}
+stock_betas <- list()
+
+for (i in unique(rd_joined$stock)) {
+  stock_betas[[i]] <- summary(risk_fit_list[[i]])$coefficients[2, 1] %>% as.data.frame()
+}
+
+betas_df <- bind_rows(stock_betas, .id = 'stock')
+names(betas_df) <- c('stock', 'betas')
+print(betas_df)
+```
+
+```{r}
+Jul1_preds <- combined_preds_df %>% filter(date == max(date)) %>% select(stock, percent_change_next_weeks_price, svr)
+
+risk_pred <- Jul1_preds %>% left_join(betas_df, join_by(stock))
+```
+
+risk_pred data frame can be used for the visualization. If for any reason we decide to pick a different model after additional changes or tuning, we can select a different column in chunk above.
+I haven't looked too much into picking the best stock, I figure once we have the visualization it will be easier to make that decision. Also, our price predictions and original measurements may not be as interpretable since we normalized the data. For example, stock AA isn't predicted to see a percent change of 0.696 in the next week. SVR still generally needs centering and scaling to work properly, so not sure yet how we unwind this, but just a word of caution for when we give our write up.
