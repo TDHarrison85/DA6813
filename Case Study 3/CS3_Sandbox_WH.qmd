@@ -615,3 +615,58 @@ risk_pred <- Jul1_preds %>% left_join(betas_df, join_by(stock))
 
 risk_pred data frame can be used for the visualization. If for any reason we decide to pick a different model after additional changes or tuning, we can select a different column in chunk above.
 I haven't looked too much into picking the best stock, I figure once we have the visualization it will be easier to make that decision. Also, our price predictions and original measurements may not be as interpretable since we normalized the data. For example, stock AA isn't predicted to see a percent change of 0.696 in the next week. SVR still generally needs centering and scaling to work properly, so not sure yet how we unwind this, but just a word of caution for when we give our write up.
+
+#Holly adding Visuals here.....(it will not hurt my feelings if these get deleted or changed)
+
+```{r}
+
+ggplot(risk_pred, aes(x = betas, y = svr)) +
+  geom_point(color = "blue", alpha = 0.7) +
+  labs(
+    title = "Scatter Plot of Predicted Percent Change vs. Betas",
+    x = "Betas",
+    y = "Predicted Percent Change for Next Week"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.minor = element_blank()
+  )
+
+```
+#Hopefully put the right variables on the right axis..
+WH: Axes look right, percent change is like a function of the risk value, which is represent by Beta. Chart below is a good idea, adding the label. HD looks like good return with only moderate risk, since the value is just above 1 for Beta, it means it is theoretically only slightly more volatile than the market. CVX has the best return while still being less volatile, so depending on what sort of risk a person's stock portfolio is willing to accept that may be the better choice.
+
+```{r}
+
+ggplot(risk_pred, aes(x = betas, y = svr, label = stock)) +
+  geom_point(color = "blue", alpha = 0.7) +
+  geom_text(vjust = -1, hjust = 1, size = 3) +
+  labs(
+    title = "Risk-Return Trade-Off by Stock",
+    x = "Betas",
+    y = "Predicted Percent Change for Next Week"
+  ) +
+  theme_minimal()
+
+```
+
+#Not at all sure if I'm right about comparing these two fields from risk_pred but I saw we have a prediction for next week and an SVR prediction? Just comparing the two...
+WH: percent_change_next_week is the actual value for the week's percent change, not a prediction. In practice we wouldn't have that, but since we are making this model we do have the benefit of hindsight and can see if we got it right. I've changed those across the charts to make sure we are using the SVR prediction instead of the actual value.
+
+```{r}
+ggplot(risk_pred, aes(x = stock)) +
+  geom_bar(aes(y = percent_change_next_weeks_price, fill = "Actual"), stat = "identity", position = "dodge") +
+  geom_bar(aes(y = svr, fill = "SVR"), stat = "identity", position = "dodge", alpha = 0.8) +
+  labs(
+    title = "Comparison of Actual Percent Change and SVR by Stock",
+    x = "Stock",
+    y = "Percent Change"
+  ) +
+  scale_fill_manual(values = c("Actual" = "dodgerblue", "SVR" = "orange")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+This chart highlights what the actual vs predicted relationship would be, i.e. tells us if we pick one stock, are we right about it? We can HD has a slightly lower percent change than we expected, and that CVX is actually slightly higher.
+This kind of puts me even more back to a mind set about the normalization. We know which ones might be the best stocks, but we have two relatively good options and we don't know if one of them might even have negative return. If it does, and if we predict as such, we would likely make different choices about what stock. I'm actually wondering if it would be possible for us to "unwind" the normalization algebraically. Basically solving for the original value from the normalization formula from earlier. I'll have to think more about that.
