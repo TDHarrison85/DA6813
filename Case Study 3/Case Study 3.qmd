@@ -1,0 +1,109 @@
+---
+title: "DA 6813 Case Study "
+author: "Will Hytlin, Holly Millazo and Tim Harrison"
+date: today
+format: 
+  html:
+    theme: lumen # or flatly, lumen, united, etc.
+    toc: true # Adds a table of contents
+    toc-depth: 2 # Depth of table of contents
+    toc-location: left
+    code-fold: true # Folds code by default
+    number-sections: true # Numbered sections
+    df-print: paged # Nice table format
+    fig-align: center # Centers figures
+    fig-width: 6 # Adjust figure size
+    fig-height: 4
+    reference-location: section # Valid value for citation references
+---
+
+# Executive Summary
+
+<!-- 
+Purpose: Provide a concise overview of the key findings and results of the analysis.
+Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
+-->
+
+Content for Executive Summary goes here.
+
+# Problem Statement
+
+The Dow Jones Index case study addresses a critical business challenge: predicting weekly stock performance to optimize investment strategies. In a highly volatile market, businesses and investors rely on accurate forecasts to maximize returns and mitigate risks. This study aims to develop predictive models that forecast the percentage change in stock prices for the following week, helping identify stocks with the highest growth potential. Using historical data, including stock prices, trading volumes, and financial indicators, the analysis seeks to improve decision-making by leveraging models such as Linear Regression, Decision Trees, and Support Vector Regression. These models will be evaluated for their accuracy and ability to assess risk using methods like the Capital Asset Pricing Model (CAPM). Addressing this problem will enable businesses to allocate resources more effectively, capitalize on profitable opportunities, and enhance their competitive edge in the financial market. Notably, the study will also examine broader market risks, such as the unusual losses experienced by all Dow Jones stocks in the week ending May 27, 2011, providing a comprehensive view of potential challenges.
+<!-- 
+Purpose: Explain the problem that the study aims to solve.
+Instructions: Clearly define the task at hand, which in this case is predicting customer acquisition. Outline the objectives and what solving this problem would mean for the company.
+-->
+
+Content for Problem Statement goes here.
+
+# Additional Sources
+
+<!-- 
+Purpose: Reference relevant literature or sources to support the analysis.
+Instructions: Provide citations and key insights from sources relevant to the case study or the models used.
+-->
+Support Vector Machines (SVMs) have been extensively applied in financial markets for stock price prediction due to their ability to handle complex, non-linear relationships. For instance, a study by Kim (2003) demonstrated that SVMs could outperform traditional models in forecasting stock price indices, highlighting their robustness in capturing market dynamics. 
+
+The Capital Asset Pricing Model (CAPM) is a fundamental tool in finance for assessing the risk and expected return of an investment. It establishes a linear relationship between the expected return of an asset and its systematic risk, measured by beta. This model aids investors in determining whether a stock is fairly priced relative to its risk. For a comprehensive understanding of CAPM, Investopedia provides an in-depth explanation of its components and applications. 
+
+Integrating SVMs for stock price prediction with CAPM for risk assessment can offer a holistic approach to investment decision-making, combining advanced predictive analytics with established financial theories. 
+
+1. **Kim, K. (2003).**  
+   A study on the application of Support Vector Machines (SVM) for stock price index prediction.  
+  https://www.researchgate.net/publication/220379019
+
+2. **Wall Street Prep - Capital Asset Pricing Model (CAPM).**  
+   Comprehensive guide on using CAPM for risk assessment in financial markets.  
+   https://www.wallstreetprep.com/knowledge/capm-capital-asset-pricing-model
+
+3. **Investopedia - Capital Asset Pricing Model (CAPM).**  
+   In-depth explanation of CAPM, its components, and applications.  
+  https://www.investopedia.com/terms/c/capm.asp
+
+
+# Methodology
+
+<!-- 
+Purpose: Describe the methods and processes used to conduct the analysis.
+Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
+-->
+
+To predict weekly stock price changes (`percent_change_next_weeks_price`), we employed three models: Linear Regression (LM), Decision Trees (DT), and Support Vector Regression (SVR). Before modeling, we undertook comprehensive data preprocessing. Missing values in key variables were addressed using KNN imputation to preserve patterns in the data. We scaled and normalized numeric variables to ensure comparability, especially crucial for SVR, which relies on distance measures in feature space. Additionally, we created lagged variables to capture potential temporal dependencies. However, after evaluating residual plots, we found no significant relationship between the lagged variables and the target, leading to their exclusion from the final models. The data was then split into training (Q1) and testing (Q2) sets, maintaining temporal integrity to simulate real-world forecasting.
+
+Each model comes with its own assumptions. Linear Regression assumes a linear relationship between predictors and the target, independence of errors, homoscedasticity (constant error variance), and normal distribution of errors. It also requires minimal multicollinearity among predictors. Decision Trees, on the other hand, are non-parametric and assume no specific relationship between predictors and the target but can be sensitive to small changes in data. SVR, which ultimately performed best, assumes no specific relationship but depends heavily on normalized data to maximize the margin around the true values. SVR’s ability to model non-linear patterns allowed it to achieve the lowest Mean Absolute Percentage Error (MAPE) and Root Mean Square Error (RMSE), making it the most reliable predictor of weekly stock changes. Future work could explore ensemble methods or additional financial indicators to further enhance predictive accuracy.
+
+# Data
+
+<!-- 
+Purpose: Explain the data used in the analysis and any preprocessing steps.
+Instructions: Provide an overview of the dataset, variables, and any cleaning steps or transformations made. Mention variables used or excluded and why.
+-->
+
+The dataset for this analysis consists of weekly stock performance metrics from the Dow Jones Index, containing variables such as opening, closing, high, and low prices, trading volumes, and percentage changes in prices. We began by importing and inspecting the dataset to understand its structure and identify missing values. Missing data, particularly in key numeric variables like `percent_change_volume_over_last_wk` and `previous_weeks_volume`, was imputed using KNN imputation to maintain data integrity. Numeric features were normalized and scaled to ensure they were on a comparable scale, which is critical for models like SVR that rely on distance calculations. Additionally, we explored the distributions and correlations of the numeric variables to identify potential predictors. Although we initially created lagged variables to capture temporal relationships, residual plots showed no significant correlation with the target variable (`percent_change_next_weeks_price`), leading to their exclusion. The dataset was then split into training (Q1) and testing (Q2) sets to facilitate model validation while preserving temporal order. This comprehensive preprocessing ensured a robust foundation for subsequent modeling efforts.
+
+# Findings
+
+<!-- 
+Purpose: Present the results of the analysis.
+Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
+-->
+
+Content for Findings goes here.
+
+# Conclusion
+
+<!-- 
+Purpose: Summarize the key takeaways and provide actionable recommendations.
+Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
+-->
+
+Content for Conclusion goes here.
+
+# Appendix
+
+<!-- 
+Purpose: Include supplementary material or detailed technical results.
+Instructions: Provide code snippets, detailed model output, and data summaries.
+-->
+
+Content for Appendix goes here.
