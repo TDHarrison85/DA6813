@@ -670,3 +670,22 @@ ggplot(risk_pred, aes(x = stock)) +
 ```
 This chart highlights what the actual vs predicted relationship would be, i.e. tells us if we pick one stock, are we right about it? We can HD has a slightly lower percent change than we expected, and that CVX is actually slightly higher.
 This kind of puts me even more back to a mind set about the normalization. We know which ones might be the best stocks, but we have two relatively good options and we don't know if one of them might even have negative return. If it does, and if we predict as such, we would likely make different choices about what stock. I'm actually wondering if it would be possible for us to "unwind" the normalization algebraically. Basically solving for the original value from the normalization formula from earlier. I'll have to think more about that.
+
+#Unwinding the normalization:
+
+```{r}
+min_pct <- min(test_data_filtered$percent_change_next_weeks_price)
+max_pct <- max(test_data_filtered$percent_change_next_weeks_price)
+
+risk_pred %>% mutate(
+  pct_fix = (percent_change_next_weeks_price * (max_pct - min_pct) + min_pct) / 100,
+  pred_fix = (svr * (max_pct - min_pct) + min_pct) / 100
+)
+
+#train_data
+#normalize_min_max <- function(x) {
+#  (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
+#}
+```
+
+Based on this, we can see that both CVX and HD stocks would be good investments, including in hindsight. CVX is the safer choice based on the Beta risk value, and actually ends up being more profitable than we expect. HD is still profitable, though not as much as originally predicted, which makes sense due to the fact that it has a higher risk value implying more volatility.
