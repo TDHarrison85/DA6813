@@ -726,19 +726,19 @@ Root node error: 4.2149/360 = 0.011708
 n= 360 
 
          CP nsplit rel error  xerror    xstd
-1  0.055392      0   1.00000 1.00733 0.13675
-2  0.033490      3   0.83382 0.92768 0.12891
-3  0.020011      4   0.80033 1.07174 0.14363
-4  0.018098      5   0.78032 1.08223 0.14315
-5  0.015296      6   0.76222 1.10654 0.14376
-6  0.014913      8   0.73163 1.12249 0.14392
-7  0.014087      9   0.71672 1.11152 0.14351
-8  0.013871     10   0.70263 1.12769 0.14442
-9  0.012061     13   0.66102 1.14059 0.14418
-10 0.011764     14   0.64896 1.20058 0.15080
-11 0.010559     15   0.63719 1.21103 0.15075
-12 0.010282     16   0.62663 1.23132 0.15137
-13 0.010000     17   0.61635 1.22840 0.15077</code></pre>
+1  0.055392      0   1.00000 1.00529 0.13691
+2  0.033490      3   0.83382 0.97216 0.13199
+3  0.020011      4   0.80033 1.06025 0.13958
+4  0.018098      5   0.78032 1.14829 0.14345
+5  0.015296      6   0.76222 1.14058 0.14297
+6  0.014913      8   0.73163 1.13570 0.14336
+7  0.014087      9   0.71672 1.13284 0.14040
+8  0.013871     10   0.70263 1.14907 0.14077
+9  0.012061     13   0.66102 1.15502 0.14084
+10 0.011764     14   0.64896 1.18126 0.14825
+11 0.010559     15   0.63719 1.21363 0.14894
+12 0.010282     16   0.62663 1.21410 0.14885
+13 0.010000     17   0.61635 1.22522 0.14882</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tree_model, <span class="at">uniform =</span> <span class="cn">TRUE</span>, <span class="at">main =</span> <span class="st">"Regression Tree for Stock Price Prediction"</span>)</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(tree_model, <span class="at">use.n =</span> <span class="cn">TRUE</span>, <span class="at">all =</span> <span class="cn">TRUE</span>, <span class="at">cex =</span> <span class="fl">0.7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1703,6 +1703,37 @@ Warning in pred1.tree(object, tree.matrix(newdata)): NAs introduced by coercion<
 </div>
 </div>
 <p>This chart highlights what the actual vs predicted relationship would be, i.e.&nbsp;tells us if we pick one stock, are we right about it? We can HD has a slightly lower percent change than we expected, and that CVX is actually slightly higher. This kind of puts me even more back to a mind set about the normalization. We know which ones might be the best stocks, but we have two relatively good options and we don’t know if one of them might even have negative return. If it does, and if we predict as such, we would likely make different choices about what stock. I’m actually wondering if it would be possible for us to “unwind” the normalization algebraically. Basically solving for the original value from the normalization formula from earlier. I’ll have to think more about that.</p>
+<p>#Unwinding the normalization:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>min_pct <span class="ot">&lt;-</span> <span class="fu">min</span>(test_data_filtered<span class="sc">$</span>percent_change_next_weeks_price)</span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>max_pct <span class="ot">&lt;-</span> <span class="fu">max</span>(test_data_filtered<span class="sc">$</span>percent_change_next_weeks_price)</span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>risk_pred <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
+<span id="cb121-5"><a href="#cb121-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pct_fix =</span> (percent_change_next_weeks_price <span class="sc">*</span> (max_pct <span class="sc">-</span> min_pct) <span class="sc">+</span> min_pct) <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb121-6"><a href="#cb121-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred_fix =</span> (svr <span class="sc">*</span> (max_pct <span class="sc">-</span> min_pct) <span class="sc">+</span> min_pct) <span class="sc">/</span> <span class="dv">100</span></span>
+<span id="cb121-7"><a href="#cb121-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 30 × 6
+   stock percent_change_next_weeks_price   svr betas pct_fix pred_fix
+   &lt;chr&gt;                           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+ 1 AA                              0.867 0.696 1.17   0.0716  0.0369 
+ 2 AXP                             0.905 0.591 0.841  0.0794  0.0155 
+ 3 BA                              0.709 0.733 1.11   0.0396  0.0445 
+ 4 BAC                             0.781 0.472 0.854  0.0542 -0.00875
+ 5 CAT                             0.940 0.935 1.63   0.0866  0.0855 
+ 6 CSCO                            0.817 0.607 0.673  0.0616  0.0188 
+ 7 CVX                             0.823 0.772 0.958  0.0628  0.0524 
+ 8 DD                              0.763 0.764 1.38   0.0505  0.0507 
+ 9 DIS                             0.789 0.818 1.24   0.0558  0.0617 
+10 GE                              0.842 0.710 0.872  0.0667  0.0396 
+# ℹ 20 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="co">#train_data</span></span>
+<span id="cb123-2"><a href="#cb123-2" aria-hidden="true" tabindex="-1"></a><span class="co">#normalize_min_max &lt;- function(x) {</span></span>
+<span id="cb123-3"><a href="#cb123-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))</span></span>
+<span id="cb123-4"><a href="#cb123-4" aria-hidden="true" tabindex="-1"></a><span class="co">#}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Based on this, we can see that both CVX and HD stocks would be good investments, including in hindsight. CVX is the safer choice based on the Beta risk value, and actually ends up being more profitable than we expect. HD is still profitable, though not as much as originally predicted, which makes sense due to the fact that it has a higher risk value implying more volatility.</p>
 </section>
 
 </main>

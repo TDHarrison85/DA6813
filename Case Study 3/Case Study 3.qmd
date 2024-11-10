@@ -28,13 +28,14 @@ Content for Executive Summary goes here.
 
 # Problem Statement
 
-The Dow Jones Index case study addresses a critical business challenge: predicting weekly stock performance to optimize investment strategies. In a highly volatile market, businesses and investors rely on accurate forecasts to maximize returns and mitigate risks. This study aims to develop predictive models that forecast the percentage change in stock prices for the following week, helping identify stocks with the highest growth potential. Using historical data, including stock prices, trading volumes, and financial indicators, the analysis seeks to improve decision-making by leveraging models such as Linear Regression, Decision Trees, and Support Vector Regression. These models will be evaluated for their accuracy and ability to assess risk using methods like the Capital Asset Pricing Model (CAPM). Addressing this problem will enable businesses to allocate resources more effectively, capitalize on profitable opportunities, and enhance their competitive edge in the financial market. Notably, the study will also examine broader market risks, such as the unusual losses experienced by all Dow Jones stocks in the week ending May 27, 2011, providing a comprehensive view of potential challenges.
 <!-- 
 Purpose: Explain the problem that the study aims to solve.
 Instructions: Clearly define the task at hand, which in this case is predicting customer acquisition. Outline the objectives and what solving this problem would mean for the company.
 -->
 
-Content for Problem Statement goes here.
+The Dow Jones Index case study addresses a critical business challenge: predicting weekly stock performance to optimize investment strategies. In a highly volatile market, businesses and investors rely on accurate forecasts to maximize returns and mitigate risks. This study aims to develop predictive models that forecast the percentage change in stock prices for the following week, helping identify stocks with the highest growth potential. Using historical data, including stock prices, trading volumes, and financial indicators, the analysis seeks to improve decision-making by leveraging models such as Linear Regression, Decision Trees, and Support Vector Regression. These models will be evaluated for their accuracy and ability to assess risk using methods like the Capital Asset Pricing Model (CAPM). Addressing this problem will enable businesses to allocate resources more effectively, capitalize on profitable opportunities, and enhance their competitive edge in the financial market. Notably, the study will also examine broader market risks, such as the unusual losses experienced by all Dow Jones stocks in the week ending May 27, 2011, providing a comprehensive view of potential challenges.
+
+
 
 # Additional Sources
 
@@ -68,9 +69,9 @@ Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
 
-To predict weekly stock price changes (`percent_change_next_weeks_price`), we employed three models: Linear Regression (LM), Decision Trees (DT), and Support Vector Regression (SVR). Before modeling, we undertook comprehensive data preprocessing. Missing values in key variables were addressed using KNN imputation to preserve patterns in the data. We scaled and normalized numeric variables to ensure comparability, especially crucial for SVR, which relies on distance measures in feature space. Additionally, we created lagged variables to capture potential temporal dependencies. However, after evaluating residual plots, we found no significant relationship between the lagged variables and the target, leading to their exclusion from the final models. The data was then split into training (Q1) and testing (Q2) sets, maintaining temporal integrity to simulate real-world forecasting.
+To predict weekly stock price changes (`percent_change_next_weeks_price`), we employed three models: Linear Regression (LM), Decision Trees (DT), and Support Vector Regression (SVR). Before modeling, we performed comprehensive data preprocessing. Missing values in key variables were addressed using KNN imputation to preserve data integrity. Numeric features were scaled and normalized to ensure comparability, particularly important for SVR, which relies on distance measures in feature space. Lagged variables were created to capture potential temporal dependencies; however, residual plots indicated no significant relationship between the lagged variables and the target, so they were excluded from the final models. The data was then split into training (Q1) and testing (Q2) sets, maintaining temporal integrity to simulate real-world forecasting scenarios.
 
-Each model comes with its own assumptions. Linear Regression assumes a linear relationship between predictors and the target, independence of errors, homoscedasticity (constant error variance), and normal distribution of errors. It also requires minimal multicollinearity among predictors. Decision Trees, on the other hand, are non-parametric and assume no specific relationship between predictors and the target but can be sensitive to small changes in data. SVR, which ultimately performed best, assumes no specific relationship but depends heavily on normalized data to maximize the margin around the true values. SVR’s ability to model non-linear patterns allowed it to achieve the lowest Mean Absolute Percentage Error (MAPE) and Root Mean Square Error (RMSE), making it the most reliable predictor of weekly stock changes. Future work could explore ensemble methods or additional financial indicators to further enhance predictive accuracy.
+Each model comes with specific assumptions. Linear Regression assumes a linear relationship between predictors and the target, independence of errors, homoscedasticity (constant error variance), and normally distributed errors. It also requires minimal multicollinearity among predictors. Decision Trees, being non-parametric, do not assume a specific relationship between predictors and the target but are sensitive to small data changes. SVR, which emerged as the best-performing model, makes no assumptions about the data's underlying distribution but relies on normalized inputs to maximize the margin around the true values. Model performance was evaluated using Root Mean Square Error (RMSE), as it effectively measures prediction accuracy without the limitations of Mean Absolute Percentage Error (MAPE), which is problematic when actual values approach zero. SVR consistently achieved the lowest RMSE, making it the most reliable model for predicting weekly stock changes. Future work could explore ensemble methods or incorporate additional financial indicators to improve performance further.
 
 # Data
 
@@ -79,7 +80,11 @@ Purpose: Explain the data used in the analysis and any preprocessing steps.
 Instructions: Provide an overview of the dataset, variables, and any cleaning steps or transformations made. Mention variables used or excluded and why.
 -->
 
-The dataset for this analysis consists of weekly stock performance metrics from the Dow Jones Index, containing variables such as opening, closing, high, and low prices, trading volumes, and percentage changes in prices. We began by importing and inspecting the dataset to understand its structure and identify missing values. Missing data, particularly in key numeric variables like `percent_change_volume_over_last_wk` and `previous_weeks_volume`, was imputed using KNN imputation to maintain data integrity. Numeric features were normalized and scaled to ensure they were on a comparable scale, which is critical for models like SVR that rely on distance calculations. Additionally, we explored the distributions and correlations of the numeric variables to identify potential predictors. Although we initially created lagged variables to capture temporal relationships, residual plots showed no significant correlation with the target variable (`percent_change_next_weeks_price`), leading to their exclusion. The dataset was then split into training (Q1) and testing (Q2) sets to facilitate model validation while preserving temporal order. This comprehensive preprocessing ensured a robust foundation for subsequent modeling efforts.
+The dataset for this analysis consists of weekly stock performance metrics from the Dow Jones Index, including variables such as opening, closing, high, and low prices, trading volumes, and percentage changes in prices. After importing the data, we conducted a thorough inspection to understand its structure and address missing values. Missing data, particularly in numeric variables like `percent_change_volume_over_last_wk` and `previous_weeks_volume`, was imputed using KNN imputation to maintain data integrity and preserve patterns. Numeric features were normalized and scaled to ensure comparability, which was especially crucial for models like SVR that depend on distance-based calculations. 
+
+To explore potential temporal dependencies, we initially created lagged variables, assuming that previous week changes might have predictive power for the target variable, `percent_change_next_weeks_price`. However, as shown in the residual plot below, there was no significant correlation between the lagged variable (`percent_change_price` of the previous week) and the target variable. The scatterplot shows a nearly flat trend line, indicating that the past week's percentage change provides no meaningful predictive value for the current week's change. Consequently, we excluded the lagged variables from our final models to avoid introducing unnecessary noise. After preprocessing, the data was split into training (Q1) and testing (Q2) sets, maintaining temporal integrity to simulate realistic forecasting scenarios. This preprocessing ensured a solid foundation for our modeling efforts.
+
+Below, the plot illustrates the lack of correlation between the lagged variable and the target, confirming its irrelevance to our predictive modeling: 
 
 
 ```{r setup, include=FALSE} 
@@ -189,11 +194,30 @@ Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
 
+
+Our analysis assessed the performance of Linear Regression (LM), Decision Trees (DT), and Support Vector Regression (SVR) for predicting weekly stock price changes, with Root Mean Square Error (RMSE) as the evaluation metric. Preprocessing steps, including KNN imputation and normalization, ensured the models were optimized for performance. Among the models, SVR consistently delivered the lowest RMSE, averaging **0.211**, compared to **18.3** for LM and **0.250** for DT, as shown in the bar chart below. This highlights SVR’s superior ability to capture complex, non-linear relationships, making it the most reliable model for stock forecasting.
+
+For individual stocks such as AA, AXP, and BA, SVR demonstrated robust performance, with RMSE values of **0.234**, **0.167**, and **0.250**, respectively. In contrast, LM’s RMSE for these stocks was significantly higher at **18.8**, **16.8**, and **3.21**, while DT showed moderate accuracy with RMSE values of **0.335**, **0.234**, and **0.274**. The bar chart below compares RMSE values across all three models, clearly illustrating SVR’s consistent accuracy.
+
+The second visual, a line graph, provides an analysis of stock performance relative to the S&P 500. This graph plots the Beta coefficient (x-axis), which measures each stock's volatility compared to the market, against performance (y-axis). Stocks on the left represent lower risk (Beta < 1), while those on the right show higher risk (Beta > 1). This risk-performance relationship helps contextualize each stock’s predictive accuracy and market behavior. SVR's ability to accurately forecast stock prices across both low- and high-risk stocks demonstrates its adaptability, even under varying market conditions.
+
+### Visuals:
+1. **Bar Chart: RMSE Comparison Across Models**  
+   Highlights the predictive accuracy of LM, DT, and SVR for individual stocks.
+
+2. **Line Graph: Stock Performance Relative to S&P 500**  
+   Shows the relationship between risk (Beta coefficient) and stock performance, providing insights into market dynamics and risk management.
+2. **Bar Graph: Comparison of Actual vs SVR Prediction by Stock**  
+
+These findings affirm SVR as the most effective model for predicting weekly stock price changes, offering both accuracy and adaptability. Future efforts could explore ensemble methods or integrate additional risk indicators for enhanced forecasting.
+
+
+
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 train_data_scaled <- train_data_scaled[ , names(train_data_scaled) != 'percent_change_price_lag1']
 test_data_scaled <- test_data_scaled[ , names(test_data_scaled) != 'percent_change_price_lag1']
 
-unique(train_data_scaled$stock)
+#unique(train_data_scaled$stock)
 
 form1 <- percent_change_next_weeks_price ~ .
 
@@ -208,9 +232,9 @@ for (i in c(unique(train_data_scaled$stock))) {
   best_Params_list[[i]] <- svr_tune_lists[[i]]$best.parameters
 }
 
-for (i in c(unique(train_data_scaled$stock))) {
-    print(is.na(best_Params_list[[i]]$gamma))
-}
+#for (i in c(unique(train_data_scaled$stock))) {
+ #   print(is.na(best_Params_list[[i]]$gamma))
+#}
 
 
 # this is the part to copy for the other models
@@ -231,15 +255,15 @@ for (i in c(unique(train_data_scaled$stock))) {
 
 predsdf <- bind_rows(newpreds, .id = "column_label")
 
-predsdf %>% group_by(stock) %>% 
-  summarize(
-    SVR = mean((na.omit(percent_change_next_weeks_price) - svr)^2)
-  )
+#predsdf %>% group_by(stock) %>% 
+ # summarize(
+  #  SVR = mean((na.omit(percent_change_next_weeks_price) - svr)^2)
+ # )
 
-predsdf %>% 
-  summarize(
-    SVR = mean((na.omit(percent_change_next_weeks_price) - svr)^2)
-  )
+#predsdf %>% 
+#  summarize(
+#    SVR = mean((na.omit(percent_change_next_weeks_price) - svr)^2)
+#  )
 
 # Defining the formula for LM dynamically to use all existing variables except 'percent_change_next_weeks_price'
 lm_formula <- as.formula(paste("percent_change_next_weeks_price ~ ."))
@@ -279,9 +303,9 @@ for (i in unique(test_data_scaled$stock)) {
 }
 
 # Example: Access the decision tree model for a specific stock, e.g., "AA"
-summary(tree_fit_list[["AA"]])  # Provides a summary of the tree for stock "AA"
-plot(tree_fit_list[["AA"]])     # Plots the decision tree for stock "AA"
-text(tree_fit_list[["AA"]], pretty = 0) # Adds text to the tree plot
+#summary(tree_fit_list[["AA"]])  # Provides a summary of the tree for stock "AA"
+#plot(tree_fit_list[["AA"]])     # Plots the decision tree for stock "AA"
+#text(tree_fit_list[["AA"]], pretty = 0) # Adds text to the tree plot
 
 # Initialize a list to store predictions
 treepreds <- list()
@@ -297,10 +321,12 @@ for (i in unique(test_data_scaled$stock)) {
 combined_preds_df <- bind_rows(newpreds, .id = "stock")
 
 # View the combined predictions
-print(combined_preds_df)
+#print(combined_preds_df)
 
 
+```
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
 
 
@@ -322,7 +348,7 @@ performance_metrics <- combined_preds_df %>%
     #MAPE_Tree = mean(abs(percent_change_next_weeks_price - tree_pred) * 100 / abs(percent_change_next_weeks_price), na.rm = TRUE)
   )
 
-print(performance_metrics)
+#print(performance_metrics)
 
 
 performance_metrics %>% summarize(
@@ -355,7 +381,7 @@ ggplot(combined_preds_df, aes(x = percent_change_next_weeks_price)) +
   theme_minimal()
 
 
-SP500_raw
+#SP500_raw
 
 SP500 <- SP500_raw %>% mutate(
   Date = parse_date_time(Date, '%d-%b-%y'),
@@ -393,7 +419,7 @@ for (i in unique(rd_joined$stock)) {
 
 betas_df <- bind_rows(stock_betas, .id = 'stock')
 names(betas_df) <- c('stock', 'betas')
-print(betas_df)
+#print(betas_df)
 
 Jul1_preds <- combined_preds_df %>% filter(date == max(date)) %>% select(stock, percent_change_next_weeks_price, svr)
 
