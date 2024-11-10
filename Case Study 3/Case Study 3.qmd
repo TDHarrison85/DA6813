@@ -1,5 +1,5 @@
 ---
-title: "DA 6813 Case Study "
+title: "DA 6813 Case Study 3: Dow Jones"
 author: "Will Hytlin, Holly Millazo and Tim Harrison"
 date: today
 format: 
@@ -24,7 +24,7 @@ Purpose: Provide a concise overview of the key findings and results of the analy
 Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
 -->
 
-Content for Executive Summary goes here.
+This case study focuses on predicting weekly stock price changes for the Dow Jones Index to optimize investment strategies. Using historical stock performance data, including prices, trading volumes, and financial indicators, the analysis aimed to forecast the **percent_change_next_weeks_price** for each stock. Three models—Linear Regression (LM), Decision Trees (DT), and Support Vector Regression (SVR)—were developed and evaluated using Root Mean Square Error (RMSE) as the primary metric. Data preprocessing steps included handling missing values with KNN imputation and normalizing numeric features to ensure comparability, especially for SVR. The findings showed that SVR consistently outperformed LM and DT, delivering the lowest RMSE across various stocks. This highlights its superior capability in capturing complex, non-linear relationships within the data. The insights gained from this analysis provide actionable recommendations for selecting stocks with high growth potential and managing investment risks. Future enhancements, such as incorporating ensemble methods and additional financial indicators, could further improve predictive accuracy and decision-making.
 
 # Problem Statement
 
@@ -474,7 +474,12 @@ Purpose: Summarize the key takeaways and provide actionable recommendations.
 Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
 -->
 
-Content for Conclusion goes here.
+
+
+
+
+
+In conclusion, the study demonstrated that Support Vector Regression (SVR) is the most effective model for predicting weekly stock price changes, consistently outperforming Linear Regression and Decision Trees in terms of RMSE. This result underscores the importance of selecting models capable of capturing complex, non-linear relationships in financial data. The preprocessing steps, including normalization and KNN imputation, ensured the models operated on high-quality data, contributing to the reliability of the findings. While the SVR model showed strong predictive performance, future improvements could involve exploring ensemble techniques and integrating additional indicators such as market sentiment or macroeconomic variables. These enhancements could further refine the models’ predictive capabilities and provide deeper insights into stock market behavior, aiding investors in making informed, data-driven decisions.
 
 # Appendix
 

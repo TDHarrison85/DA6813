@@ -9,7 +9,7 @@
 <meta name="author" content="Will Hytlin, Holly Millazo and Tim Harrison">
 <meta name="dcterms.date" content="2024-11-10">
 
-<title>DA 6813 Case Study</title>
+<title>DA 6813 Case Study 3: Dow Jones</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -66,7 +66,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">DA 6813 Case Study</h1>
+<h1 class="title">DA 6813 Case Study 3: Dow Jones</h1>
 </div>
 
 
@@ -101,15 +101,15 @@ ul.task-list li input[type="checkbox"] {
 Purpose: Provide a concise overview of the key findings and results of the analysis.
 Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
 -->
-<p>Content for Executive Summary goes here.</p>
+<p>This case study focuses on predicting weekly stock price changes for the Dow Jones Index to optimize investment strategies. Using historical stock performance data, including prices, trading volumes, and financial indicators, the analysis aimed to forecast the <strong>percent_change_next_weeks_price</strong> for each stock. Three models—Linear Regression (LM), Decision Trees (DT), and Support Vector Regression (SVR)—were developed and evaluated using Root Mean Square Error (RMSE) as the primary metric. Data preprocessing steps included handling missing values with KNN imputation and normalizing numeric features to ensure comparability, especially for SVR. The findings showed that SVR consistently outperformed LM and DT, delivering the lowest RMSE across various stocks. This highlights its superior capability in capturing complex, non-linear relationships within the data. The insights gained from this analysis provide actionable recommendations for selecting stocks with high growth potential and managing investment risks. Future enhancements, such as incorporating ensemble methods and additional financial indicators, could further improve predictive accuracy and decision-making.</p>
 </section>
 <section id="problem-statement" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Problem Statement</h1>
-<p>The Dow Jones Index case study addresses a critical business challenge: predicting weekly stock performance to optimize investment strategies. In a highly volatile market, businesses and investors rely on accurate forecasts to maximize returns and mitigate risks. This study aims to develop predictive models that forecast the percentage change in stock prices for the following week, helping identify stocks with the highest growth potential. Using historical data, including stock prices, trading volumes, and financial indicators, the analysis seeks to improve decision-making by leveraging models such as Linear Regression, Decision Trees, and Support Vector Regression. These models will be evaluated for their accuracy and ability to assess risk using methods like the Capital Asset Pricing Model (CAPM). Addressing this problem will enable businesses to allocate resources more effectively, capitalize on profitable opportunities, and enhance their competitive edge in the financial market. Notably, the study will also examine broader market risks, such as the unusual losses experienced by all Dow Jones stocks in the week ending May 27, 2011, providing a comprehensive view of potential challenges. <!-- 
+<!-- 
 Purpose: Explain the problem that the study aims to solve.
 Instructions: Clearly define the task at hand, which in this case is predicting customer acquisition. Outline the objectives and what solving this problem would mean for the company.
---></p>
-<p>Content for Problem Statement goes here.</p>
+-->
+<p>The Dow Jones Index case study addresses a critical business challenge: predicting weekly stock performance to optimize investment strategies. In a highly volatile market, businesses and investors rely on accurate forecasts to maximize returns and mitigate risks. This study aims to develop predictive models that forecast the percentage change in stock prices for the following week, helping identify stocks with the highest growth potential. Using historical data, including stock prices, trading volumes, and financial indicators, the analysis seeks to improve decision-making by leveraging models such as Linear Regression, Decision Trees, and Support Vector Regression. These models will be evaluated for their accuracy and ability to assess risk using methods like the Capital Asset Pricing Model (CAPM). Addressing this problem will enable businesses to allocate resources more effectively, capitalize on profitable opportunities, and enhance their competitive edge in the financial market. Notably, the study will also examine broader market risks, such as the unusual losses experienced by all Dow Jones stocks in the week ending May 27, 2011, providing a comprehensive view of potential challenges.</p>
 </section>
 <section id="additional-sources" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Additional Sources</h1>
@@ -166,17 +166,11 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
-<section id="findings-1" class="level3" data-number="6.0.1">
-<h3 data-number="6.0.1" class="anchored" data-anchor-id="findings-1"><span class="header-section-number">6.0.1</span> Findings</h3>
-</section>
-<section id="findings-2" class="level3" data-number="6.0.2">
-<h3 data-number="6.0.2" class="anchored" data-anchor-id="findings-2"><span class="header-section-number">6.0.2</span> Findings</h3>
 <p>Our analysis assessed the performance of Linear Regression (LM), Decision Trees (DT), and Support Vector Regression (SVR) for predicting weekly stock price changes, with Root Mean Square Error (RMSE) as the evaluation metric. Preprocessing steps, including KNN imputation and normalization, ensured the models were optimized for performance. Among the models, SVR consistently delivered the lowest RMSE, averaging <strong>0.211</strong>, compared to <strong>18.3</strong> for LM and <strong>0.250</strong> for DT, as shown in the bar chart below. This highlights SVR’s superior ability to capture complex, non-linear relationships, making it the most reliable model for stock forecasting.</p>
 <p>For individual stocks such as AA, AXP, and BA, SVR demonstrated robust performance, with RMSE values of <strong>0.234</strong>, <strong>0.167</strong>, and <strong>0.250</strong>, respectively. In contrast, LM’s RMSE for these stocks was significantly higher at <strong>18.8</strong>, <strong>16.8</strong>, and <strong>3.21</strong>, while DT showed moderate accuracy with RMSE values of <strong>0.335</strong>, <strong>0.234</strong>, and <strong>0.274</strong>. The bar chart below compares RMSE values across all three models, clearly illustrating SVR’s consistent accuracy.</p>
 <p>The second visual, a line graph, provides an analysis of stock performance relative to the S&amp;P 500. This graph plots the Beta coefficient (x-axis), which measures each stock’s volatility compared to the market, against performance (y-axis). Stocks on the left represent lower risk (Beta &lt; 1), while those on the right show higher risk (Beta &gt; 1). This risk-performance relationship helps contextualize each stock’s predictive accuracy and market behavior. SVR’s ability to accurately forecast stock prices across both low- and high-risk stocks demonstrates its adaptability, even under varying market conditions.</p>
-</section>
-<section id="visuals" class="level3" data-number="6.0.3">
-<h3 data-number="6.0.3" class="anchored" data-anchor-id="visuals"><span class="header-section-number">6.0.3</span> Visuals:</h3>
+<section id="visuals" class="level3" data-number="6.0.1">
+<h3 data-number="6.0.1" class="anchored" data-anchor-id="visuals"><span class="header-section-number">6.0.1</span> Visuals:</h3>
 <ol type="1">
 <li><p><strong>Bar Chart: RMSE Comparison Across Models</strong><br>
 Highlights the predictive accuracy of LM, DT, and SVR for individual stocks.</p></li>
@@ -237,7 +231,7 @@ Shows the relationship between risk (Beta coefficient) and stock performance, pr
 Purpose: Summarize the key takeaways and provide actionable recommendations.
 Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
 -->
-<p>Content for Conclusion goes here.</p>
+<p>In conclusion, the study demonstrated that Support Vector Regression (SVR) is the most effective model for predicting weekly stock price changes, consistently outperforming Linear Regression and Decision Trees in terms of RMSE. This result underscores the importance of selecting models capable of capturing complex, non-linear relationships in financial data. The preprocessing steps, including normalization and KNN imputation, ensured the models operated on high-quality data, contributing to the reliability of the findings. While the SVR model showed strong predictive performance, future improvements could involve exploring ensemble techniques and integrating additional indicators such as market sentiment or macroeconomic variables. These enhancements could further refine the models’ predictive capabilities and provide deeper insights into stock market behavior, aiding investors in making informed, data-driven decisions.</p>
 </section>
 <section id="appendix" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Appendix</h1>
