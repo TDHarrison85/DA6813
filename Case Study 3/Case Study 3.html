@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Will Hytlin, Holly Millazo and Tim Harrison">
-<meta name="dcterms.date" content="2024-11-09">
+<meta name="dcterms.date" content="2024-11-10">
 
 <title>DA 6813 Case Study</title>
 <style>
@@ -35,6 +35,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="Case Study 3_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Case Study 3_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="Case Study 3_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="Case Study 3_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="Case Study 3_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
 
 
 </head>
@@ -81,7 +83,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">November 9, 2024</p>
+      <p class="date">November 10, 2024</p>
     </div>
   </div>
   
@@ -146,6 +148,15 @@ Purpose: Explain the data used in the analysis and any preprocessing steps.
 Instructions: Provide an overview of the dataset, variables, and any cleaning steps or transformations made. Mention variables used or excluded and why.
 -->
 <p>The dataset for this analysis consists of weekly stock performance metrics from the Dow Jones Index, containing variables such as opening, closing, high, and low prices, trading volumes, and percentage changes in prices. We began by importing and inspecting the dataset to understand its structure and identify missing values. Missing data, particularly in key numeric variables like <code>percent_change_volume_over_last_wk</code> and <code>previous_weeks_volume</code>, was imputed using KNN imputation to maintain data integrity. Numeric features were normalized and scaled to ensure they were on a comparable scale, which is critical for models like SVR that rely on distance calculations. Additionally, we explored the distributions and correlations of the numeric variables to identify potential predictors. Although we initially created lagged variables to capture temporal relationships, residual plots showed no significant correlation with the target variable (<code>percent_change_next_weeks_price</code>), leading to their exclusion. The dataset was then split into training (Q1) and testing (Q2) sets to facilitate model validation while preserving temporal order. This comprehensive preprocessing ensured a robust foundation for subsequent modeling efforts.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-3_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="findings" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Findings</h1>
@@ -153,7 +164,193 @@ Instructions: Provide an overview of the dataset, variables, and any cleaning st
 Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
-<p>Content for Findings goes here.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "AA"   "AXP"  "BA"   "BAC"  "CAT"  "CSCO" "CVX"  "DD"   "DIS"  "GE"  
+[11] "HD"   "HPQ"  "IBM"  "INTC" "JNJ"  "JPM"  "KRFT" "KO"   "MCD"  "MMM" 
+[21] "MRK"  "MSFT" "PFE"  "PG"   "T"    "TRV"  "UTX"  "VZ"   "WMT"  "XOM" </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE
+[1] FALSE</code></pre>
+</div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["stock"],"name":[1],"type":["chr"],"align":["left"]},{"label":["SVR"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"AA","2":"0.05485737"},{"1":"AXP","2":"0.02784808"},{"1":"BA","2":"0.06267398"},{"1":"BAC","2":"0.02480212"},{"1":"CAT","2":"0.17202610"},{"1":"CSCO","2":"0.04321604"},{"1":"CVX","2":"0.08980055"},{"1":"DD","2":"0.04914419"},{"1":"DIS","2":"0.09332876"},{"1":"GE","2":"0.06167852"},{"1":"HD","2":"0.07044063"},{"1":"HPQ","2":"0.04675957"},{"1":"IBM","2":"0.03788243"},{"1":"INTC","2":"0.04608822"},{"1":"JNJ","2":"0.01838588"},{"1":"JPM","2":"0.05893375"},{"1":"KO","2":"0.01796804"},{"1":"KRFT","2":"0.02252376"},{"1":"MCD","2":"0.01902456"},{"1":"MMM","2":"0.04867731"},{"1":"MRK","2":"0.01510886"},{"1":"MSFT","2":"0.03315779"},{"1":"PFE","2":"0.06055194"},{"1":"PG","2":"0.01992482"},{"1":"T","2":"0.02722241"},{"1":"TRV","2":"0.04788381"},{"1":"UTX","2":"0.04605910"},{"1":"VZ","2":"0.06346770"},{"1":"WMT","2":"0.02204408"},{"1":"XOM","2":"0.04991607"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["SVR"],"name":[1],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.04837988"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Regression tree:
+tree(formula = tree_formula, data = stock_data)
+Variables actually used in tree construction:
+[1] "close"
+Number of terminal nodes:  2 
+Residual mean deviance:  0.007199 = 0.07199 / 10 
+Distribution of residuals:
+     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+-0.148200 -0.033220  0.007472  0.000000  0.061980  0.097500 </code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-3_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 390 × 6
+   date                stock percent_change_next_weeks…¹   svr lm_pred tree_pred
+   &lt;dttm&gt;              &lt;chr&gt;                       &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
+ 1 2011-04-01 00:00:00 AA                         0.656  0.589    17.8     0.754
+ 2 2011-04-08 00:00:00 AA                         0.0967 0.611    17.7     0.754
+ 3 2011-04-15 00:00:00 AA                         0.698  0.562    19.5     0.754
+ 4 2011-04-21 00:00:00 AA                         0.532  0.633    17.3     0.754
+ 5 2011-04-29 00:00:00 AA                         0.481  0.585    18.3     0.754
+ 6 2011-05-06 00:00:00 AA                         0.498  0.593    19.0     0.754
+ 7 2011-05-13 00:00:00 AA                         0.302  0.621    18.0     0.754
+ 8 2011-05-20 00:00:00 AA                         0.675  0.567    19.7     0.754
+ 9 2011-05-27 00:00:00 AA                         0.278  0.623    18.0     0.754
+10 2011-06-03 00:00:00 AA                         0.318  0.567    20.2     0.754
+# ℹ 380 more rows
+# ℹ abbreviated name: ¹​percent_change_next_weeks_price</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 30 × 4
+   stock RMSE_LM RMSE_SVR RMSE_Tree
+   &lt;chr&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+ 1 AA     18.8      0.234     0.335
+ 2 AXP    16.8      0.167     0.234
+ 3 BA      3.21     0.250     0.274
+ 4 BAC    29.2      0.157     0.330
+ 5 CAT     0.650    0.415     0.244
+ 6 CSCO    1.37     0.208     0.305
+ 7 CVX     2.91     0.300     0.192
+ 8 DD      5.07     0.222     0.279
+ 9 DIS     9.40     0.305     0.299
+10 GE     11.0      0.248     0.294
+# ℹ 20 more rows</code></pre>
+</div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["RMSE_LM"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["RMSE_SVR"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["RMSE_Tree"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"18.26677","2":"0.2111089","3":"0.2500495"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["RMSE_LM"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["RMSE_SVR"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["RMSE_Tree"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"33.13613","2":"0.2199543","3":"0.2547144"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-3_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Date"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Open"],"name":[2],"type":["chr"],"align":["left"]},{"label":["High"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Low"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Close."],"name":[5],"type":["chr"],"align":["left"]},{"label":["Adj.Close."],"name":[6],"type":["chr"],"align":["left"]},{"label":["Volume"],"name":[7],"type":["chr"],"align":["left"]}],"data":[{"1":"20-Jun-11","2":"1,271.50","3":"1,298.61","4":"1,262.87","5":"1,283.50","6":"1,283.50","7":"16,222,680,000"},{"1":"13-Jun-11","2":"1,271.31","3":"1,292.50","4":"1,258.07","5":"1,271.50","6":"1,271.50","7":"20,466,010,000"},{"1":"6-Jun-11","2":"1,300.26","3":"1,300.26","4":"1,268.28","5":"1,270.98","6":"1,270.98","7":"18,551,800,000"},{"1":"30-May-11","2":"1,331.10","3":"1,345.20","4":"1,297.90","5":"1,300.16","6":"1,300.16","7":"16,204,530,000"},{"1":"23-May-11","2":"1,333.07","3":"1,334.62","4":"1,311.80","5":"1,331.10","6":"1,331.10","7":"17,595,530,000"},{"1":"16-May-11","2":"1,334.77","3":"1,346.82","4":"1,318.51","5":"1,333.27","6":"1,333.27","7":"19,514,380,000"},{"1":"9-May-11","2":"1,340.20","3":"1,359.44","4":"1,332.03","5":"1,337.77","6":"1,337.77","7":"19,539,110,000"},{"1":"2-May-11","2":"1,365.21","3":"1,370.58","4":"1,329.17","5":"1,340.20","6":"1,340.20","7":"20,363,720,000"},{"1":"25-Apr-11","2":"1,337.14","3":"1,364.56","4":"1,331.47","5":"1,363.61","6":"1,363.61","7":"17,617,650,000"},{"1":"18-Apr-11","2":"1,313.35","3":"1,337.49","4":"1,294.70","5":"1,337.38","6":"1,337.38","7":"15,933,560,000"},{"1":"11-Apr-11","2":"1,329.01","3":"1,333.77","4":"1,302.42","5":"1,319.68","6":"1,319.68","7":"19,701,690,000"},{"1":"4-Apr-11","2":"1,333.56","3":"1,339.46","4":"1,322.94","5":"1,328.17","6":"1,328.17","7":"19,888,170,000"},{"1":"28-Mar-11","2":"1,315.45","3":"1,337.85","4":"1,305.26","5":"1,332.41","6":"1,332.41","7":"18,297,330,000"},{"1":"21-Mar-11","2":"1,281.65","3":"1,319.18","4":"1,281.65","5":"1,313.80","6":"1,313.80","7":"20,090,110,000"},{"1":"14-Mar-11","2":"1,301.19","3":"1,301.19","4":"1,249.05","5":"1,279.21","6":"1,279.21","7":"23,905,220,000"},{"1":"7-Mar-11","2":"1,322.72","3":"1,327.68","4":"1,291.99","5":"1,304.28","6":"1,304.28","7":"20,669,090,000"},{"1":"28-Feb-11","2":"1,321.61","3":"1,332.28","4":"1,302.58","5":"1,321.15","6":"1,321.15","7":"12,022,480,000"},{"1":"21-Feb-11","2":"1,338.91","3":"1,338.91","4":"1,294.26","5":"1,319.88","6":"1,319.88","7":"7,712,050,000"},{"1":"14-Feb-11","2":"1,328.73","3":"1,344.07","4":"1,324.61","5":"1,343.01","6":"1,343.01","7":"12,589,110,000"},{"1":"7-Feb-11","2":"1,311.85","3":"1,330.79","4":"1,311.74","5":"1,329.15","6":"1,329.15","7":"20,109,950,000"},{"1":"31-Jan-11","2":"1,276.50","3":"1,311.00","4":"1,276.50","5":"1,310.87","6":"1,310.87","7":"21,726,860,000"},{"1":"24-Jan-11","2":"1,283.29","3":"1,302.67","4":"1,275.10","5":"1,276.34","6":"1,276.34","7":"23,156,650,000"},{"1":"17-Jan-11","2":"1,293.22","3":"1,296.06","4":"1,271.26","5":"1,283.35","6":"1,283.35","7":"19,899,340,000"},{"1":"10-Jan-11","2":"1,270.84","3":"1,293.24","4":"1,262.18","5":"1,293.24","6":"1,293.24","7":"21,286,570,000"},{"1":"3-Jan-11","2":"1,276.29","3":"1,278.17","4":"1,261.70","5":"1,271.50","6":"1,271.50","7":"9,807,210,000"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["pct"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["percent_change_price"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.037926675","2":"3.792670","_rn_":"1"},{"1":"-0.044284859","2":"-4.428490","_rn_":"2"},{"1":"-0.024706609","2":"-2.470660","_rn_":"3"},{"1":"0.016383113","2":"1.638310","_rn_":"4"},{"1":"0.059332509","2":"5.933250","_rn_":"5"},{"1":"0.002308136","2":"0.230814","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   stock     betas
+1     AA 1.1725304
+2    AXP 0.8412370
+3     BA 1.1128029
+4    BAC 0.8543340
+5    CAT 1.6339876
+6   CSCO 0.6728097
+7    CVX 0.9576598
+8     DD 1.3818514
+9    DIS 1.2379936
+10    GE 0.8723050
+11    HD 1.0236042
+12   HPQ 0.9324046
+13   IBM 0.7556635
+14  INTC 0.9967677
+15   JNJ 0.5137296
+16   JPM 0.6997650
+17  KRFT 0.2728910
+18    KO 0.5902203
+19   MCD 0.5584826
+20   MMM 0.9663208
+21   MRK 0.2065984
+22  MSFT 0.5429847
+23   PFE 0.7351774
+24    PG 0.2777192
+25     T 0.6540860
+26   TRV 0.9439450
+27   UTX 0.8619338
+28    VZ 0.6654782
+29   WMT 0.4540274
+30   XOM 1.1133388</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-3_files/figure-html/unnamed-chunk-2-3.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-3_files/figure-html/unnamed-chunk-2-4.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="conclusion" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Conclusion</h1>
