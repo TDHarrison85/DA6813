@@ -645,7 +645,7 @@ ggplot(risk_pred, aes(x = betas, y = svr, label = stock)) +
   labs(
     title = "Risk-Return Trade-Off by Stock",
     x = "Betas",
-    y = "Predicted Percent Change for Next Week"
+    y = "Predicted Percent Change for Next Week (normalized)"
   ) +
   theme_minimal()
 
@@ -657,13 +657,13 @@ WH: percent_change_next_week is the actual value for the week's percent change, 
 ```{r}
 ggplot(risk_pred, aes(x = stock)) +
   geom_bar(aes(y = percent_change_next_weeks_price, fill = "Actual"), stat = "identity", position = "dodge") +
-  geom_bar(aes(y = svr, fill = "SVR"), stat = "identity", position = "dodge", alpha = 0.8) +
+  geom_point(aes(y = svr, fill = "SVR \nPrediction"), shape = '_', size = 7, color = 'orange') +
   labs(
     title = "Comparison of Actual Percent Change and SVR by Stock",
     x = "Stock",
-    y = "Percent Change"
+    y = "Percent Change (normalized values)"
   ) +
-  scale_fill_manual(values = c("Actual" = "dodgerblue", "SVR" = "orange")) +
+  scale_fill_manual(values = c("Actual" = "dodgerblue", "SVR \nPrediction" = "orange")) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
