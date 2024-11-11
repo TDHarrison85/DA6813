@@ -725,20 +725,20 @@ Root node error: 4.2149/360 = 0.011708
 
 n= 360 
 
-         CP nsplit rel error  xerror    xstd
-1  0.055392      0   1.00000 1.00529 0.13691
-2  0.033490      3   0.83382 0.97216 0.13199
-3  0.020011      4   0.80033 1.06025 0.13958
-4  0.018098      5   0.78032 1.14829 0.14345
-5  0.015296      6   0.76222 1.14058 0.14297
-6  0.014913      8   0.73163 1.13570 0.14336
-7  0.014087      9   0.71672 1.13284 0.14040
-8  0.013871     10   0.70263 1.14907 0.14077
-9  0.012061     13   0.66102 1.15502 0.14084
-10 0.011764     14   0.64896 1.18126 0.14825
-11 0.010559     15   0.63719 1.21363 0.14894
-12 0.010282     16   0.62663 1.21410 0.14885
-13 0.010000     17   0.61635 1.22522 0.14882</code></pre>
+         CP nsplit rel error xerror    xstd
+1  0.055392      0   1.00000 1.0086 0.13717
+2  0.033490      3   0.83382 1.0358 0.13408
+3  0.020011      4   0.80033 1.0895 0.14516
+4  0.018098      5   0.78032 1.1404 0.14841
+5  0.015296      6   0.76222 1.1837 0.15522
+6  0.014913      8   0.73163 1.1824 0.15427
+7  0.014087      9   0.71672 1.1835 0.15438
+8  0.013871     10   0.70263 1.1780 0.15309
+9  0.012061     13   0.66102 1.1756 0.15278
+10 0.011764     14   0.64896 1.1870 0.15187
+11 0.010559     15   0.63719 1.1936 0.15160
+12 0.010282     16   0.62663 1.1912 0.15165
+13 0.010000     17   0.61635 1.1961 0.15115</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tree_model, <span class="at">uniform =</span> <span class="cn">TRUE</span>, <span class="at">main =</span> <span class="st">"Regression Tree for Stock Price Prediction"</span>)</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(tree_model, <span class="at">use.n =</span> <span class="cn">TRUE</span>, <span class="at">all =</span> <span class="cn">TRUE</span>, <span class="at">cex =</span> <span class="fl">0.7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1670,7 +1670,7 @@ Warning in pred1.tree(object, tree.matrix(newdata)): NAs introduced by coercion<
 <span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Risk-Return Trade-Off by Stock"</span>,</span>
 <span id="cb119-6"><a href="#cb119-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Betas"</span>,</span>
-<span id="cb119-7"><a href="#cb119-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Predicted Percent Change for Next Week"</span></span>
+<span id="cb119-7"><a href="#cb119-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Predicted Percent Change for Next Week (normalized)"</span></span>
 <span id="cb119-8"><a href="#cb119-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb119-9"><a href="#cb119-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -1685,13 +1685,13 @@ Warning in pred1.tree(object, tree.matrix(newdata)): NAs introduced by coercion<
 <div class="cell">
 <div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(risk_pred, <span class="fu">aes</span>(<span class="at">x =</span> stock)) <span class="sc">+</span></span>
 <span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">y =</span> percent_change_next_weeks_price, <span class="at">fill =</span> <span class="st">"Actual"</span>), <span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">y =</span> svr, <span class="at">fill =</span> <span class="st">"SVR"</span>), <span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> svr, <span class="at">fill =</span> <span class="st">"SVR </span><span class="sc">\n</span><span class="st">Prediction"</span>), <span class="at">shape =</span> <span class="st">'_'</span>, <span class="at">size =</span> <span class="dv">7</span>, <span class="at">color =</span> <span class="st">'orange'</span>) <span class="sc">+</span></span>
 <span id="cb120-4"><a href="#cb120-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb120-5"><a href="#cb120-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparison of Actual Percent Change and SVR by Stock"</span>,</span>
 <span id="cb120-6"><a href="#cb120-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Stock"</span>,</span>
-<span id="cb120-7"><a href="#cb120-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percent Change"</span></span>
+<span id="cb120-7"><a href="#cb120-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percent Change (normalized values)"</span></span>
 <span id="cb120-8"><a href="#cb120-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb120-9"><a href="#cb120-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Actual"</span> <span class="ot">=</span> <span class="st">"dodgerblue"</span>, <span class="st">"SVR"</span> <span class="ot">=</span> <span class="st">"orange"</span>)) <span class="sc">+</span></span>
+<span id="cb120-9"><a href="#cb120-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Actual"</span> <span class="ot">=</span> <span class="st">"dodgerblue"</span>, <span class="st">"SVR </span><span class="sc">\n</span><span class="st">Prediction"</span> <span class="ot">=</span> <span class="st">"orange"</span>)) <span class="sc">+</span></span>
 <span id="cb120-10"><a href="#cb120-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb120-11"><a href="#cb120-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
