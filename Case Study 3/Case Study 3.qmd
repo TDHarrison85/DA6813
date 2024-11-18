@@ -1,6 +1,6 @@
 ---
-title: "DA 6813 Case Study 3: Dow Jones"
-author: "Will Hytlin, Holly Millazo and Tim Harrison"
+title: "DA 6813 Case Study 3 Dow Jones"
+author: "Will Hyltin, Holly Milazzo and Tim Harrison"
 date: today
 format: 
   html:

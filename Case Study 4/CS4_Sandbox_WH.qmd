@@ -1,0 +1,266 @@
+---
+title: "Case Study 4"
+format: html
+---
+
+# Load Data and Packages
+
+```{r}
+pacman::p_load(survival, randomForestSRC, MASS, SMCRM, tidyverse, here, skimr, corrplot, rpart)
+```
+
+```{r}
+data(acquisitionRetention)
+rawdf <- acquisitionRetention
+```
+
+```{r}
+str(rawdf)
+```
+
+```{r}
+head(rawdf)
+```
+
+```{r}
+skim(rawdf)
+```
+
+```{r}
+#column definitions
+?acquisitionRetention
+```
+
+```{r}
+rawdf %>% select_if(is.numeric) %>% cor() %>% corrplot(method = 'number', number.cex = 0.6)
+```
+
+lots of multicollinearity. Random Forest will be able to handle this, so not a huge issue. But important to note for our narrative.
+
+```{r}
+# Survival Plot
+
+surv <- data.frame(duration = seq(0,max(rawdf$duration), by = 1))
+surv1 <- surv %>% 
+  group_by(duration) %>% 
+  mutate(dist = sum(rawdf$duration > duration))
+#greater than removes all of the results where duration == 0, i.e. those not acquired
+
+surv1 %>% ggplot(aes(x = duration, y = dist)) +
+  geom_line() +
+  scale_y_continuous(name = 'Count', sec.axis = sec_axis(trans = ~./max(surv1$dist), name = 'Distribution'))
+```
+
+```{r}
+surv2 <- surv1 %>% 
+  ungroup() %>% 
+  mutate(dens = dist - lead(dist, 1),
+         dens = ifelse(is.na(dens), 0, dens),
+         hazard = dens/dist,
+         dens2 = dens/max(dist)
+  )
+
+surv2 %>% ggplot(aes(x = duration, y = dens2)) +
+  geom_line()
+```
+
+```{r}
+surv2 %>% ggplot(aes(x = duration, y = hazard)) +
+  geom_line()
+  #scale_y_continuous(name = 'Count', sec.axis = sec_axis(trans = ~./max(surv1$dist), name = 'Density'))
+```
+
+In general, we need to remove 
+I'm tempted to say this needs to be a two-fold analysis: Predict first who we would obtain, then predict how long we expect them to stay.
+
+
+for predicting those acquired:
+  remove profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow. these variables are always zero when acquisition == 0. Basically gives the answers ahead of time, can't use to predict
+  
+  
+```{r}
+sum(rawdf[which(rawdf$acquisition == 0),]$duration)
+```
+# test and train split
+
+```{r}
+durdf <- filter(rawdf, acquisition == 1)
+
+set.seed(321)
+acq_part <- sample(nrow(rawdf),0.8*nrow(rawdf),replace = F)
+acq_train <- rawdf[acq_part,]
+acq_test <- rawdf[-acq_part,]
+
+set.seed(321)
+dur_part <- sample(nrow(durdf),0.8*nrow(durdf),replace = F)
+dur_train <- durdf[dur_part,]
+dur_test <- durdf[-dur_part,]
+```
+
+Two test and train splits are performed, one on the raw data and one on the data filtered just to those which were acquired.
+
+# Predicting Acquisition
+
+```{r}
+acq_train1 <- acq_train %>% select(-c(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow, customer)) %>% 
+  mutate(acquisition = as.factor(acquisition))
+acq_test1 <- acq_test %>% select(-c(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow, customer)) %>% 
+  mutate(acquisition = as.factor(acquisition))
+```
+
+# Logistic Regression
+doing logistic regression to set up a baseline for our random forest performance.
+
+```{r}
+set.seed(321)
+logfit1 <- step(glm(acquisition ~ ., 
+                   data = acq_train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+summary(logfit1)
+```
+
+```{r}
+car::vif(logfit1)
+```
+
+```{r}
+set.seed(321)
+logfit2 <- step(glm(acquisition ~ . -acq_exp_sq, 
+                   data = acq_train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+summary(logfit2)
+```
+
+```{r}
+car::vif(logfit2)
+```
+
+```{r}
+plot(logfit2)
+```
+
+extreme values are causing lots of issues with logistic regression. May return to this to see of we can get better performance by normalizing or removing extreme values.
+
+```{r}
+acq_preds <- data.frame(actual = acq_test$acquisition,
+                        log_preds = predict(logfit2, acq_test1))
+```
+
+
+# Decision Trees
+
+```{r}
+dtfit1 <- rpart(acquisition ~ ., data = acq_train1)
+```
+
+```{r}
+summary(dtfit1)
+```
+
+```{r}
+rattle::fancyRpartPlot(dtfit1, sub = '')
+```
+
+```{r}
+acq_preds$dt_preds <- predict(dtfit1, acq_test1)
+```
+
+# Random Forest
+
+```{r}
+rffit1 <- rfsrc(acquisition ~ .,
+                data = acq_train1, 
+                importance = TRUE, 
+                ntree = 500)
+```
+
+```{r}
+rffit1
+```
+
+```{r}
+rffit1$importance
+```
+
+```{r}
+acq_mindepth <- max.subtree(rffit1, sub.order = T)
+```
+
+```{r}
+print(round(acq_mindepth$order, 3)[,1])
+```
+
+```{r}
+find.interaction(rffit1, method = 'vimp', importance = 'permute')
+```
+
+very little difference between additive and paired values for each variable so little interaction
+
+### Partial Dependence
+
+```{r}
+rawdf %>% select(ends_with('sq')) %>% names()
+```
+gets names of variables with a square term. Idea is that these variables have been shown to have a quadratic relationship to response variables. Only one of these is relevant to acquisition, so we will check that one.
+
+```{r}
+log_part1 <- glm(acquisition ~ . -acq_exp_sq, 
+                   data = acq_train1, family = binomial)
+log_part2 <- glm(acquisition ~ ., 
+                   data = acq_train1, family = binomial)
+```
+
+```{r}
+summary(log_part1)
+summary(log_part2)
+```
+
+negative higher order term for acquisition expenditure when including both indicates that lower values the relationship is positive, but for higher vals of acq expenditure it is expected to be negative.
+
+```{r}
+min(rffit1$xvar$acq_exp)
+max(rffit1$xvar$acq_exp)
+acq_seq <- seq(25,1050,25)
+```
+
+```{r}
+marginal_effect_acq <- partial(rffit1,
+                           partial.xvar = "acq_exp",
+                           partial.values = acq_seq)
+part_acq_exp <- marginal_effect_acq$classOutput$acquisition %>% 
+  mutate(pred = round(.$'1'))
+```
+
+I'm not sure how to really get past this step for marginal effects. lectures only cover regression, for classification this gives a probability for each class. Makes it difficult to index and I'm not sure this is a good practice anyway.
+
+```{r}
+mag_eff_acq_df <- data.frame(pred.acq = part_acq_exp, acq_seq = acq_seq)
+```
+
+# Predicting Duration
+
+# Random Survival Forest
+
+```{r}
+set.seed(321)
+rsf_fit <- rfsrc(Surv(duration, acquisition)~., dur_train, ntree = 100, membership = TRUE, importance = TRUE)
+
+print(rsf_fit)
+```
+
+```{r}
+test_preds <- predict(rsf_fit, dur_test)
+```
+
+```{r}
+data.frame(preds = test_preds$predicted,
+           actual = dur_test$duration)
+```
+
+Those predictions are pretty bad, so there's a lot of work to be done here to get this type of model working or I just need to abandon it.
