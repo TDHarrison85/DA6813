@@ -1,0 +1,351 @@
+---
+title: "Case Study 4"
+format: html
+---
+
+# Load Data and Packages
+
+```{r}
+pacman::p_load(survival, randomForestSRC, MASS, SMCRM, tidyverse, here, skimr, corrplot, rpart)
+```
+
+```{r}
+data(acquisitionRetention)
+rawdf <- acquisitionRetention
+```
+
+```{r}
+str(rawdf)
+```
+
+```{r}
+head(rawdf)
+```
+
+```{r}
+skim(rawdf)
+```
+
+```{r}
+rawdf <- rawdf %>% mutate_at(c('industry', 'acquisition'), as.factor)
+```
+
+
+```{r}
+#column definitions
+?acquisitionRetention
+```
+
+```{r}
+rawdf %>% select_if(is.numeric) %>% cor() %>% corrplot(method = 'number', number.cex = 0.6)
+```
+
+lots of multicollinearity. Random Forest will be able to handle this, so not a huge issue. But important to note for our narrative.
+
+```{r}
+# Survival Plot
+
+surv <- data.frame(duration = seq(0,max(rawdf$duration), by = 1))
+surv1 <- surv %>% 
+  group_by(duration) %>% 
+  mutate(dist = sum(rawdf$duration > duration))
+#greater than removes all of the results where duration == 0, i.e. those not acquired
+
+surv1 %>% ggplot(aes(x = duration, y = dist)) +
+  geom_line() +
+  scale_y_continuous(name = 'Count', sec.axis = sec_axis(transform = ~./max(surv1$dist), name = 'Distribution'))
+```
+
+
+for predicting those acquired:
+  remove profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow. these variables are always zero when acquisition == 0. Basically gives the answers ahead of time, can't use to predict
+  
+  
+```{r}
+sum(rawdf[which(rawdf$acquisition == 0),]$duration)
+```
+
+```{r}
+rawdf %>% select(ends_with('sq')) %>% names()
+```
+
+Gets names of variables with a square term. Idea is that these variables have been shown to have a quadratic relationship to response variables. This is mostly necessary for the steps when determining partial dependence, otherwise we would usually exclude these variables.
+
+# test and train split
+
+```{r}
+set.seed(321)
+acq_part <- sample(nrow(rawdf),0.8*nrow(rawdf),replace = F)
+acq_train1 <- rawdf[acq_part,]
+acq_test1 <- rawdf[-acq_part,]
+```
+
+Two test and train splits are performed, one on the raw data and one on the data filtered just to those which were acquired.
+
+# Predicting Acquisition
+
+```{r}
+acq_train1 <- acq_train1 %>% select(-c(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow)) 
+acq_test1 <- acq_test1 %>% select(-c(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow)) 
+```
+
+note: did not remove customer so that I can use it to join predictions back on dataset later. Will remove from model formulae.
+
+# Logistic Regression
+doing logistic regression to set up a baseline for our random forest performance.
+
+```{r}
+set.seed(321)
+logfit1 <- step(glm(acquisition ~ . -customer, 
+                   data = acq_train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+summary(logfit1)
+```
+
+```{r}
+car::vif(logfit1)
+```
+
+```{r}
+set.seed(321)
+logfit2 <- step(glm(acquisition ~ . -acq_exp_sq -customer, 
+                   data = acq_train1, family = binomial), 
+               direction = "backward", trace = 0)
+```
+
+```{r}
+summary(logfit2)
+```
+
+```{r}
+car::vif(logfit2)
+```
+
+```{r}
+plot(logfit2)
+```
+
+extreme values are causing lots of issues with logistic regression. May return to this to see of we can get better performance by normalizing or removing extreme values.
+
+```{r}
+acq_preds <- data.frame(actual = acq_test1$acquisition,
+                        log_preds = predict(logfit2, acq_test1, type = 'response')) %>% mutate(
+                          log_preds = as.factor(ifelse(log_preds >= 0.5, 1, 0))
+                        )
+```
+
+# Support Vector Machines
+
+
+# Decision Trees
+
+I'm only doing this step to correlate back to the importance variable for our random forest. Basically so we can visualize the importance variables and where they are in the trees.
+
+```{r}
+set.seed(321)
+dtfit1 <- rpart(acquisition ~ . -customer, data = acq_train1)
+```
+
+```{r}
+summary(dtfit1)
+```
+
+```{r}
+rattle::fancyRpartPlot(dtfit1, sub = '')
+```
+
+```{r}
+acq_preds$dt_preds <- predict(dtfit1, acq_test1)
+```
+
+# Random Forest
+
+```{r}
+set.seed(321)
+rffit1 <- rfsrc(acquisition ~ . -acq_exp_sq -customer,
+                data = acq_train1, 
+                importance = TRUE, 
+                ntree = 100)
+```
+
+```{r}
+rffit1
+```
+
+```{r}
+rffit1$importance
+```
+
+```{r}
+acq_mindepth <- max.subtree(rffit1, sub.order = T)
+```
+
+```{r}
+print(round(acq_mindepth$order, 3)[,1])
+```
+
+```{r}
+find.interaction(rffit1, method = 'vimp', importance = 'permute')
+```
+
+very little difference between additive and paired values for each variable so little interaction
+
+```{r}
+acq_test_prob <- predict(rffit1, newdata = acq_test1)$predicted[,2]
+acq_preds$rf_preds <- acq_test_prob
+acq_preds <- acq_preds %>% mutate(rf_preds = as.factor(ifelse(rf_preds >= 0.5, 1, 0)))
+```
+
+###Logistic Confusion Matrix
+
+```{r}
+caret::confusionMatrix(acq_preds$log_preds, reference = acq_preds$actual, positive = '1')
+```
+
+logistic regression performs just barely worse than the random forest (below). It is worse on the full dataset, so we can still continue with random forest, but we may just need some additional tuning for either model to see if we can improve one over the other. Also worth mentioning that logistic didn't really pass it's assumptions, so may be another reason to avoid logistic.
+
+### Random Forest Confusion Matrix
+
+```{r}
+caret::confusionMatrix(acq_preds$rf_preds, reference = acq_preds$actual, positive = '1')
+```
+Good sensitivity, but bad specificity. This means we should have most of the actual acquired records in our dataset for duration, but we will let them in at the cost of several of the un-acquired records being let into the dataset.
+
+### SVM Confusion Matrix
+
+```{r}
+
+```
+
+
+Applying the acquisition model to the full dataset:
+
+```{r}
+acq_raw_prob <- predict(rffit1, newdata = select(rawdf, names(acq_test1)))$predicted[,2]
+durdf <- rawdf %>% bind_cols(preds = acq_raw_prob) %>% mutate(
+  acq_preds = as.factor(ifelse(preds >= 0.5, 1, 0))
+)
+```
+
+One last confusion matrix to check how it did on the whole dataset:
+
+```{r}
+caret::confusionMatrix(durdf$acq_preds, durdf$acquisition, positive = '1')
+```
+
+so for some reason, predicting on training set leads to 100% accuracy for training records, despite their being gaps in random forest output earlier. This is great for building our subset for predicting duration, but we cannot report acquisition performance on these results, only the earlier ones on the test set.
+
+
+# Predicting Duration
+
+```{r}
+durdf1 <- durdf %>% filter(acq_preds == 1) %>% select(-acquisition)
+set.seed(321)
+dur_part <- sample(nrow(durdf1),0.8*nrow(durdf1),replace = F)
+dur_train1 <- durdf1[dur_part,]
+dur_test1 <- durdf1[-dur_part,]
+```
+
+```{r}
+names(dur_train1)
+```
+
+```{r}
+set.seed(321)
+rfdur <- rfsrc(duration ~ profit + acq_exp + ret_exp + freq + crossbuy + sow + industry + revenue + employees, #-customer -acq_exp_sq -ret_exp_sq -freq_sq,
+                data = dur_train1, 
+                importance = TRUE, 
+                ntree = 500)
+```
+
+```{r}
+rfdur
+```
+
+```{r}
+data.frame(importance = rfdur$importance) %>%
+  tibble::rownames_to_column(var = "variable") %>%
+  ggplot(aes(x = reorder(variable,importance), y = importance)) +
+    geom_bar(stat = "identity", fill = "orange", color = "black")+
+    coord_flip() +
+     labs(x = "Variables", y = "Variable importance")
+#     theme_nice 
+```
+
+```{r}
+rfdur$importance
+```
+
+### Minimal Depth
+
+```{r}
+dur_mindepth <- max.subtree(rfdur,
+                        sub.order = TRUE)
+```
+
+```{r}
+print(round(dur_mindepth$order, 3)[,1])
+```
+
+```{r}
+dur_mindepth$sub.order
+```
+
+```{r}
+find.interaction(rfdur,
+                      method = "vimp",
+                      importance = "permute")
+```
+
+```{r}
+# regression with linear specification
+dur_reg_lin <- lm(duration ~  .-acq_exp_sq -ret_exp_sq -freq_sq -customer, data = select(dur_train1, -acq_preds))
+dur_reg_exp <- lm(duration ~  .-customer, data = select(dur_train1, -acq_preds))
+```
+
+```{r}
+summary(dur_reg_lin)
+summary(dur_reg_exp)
+```
+
+```{r}
+min(rfdur$xvar$ret_exp)
+max(rfdur$xvar$ret_exp)
+ret_exp_seq = seq(0,1100,20)
+```
+
+```{r}
+min(rfdur$xvar$freq)
+max(rfdur$xvar$freq)
+```
+
+```{r}
+min(rfdur$xvar$acq_exp)
+max(rfdur$xvar$acq_exp)
+```
+
+```{r}
+dur_marginal_effect <- randomForestSRC::partial(rfdur,
+                           partial.xvar = "ret_exp",
+                           partial.values = ret_exp_seq)
+
+dur_means_exp <- dur_marginal_effect$regrOutput$duration %>% colMeans()
+```
+
+```{r}
+dur_me_df <-
+  data.frame(pred_duration = dur_means_exp, ret_exp_seq = ret_exp_seq)
+```
+
+```{r}
+ggplot(dur_me_df, aes(x = ret_exp_seq, y = pred_duration)) +
+  geom_point(shape = 21, color = "purple", size = 2, stroke = 1.2)+
+  geom_smooth(method = "lm", formula = y ~ poly(x,3), se = FALSE, color = "black")+ # try with other values 
+  labs(x = "Retention Expenditures in $", y = "Predicted duration") +
+  scale_x_continuous(breaks = seq(230,2000,120))
+```
+
+Can we use variables for duration that we used in acquisition? Yes, just not quite the other way around. i.e. some variables are only good for duration, but all the acquisition variables can be used for duration.
