@@ -27,6 +27,11 @@ skim(rawdf)
 ```
 
 ```{r}
+rawdf <- rawdf %>% mutate_at(c('industry', 'acquisition'), as.factor)
+```
+
+
+```{r}
 #column definitions
 ?acquisitionRetention
 ```
@@ -88,13 +93,13 @@ durdf <- filter(rawdf, acquisition == 1)
 
 set.seed(321)
 acq_part <- sample(nrow(rawdf),0.8*nrow(rawdf),replace = F)
-acq_train <- rawdf[acq_part,]
-acq_test <- rawdf[-acq_part,]
+acq_train1 <- rawdf[acq_part,]
+acq_test1 <- rawdf[-acq_part,]
 
 set.seed(321)
 dur_part <- sample(nrow(durdf),0.8*nrow(durdf),replace = F)
-dur_train <- durdf[dur_part,]
-dur_test <- durdf[-dur_part,]
+dur_train1 <- durdf[dur_part,]
+dur_test1 <- durdf[-dur_part,]
 ```
 
 Two test and train splits are performed, one on the raw data and one on the data filtered just to those which were acquired.
@@ -102,10 +107,10 @@ Two test and train splits are performed, one on the raw data and one on the data
 # Predicting Acquisition
 
 ```{r}
-acq_train1 <- acq_train %>% select(-c(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow, customer)) %>% 
-  mutate(acquisition = as.factor(acquisition))
-acq_test1 <- acq_test %>% select(-c(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow, customer)) %>% 
-  mutate(acquisition = as.factor(acquisition))
+acq_train1 <- acq_train1 %>% select(-c(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow, customer)) 
+#%>%  mutate(acquisition = as.factor(acquisition))
+acq_test1 <- acq_test1 %>% select(-c(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow, customer)) 
+#%>% mutate(acquisition = as.factor(acquisition))
 ```
 
 # Logistic Regression
@@ -148,7 +153,7 @@ plot(logfit2)
 extreme values are causing lots of issues with logistic regression. May return to this to see of we can get better performance by normalizing or removing extreme values.
 
 ```{r}
-acq_preds <- data.frame(actual = acq_test$acquisition,
+acq_preds <- data.frame(actual = acq_test1$acquisition,
                         log_preds = predict(logfit2, acq_test1))
 ```
 
@@ -230,37 +235,138 @@ acq_seq <- seq(25,1050,25)
 ```
 
 ```{r}
-marginal_effect_acq <- partial(rffit1,
-                           partial.xvar = "acq_exp",
-                           partial.values = acq_seq)
-part_acq_exp <- marginal_effect_acq$classOutput$acquisition %>% 
-  mutate(pred = round(.$'1'))
+#marginal_effect_acq <- partial(rffit1,
+#                           partial.xvar = "acq_exp",
+#                           partial.values = acq_seq)
+#part_acq_exp <- marginal_effect_acq$classOutput$acquisition %>% 
+#  mutate(pred = round(.$'1'))
 ```
 
 I'm not sure how to really get past this step for marginal effects. lectures only cover regression, for classification this gives a probability for each class. Makes it difficult to index and I'm not sure this is a good practice anyway.
 
 ```{r}
-mag_eff_acq_df <- data.frame(pred.acq = part_acq_exp, acq_seq = acq_seq)
+#mag_eff_acq_df <- data.frame(pred.acq = part_acq_exp, acq_seq = acq_seq)
 ```
 
 # Predicting Duration
 
+```{r}
+rfdur <- rfsrc(duration ~ .,
+                data = dur_train1, 
+                importance = TRUE, 
+                ntree = 500)
+```
+
+```{r}
+rfdur
+```
+
+```{r}
+data.frame(importance = rfdur$importance) %>%
+  tibble::rownames_to_column(var = "variable") %>%
+  ggplot(aes(x = reorder(variable,importance), y = importance)) +
+    geom_bar(stat = "identity", fill = "orange", color = "black")+
+    coord_flip() +
+     labs(x = "Variables", y = "Variable importance")
+#     theme_nice 
+```
+
+```{r}
+rfdur$importance
+```
+
+### Minimal Depth
+
+```{r}
+dur_mindepth <- max.subtree(rfdur,
+                        sub.order = TRUE)
+```
+
+```{r}
+print(round(dur_mindepth$order, 3)[,1])
+```
+
+```{r}
+dur_mindepth$sub.order
+```
+
+```{r}
+find.interaction(rfdur,
+                      method = "vimp",
+                      importance = "permute")
+```
+
+```{r}
+# regression with linear specification
+dur_reg_lin <- lm(duration ~  .-acq_exp_sq -ret_exp_sq -freq_sq, data = select(dur_train1, -acquisition))
+dur_reg_exp <- lm(duration ~  ., data = select(dur_train1, -acquisition))
+```
+
+```{r}
+summary(dur_reg_lin)
+summary(dur_reg_exp)
+```
+
+```{r}
+min(rfdur$xvar$ret_exp)
+max(rfdur$xvar$ret_exp)
+ret_exp_seq = seq(230,2000,30)
+```
+
+```{r}
+min(rfdur$xvar$freq)
+max(rfdur$xvar$freq)
+```
+
+```{r}
+min(rfdur$xvar$acq_exp)
+max(rfdur$xvar$acq_exp)
+```
+
+```{r}
+dur_marginal_effect <- randomForestSRC::partial(rfdur,
+                           partial.xvar = "ret_exp",
+                           partial.values = ret_exp_seq)
+
+dur_means_exp <- dur_marginal_effect$regrOutput$duration %>% colMeans()
+```
+
+```{r}
+dur_me_df <-
+  data.frame(pred_duration = dur_means_exp, ret_exp_seq = ret_exp_seq)
+```
+
+```{r}
+ggplot(dur_me_df, aes(x = ret_exp_seq, y = pred_duration)) +
+  geom_point(shape = 21, color = "purple", size = 2, stroke = 1.2)+
+  geom_smooth(method = "lm", formula = y ~ poly(x,3), se = FALSE, color = "black")+ # try with other values 
+  labs(x = "Average retention in $", y = "Predicted duration") +
+  scale_x_continuous(breaks = seq(230,2000,120))
+```
+
+
 # Random Survival Forest
 
 ```{r}
+dur_train2 <- dur_train1 %>% mutate(acquisition = as.numeric(acquisition))
+dur_test2 <- dur_test1 %>% mutate(acquisition = as.numeric(acquisition))
+```
+
+
+```{r}
 set.seed(321)
-rsf_fit <- rfsrc(Surv(duration, acquisition)~., dur_train, ntree = 100, membership = TRUE, importance = TRUE)
+rsf_fit <- rfsrc(Surv(duration, acquisition)~., dur_train2, ntree = 100, membership = TRUE, importance = TRUE)
 
 print(rsf_fit)
 ```
 
 ```{r}
-test_preds <- predict(rsf_fit, dur_test)
+test_preds <- predict(rsf_fit, dur_test2)
 ```
 
 ```{r}
 data.frame(preds = test_preds$predicted,
-           actual = dur_test$duration)
+           actual = dur_test1$duration)
 ```
 
 Those predictions are pretty bad, so there's a lot of work to be done here to get this type of model working or I just need to abandon it.
