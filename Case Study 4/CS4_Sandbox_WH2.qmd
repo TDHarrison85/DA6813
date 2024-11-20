@@ -165,7 +165,7 @@ acq_preds$dt_preds <- predict(dtfit1, acq_test1)
 
 ```{r}
 set.seed(321)
-rffit1 <- rfsrc(acquisition ~ . -acq_exp_sq -customer,
+rffit1 <- rfsrc(acquisition ~ acq_exp + industry + revenue + employees,
                 data = acq_train1, 
                 importance = TRUE, 
                 ntree = 100)
@@ -177,6 +177,15 @@ rffit1
 
 ```{r}
 rffit1$importance
+```
+
+```{r}
+data.frame(importance = rffit1$importance[,3]) %>%
+  tibble::rownames_to_column(var = "variable") %>%
+  ggplot(aes(x = reorder(variable,importance), y = importance)) +
+    geom_bar(stat = "identity", fill = "orange", color = "black")+
+    coord_flip() +
+     labs(x = "Variables", y = "Variable importance")
 ```
 
 ```{r}
