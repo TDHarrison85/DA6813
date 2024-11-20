@@ -49,6 +49,38 @@ Random forests are particularly well-suited for customer acquisition and retenti
 Breiman, L. (2001) Random Forests. Machine Learning, 45, 5-32.
 http://dx.doi.org/10.1023/A:1010933404324
 
+# Data Exploration and Preprocessing
+
+The `acquisitionRetention` dataset supports two distinct prediction tasks: (1) predicting which prospects will be acquired and (2) forecasting the retention duration for acquired customers. Given these tasks, different subsets of variables are suitable for each prediction.
+
+## **Task 1: Predicting Customer Acquisition**
+For this task, we can only use variables that are available before acquisition to avoid data leakage. Variables directly tied to post-acquisition behavior, such as `duration` or `profit`, should be excluded. The following variables are suitable for predicting acquisition:
+**`acq_exp`**: Total dollars spent on acquiring a prospect.
+**`acq_exp_sq`**: Square of acquisition expenditure to capture potential non-linear effects.
+**`industry`**: Indicates whether the prospect operates in the B2B sector.
+**`revenue`**: Annual sales revenue of the prospect’s firm.
+**`employees`**: Number of employees in the prospect’s firm.
+
+These variables describe the prospect’s financial and business characteristics and the firm’s investment in acquisition efforts, which are relevant predictors for whether a prospect is likely to become a customer.
+
+## **Task 2: Predicting Retention Duration**
+Once a customer is acquired, variables reflecting post-acquisition behavior and engagement can be used to predict retention duration. The following variables are suitable for this task:
+**`duration`**: The target variable for retention prediction.
+**`ret_exp`**: Total dollars spent on retaining the customer.
+**`ret_exp_sq`**: Square of retention expenditure to capture non-linear retention effects.
+**`freq`**: Number of purchases made by the customer.
+**`freq_sq`**: Square of purchase frequency.
+**`crossbuy`**: Number of product categories the customer purchased from.
+**`sow`**: Share-of-Wallet, indicating the percentage of purchases made from the firm compared to competitors.
+
+These variables capture customer engagement, retention efforts, and purchasing behavior, which are strong indicators of how long a customer will remain with the firm.
+
+## **Variables Not Used as Predictors**
+The following variables are not directly used as predictors in either task:
+
+**`customer`**: This is a unique identifier for each prospect or customer and carries no predictive value.
+**`profit`**: Represents the Customer Lifetime Value (CLV), which is a cumulative measure reflecting both acquisition and retention outcomes, making it unsuitable as a predictor for either task. Specifically, `profit` incorporates both `acq_exp` and `duration`, with `duration` being the target variable for retention. Including `profit` would result in data leakage, as it would give the model indirect access to the information it is trying to predict. Additionally, since `profit` aggregates multiple aspects of customer behavior and engagement, its use as a predictor would reduce model interpretability and could bias predictions by conflating cause and effect.
+
 # Methodology
 
 <!-- 
@@ -56,47 +88,17 @@ Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
 
-Content for Methodology goes here.
+1. Classify -aquire/not aquire all models types
+2. Build duration fom susbset of customers we will acquire using best model available(probably random forrest)
+3. PDP plot for extra credit
 
-# Data
 
-<!-- 
-Purpose: Explain the data used in the analysis and any preprocessing steps.
-Instructions: Provide an overview of the dataset, variables, and any cleaning steps or transformations made. Mention variables used or excluded and why.
--->
 
-### Data Exploration and Preprocessing
 
-The `acquisitionRetention` dataset supports two distinct prediction tasks: (1) predicting which prospects will be acquired and (2) forecasting the retention duration for acquired customers. Given these tasks, different subsets of variables are suitable for each prediction.
-
-#### **Task 1: Predicting Customer Acquisition**
-For this task, we can only use variables that are available before acquisition to avoid data leakage. Variables directly tied to post-acquisition behavior, such as `duration` or `profit`, should be excluded. The following variables are suitable for predicting acquisition:
-- **`acq_exp`**: Total dollars spent on acquiring a prospect.
-- **`acq_exp_sq`**: Square of acquisition expenditure to capture potential non-linear effects.
-- **`industry`**: Indicates whether the prospect operates in the B2B sector.
-- **`revenue`**: Annual sales revenue of the prospect’s firm.
-- **`employees`**: Number of employees in the prospect’s firm.
-
-These variables describe the prospect’s financial and business characteristics and the firm’s investment in acquisition efforts, which are relevant predictors for whether a prospect is likely to become a customer.
-
-#### **Task 2: Predicting Retention Duration**
-Once a customer is acquired, variables reflecting post-acquisition behavior and engagement can be used to predict retention duration. The following variables are suitable for this task:
-- **`duration`**: The target variable for retention prediction.
-- **`ret_exp`**: Total dollars spent on retaining the customer.
-- **`ret_exp_sq`**: Square of retention expenditure to capture non-linear retention effects.
-- **`freq`**: Number of purchases made by the customer.
-- **`freq_sq`**: Square of purchase frequency.
-- **`crossbuy`**: Number of product categories the customer purchased from.
-- **`sow`**: Share-of-Wallet, indicating the percentage of purchases made from the firm compared to competitors.
-
-These variables capture customer engagement, retention efforts, and purchasing behavior, which are strong indicators of how long a customer will remain with the firm.
 
 ---
 
-### **Variables Not Used as Predictors**
-The following variables are not directly used as predictors in either task:
-- **`customer`**: This is a unique identifier for each prospect or customer and carries no predictive value.
-- **`profit`**: Represents the Customer Lifetime Value (CLV), which is a cumulative measure reflecting both acquisition and retention outcomes, making it unsuitable as a predictor for either task. Specifically, `profit` incorporates both `acq_exp` and `duration`, with `duration` being the target variable for retention. Including `profit` would result in data leakage, as it would give the model indirect access to the information it is trying to predict. Additionally, since `profit` aggregates multiple aspects of customer behavior and engagement, its use as a predictor would reduce model interpretability and could bias predictions by conflating cause and effect.
+
 
 # Findings
 

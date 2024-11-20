@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Will Hytlin, Holly Millazo and Tim Harrison">
-<meta name="dcterms.date" content="2024-11-18">
+<meta name="dcterms.date" content="2024-11-19">
 
 <title>DA 6813 Case Study 4 Customer Retention</title>
 <style>
@@ -50,8 +50,13 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary"><span class="header-section-number">1</span> Executive Summary</a></li>
   <li><a href="#problem-statement" id="toc-problem-statement" class="nav-link" data-scroll-target="#problem-statement"><span class="header-section-number">2</span> Problem Statement</a></li>
   <li><a href="#additional-sources" id="toc-additional-sources" class="nav-link" data-scroll-target="#additional-sources"><span class="header-section-number">3</span> Additional Sources</a></li>
-  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology"><span class="header-section-number">4</span> Methodology</a></li>
-  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data"><span class="header-section-number">5</span> Data</a></li>
+  <li><a href="#data-exploration-and-preprocessing" id="toc-data-exploration-and-preprocessing" class="nav-link" data-scroll-target="#data-exploration-and-preprocessing"><span class="header-section-number">4</span> Data Exploration and Preprocessing</a>
+  <ul class="collapse">
+  <li><a href="#task-1-predicting-customer-acquisition" id="toc-task-1-predicting-customer-acquisition" class="nav-link" data-scroll-target="#task-1-predicting-customer-acquisition"><span class="header-section-number">4.1</span> <strong>Task 1: Predicting Customer Acquisition</strong></a></li>
+  <li><a href="#task-2-predicting-retention-duration" id="toc-task-2-predicting-retention-duration" class="nav-link" data-scroll-target="#task-2-predicting-retention-duration"><span class="header-section-number">4.2</span> <strong>Task 2: Predicting Retention Duration</strong></a></li>
+  <li><a href="#variables-not-used-as-predictors" id="toc-variables-not-used-as-predictors" class="nav-link" data-scroll-target="#variables-not-used-as-predictors"><span class="header-section-number">4.3</span> <strong>Variables Not Used as Predictors</strong></a></li>
+  </ul></li>
+  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology"><span class="header-section-number">5</span> Methodology</a></li>
   <li><a href="#findings" id="toc-findings" class="nav-link" data-scroll-target="#findings"><span class="header-section-number">6</span> Findings</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">7</span> Conclusion</a></li>
   <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix"><span class="header-section-number">8</span> Appendix</a></li>
@@ -81,7 +86,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">November 18, 2024</p>
+      <p class="date">November 19, 2024</p>
     </div>
   </div>
   
@@ -121,39 +126,37 @@ Instructions: Provide citations and key insights from sources relevant to the ca
 <p>Random forests are particularly well-suited for customer acquisition and retention analysis due to their ability to handle complex, non-linear relationships and interactions between variables. Unlike traditional linear models, random forests can automatically capture intricate patterns in customer behavior without requiring explicit specification of these relationships. This capability is crucial when predicting customer retention and acquisition, as it allows the model to identify subtle, high-order interactions between demographic, behavioral, and transactional features that influence customer decisions. Additionally, random forests provide variable importance measures, which help businesses understand the key drivers of customer churn and acquisition, enabling more targeted marketing strategies (Breiman, 2001). The robustness of random forests against overfitting, even in the presence of noisy data, further enhances their reliability in dynamic and uncertain market environments, making them an ideal choice for optimizing customer relationship management.</p>
 <p>Breiman, L. (2001) Random Forests. Machine Learning, 45, 5-32. http://dx.doi.org/10.1023/A:1010933404324</p>
 </section>
-<section id="methodology" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Methodology</h1>
+<section id="data-exploration-and-preprocessing" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Data Exploration and Preprocessing</h1>
+<p>The <code>acquisitionRetention</code> dataset supports two distinct prediction tasks: (1) predicting which prospects will be acquired and (2) forecasting the retention duration for acquired customers. Given these tasks, different subsets of variables are suitable for each prediction.</p>
+<section id="task-1-predicting-customer-acquisition" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="task-1-predicting-customer-acquisition"><span class="header-section-number">4.1</span> <strong>Task 1: Predicting Customer Acquisition</strong></h2>
+<p>For this task, we can only use variables that are available before acquisition to avoid data leakage. Variables directly tied to post-acquisition behavior, such as <code>duration</code> or <code>profit</code>, should be excluded. The following variables are suitable for predicting acquisition: <strong><code>acq_exp</code></strong>: Total dollars spent on acquiring a prospect. <strong><code>acq_exp_sq</code></strong>: Square of acquisition expenditure to capture potential non-linear effects. <strong><code>industry</code></strong>: Indicates whether the prospect operates in the B2B sector. <strong><code>revenue</code></strong>: Annual sales revenue of the prospect’s firm. <strong><code>employees</code></strong>: Number of employees in the prospect’s firm.</p>
+<p>These variables describe the prospect’s financial and business characteristics and the firm’s investment in acquisition efforts, which are relevant predictors for whether a prospect is likely to become a customer.</p>
+</section>
+<section id="task-2-predicting-retention-duration" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="task-2-predicting-retention-duration"><span class="header-section-number">4.2</span> <strong>Task 2: Predicting Retention Duration</strong></h2>
+<p>Once a customer is acquired, variables reflecting post-acquisition behavior and engagement can be used to predict retention duration. The following variables are suitable for this task: <strong><code>duration</code></strong>: The target variable for retention prediction. <strong><code>ret_exp</code></strong>: Total dollars spent on retaining the customer. <strong><code>ret_exp_sq</code></strong>: Square of retention expenditure to capture non-linear retention effects. <strong><code>freq</code></strong>: Number of purchases made by the customer. <strong><code>freq_sq</code></strong>: Square of purchase frequency. <strong><code>crossbuy</code></strong>: Number of product categories the customer purchased from. <strong><code>sow</code></strong>: Share-of-Wallet, indicating the percentage of purchases made from the firm compared to competitors.</p>
+<p>These variables capture customer engagement, retention efforts, and purchasing behavior, which are strong indicators of how long a customer will remain with the firm.</p>
+</section>
+<section id="variables-not-used-as-predictors" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="variables-not-used-as-predictors"><span class="header-section-number">4.3</span> <strong>Variables Not Used as Predictors</strong></h2>
+<p>The following variables are not directly used as predictors in either task:</p>
+<p><strong><code>customer</code></strong>: This is a unique identifier for each prospect or customer and carries no predictive value. <strong><code>profit</code></strong>: Represents the Customer Lifetime Value (CLV), which is a cumulative measure reflecting both acquisition and retention outcomes, making it unsuitable as a predictor for either task. Specifically, <code>profit</code> incorporates both <code>acq_exp</code> and <code>duration</code>, with <code>duration</code> being the target variable for retention. Including <code>profit</code> would result in data leakage, as it would give the model indirect access to the information it is trying to predict. Additionally, since <code>profit</code> aggregates multiple aspects of customer behavior and engagement, its use as a predictor would reduce model interpretability and could bias predictions by conflating cause and effect.</p>
+</section>
+</section>
+<section id="methodology" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Methodology</h1>
 <!-- 
 Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
-<p>Content for Methodology goes here.</p>
-</section>
-<section id="data" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Data</h1>
-<!-- 
-Purpose: Explain the data used in the analysis and any preprocessing steps.
-Instructions: Provide an overview of the dataset, variables, and any cleaning steps or transformations made. Mention variables used or excluded and why.
--->
-<section id="data-exploration-and-preprocessing" class="level3" data-number="5.0.1">
-<h3 data-number="5.0.1" class="anchored" data-anchor-id="data-exploration-and-preprocessing"><span class="header-section-number">5.0.1</span> Data Exploration and Preprocessing</h3>
-<p>The <code>acquisitionRetention</code> dataset supports two distinct prediction tasks: (1) predicting which prospects will be acquired and (2) forecasting the retention duration for acquired customers. Given these tasks, different subsets of variables are suitable for each prediction.</p>
-<section id="task-1-predicting-customer-acquisition" class="level4" data-number="5.0.1.1">
-<h4 data-number="5.0.1.1" class="anchored" data-anchor-id="task-1-predicting-customer-acquisition"><span class="header-section-number">5.0.1.1</span> <strong>Task 1: Predicting Customer Acquisition</strong></h4>
-<p>For this task, we can only use variables that are available before acquisition to avoid data leakage. Variables directly tied to post-acquisition behavior, such as <code>duration</code> or <code>profit</code>, should be excluded. The following variables are suitable for predicting acquisition: - <strong><code>acq_exp</code></strong>: Total dollars spent on acquiring a prospect. - <strong><code>acq_exp_sq</code></strong>: Square of acquisition expenditure to capture potential non-linear effects. - <strong><code>industry</code></strong>: Indicates whether the prospect operates in the B2B sector. - <strong><code>revenue</code></strong>: Annual sales revenue of the prospect’s firm. - <strong><code>employees</code></strong>: Number of employees in the prospect’s firm.</p>
-<p>These variables describe the prospect’s financial and business characteristics and the firm’s investment in acquisition efforts, which are relevant predictors for whether a prospect is likely to become a customer.</p>
-</section>
-<section id="task-2-predicting-retention-duration" class="level4" data-number="5.0.1.2">
-<h4 data-number="5.0.1.2" class="anchored" data-anchor-id="task-2-predicting-retention-duration"><span class="header-section-number">5.0.1.2</span> <strong>Task 2: Predicting Retention Duration</strong></h4>
-<p>Once a customer is acquired, variables reflecting post-acquisition behavior and engagement can be used to predict retention duration. The following variables are suitable for this task: - <strong><code>duration</code></strong>: The target variable for retention prediction. - <strong><code>ret_exp</code></strong>: Total dollars spent on retaining the customer. - <strong><code>ret_exp_sq</code></strong>: Square of retention expenditure to capture non-linear retention effects. - <strong><code>freq</code></strong>: Number of purchases made by the customer. - <strong><code>freq_sq</code></strong>: Square of purchase frequency. - <strong><code>crossbuy</code></strong>: Number of product categories the customer purchased from. - <strong><code>sow</code></strong>: Share-of-Wallet, indicating the percentage of purchases made from the firm compared to competitors.</p>
-<p>These variables capture customer engagement, retention efforts, and purchasing behavior, which are strong indicators of how long a customer will remain with the firm.</p>
+<ol type="1">
+<li>Classify -aquire/not aquire all models types</li>
+<li>Build duration fom susbset of customers we will acquire using best model available(probably random forrest)</li>
+<li>PDP plot for extra credit</li>
+</ol>
 <hr>
-</section>
-</section>
-<section id="variables-not-used-as-predictors" class="level3" data-number="5.0.2">
-<h3 data-number="5.0.2" class="anchored" data-anchor-id="variables-not-used-as-predictors"><span class="header-section-number">5.0.2</span> <strong>Variables Not Used as Predictors</strong></h3>
-<p>The following variables are not directly used as predictors in either task: - <strong><code>customer</code></strong>: This is a unique identifier for each prospect or customer and carries no predictive value. - <strong><code>profit</code></strong>: Represents the Customer Lifetime Value (CLV), which is a cumulative measure reflecting both acquisition and retention outcomes, making it unsuitable as a predictor for either task. Specifically, <code>profit</code> incorporates both <code>acq_exp</code> and <code>duration</code>, with <code>duration</code> being the target variable for retention. Including <code>profit</code> would result in data leakage, as it would give the model indirect access to the information it is trying to predict. Additionally, since <code>profit</code> aggregates multiple aspects of customer behavior and engagement, its use as a predictor would reduce model interpretability and could bias predictions by conflating cause and effect.</p>
-</section>
 </section>
 <section id="findings" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Findings</h1>
