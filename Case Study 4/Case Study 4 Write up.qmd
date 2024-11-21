@@ -1,6 +1,6 @@
 ---
 title: "DA 6813 Case Study 4 Customer Retention"
-author: "Will Hytlin, Holly Millazo and Tim Harrison"
+author: "Will Hyltin, Holly Milazo and Tim Harrison"
 date: today
 format: 
   html:
@@ -51,35 +51,30 @@ http://dx.doi.org/10.1023/A:1010933404324
 
 # Data Exploration and Preprocessing
 
+We normalized data to perform SVM and Logistic Regression but leave it raw for Random Forrest.
+
 The `acquisitionRetention` dataset supports two distinct prediction tasks: (1) predicting which prospects will be acquired and (2) forecasting the retention duration for acquired customers. Given these tasks, different subsets of variables are suitable for each prediction.
 
 ## **Task 1: Predicting Customer Acquisition**
 For this task, we can only use variables that are available before acquisition to avoid data leakage. Variables directly tied to post-acquisition behavior, such as `duration` or `profit`, should be excluded. The following variables are suitable for predicting acquisition:
+
 **`acq_exp`**: Total dollars spent on acquiring a prospect.
+
 **`acq_exp_sq`**: Square of acquisition expenditure to capture potential non-linear effects.
+
 **`industry`**: Indicates whether the prospect operates in the B2B sector.
+
 **`revenue`**: Annual sales revenue of the prospect’s firm.
+
 **`employees`**: Number of employees in the prospect’s firm.
 
 These variables describe the prospect’s financial and business characteristics and the firm’s investment in acquisition efforts, which are relevant predictors for whether a prospect is likely to become a customer.
 
 ## **Task 2: Predicting Retention Duration**
-Once a customer is acquired, variables reflecting post-acquisition behavior and engagement can be used to predict retention duration. The following variables are suitable for this task:
-**`duration`**: The target variable for retention prediction.
-**`ret_exp`**: Total dollars spent on retaining the customer.
-**`ret_exp_sq`**: Square of retention expenditure to capture non-linear retention effects.
-**`freq`**: Number of purchases made by the customer.
-**`freq_sq`**: Square of purchase frequency.
-**`crossbuy`**: Number of product categories the customer purchased from.
-**`sow`**: Share-of-Wallet, indicating the percentage of purchases made from the firm compared to competitors.
+Using all variables to do this
+The variables of importance are ....
 
-These variables capture customer engagement, retention efforts, and purchasing behavior, which are strong indicators of how long a customer will remain with the firm.
 
-## **Variables Not Used as Predictors**
-The following variables are not directly used as predictors in either task:
-
-**`customer`**: This is a unique identifier for each prospect or customer and carries no predictive value.
-**`profit`**: Represents the Customer Lifetime Value (CLV), which is a cumulative measure reflecting both acquisition and retention outcomes, making it unsuitable as a predictor for either task. Specifically, `profit` incorporates both `acq_exp` and `duration`, with `duration` being the target variable for retention. Including `profit` would result in data leakage, as it would give the model indirect access to the information it is trying to predict. Additionally, since `profit` aggregates multiple aspects of customer behavior and engagement, its use as a predictor would reduce model interpretability and could bias predictions by conflating cause and effect.
 
 # Methodology
 
@@ -89,8 +84,9 @@ Instructions: Detail the models used and the reasoning behind them. Include spec
 -->
 
 1. Classify -aquire/not aquire all models types
+2. Speak to limitations pro/cons of each model. Cover assumptions
 2. Build duration fom susbset of customers we will acquire using best model available(probably random forrest)
-3. PDP plot for extra credit
+
 
 
 
@@ -107,7 +103,15 @@ Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
 
-Content for Findings goes here.
+Confusion Matrix for each classification model, cover sensitivity, specificity and comparison RF works better because
+Pick best model and ran confusion matrix on full data set.
+
+Variable importance plot 
+retention expenditure is not linear relationship with retention
+Show retention results
+
+Performance Metrics like MAPE
+3. PDP plot for extra credit
 
 # Conclusion
 
