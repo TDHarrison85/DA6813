@@ -158,7 +158,7 @@ Running SVM against the test data...
 svm_preds <- predict(svmfit1, acq_test1)
 ```
 
-add the SVM predictions to the preds dataframe?? 
+add the SVM predictions to the preds dataframe
 ```{r}
 acq_preds$svm_preds <- svm_preds
 ```
@@ -171,8 +171,36 @@ svm_cm <- caret::confusionMatrix(acq_preds$svm_preds,
                                  positive = '1')
 print(svm_cm)
 ```
-## LEFT OFF HERE Re-tune/address data imbalance for SVM to be continued....
+#Tuning SVM model to see if there is a better SVM performance model
 
+```{r}
+set.seed(321)
+tune.out <- tune(svm, 
+                 acquisition ~ acq_exp + industry + revenue + employees, 
+                 data = acq_train1, 
+                 kernel = "radial",
+                 ranges = list(cost = c(0.1, 1, 10), 
+                               gamma = c(0.01, 0.1, 0.5, 1, 2)))
+
+svmfit2 <- tune.out$best.model
+summary(svmfit2)
+```
+
+```{r}
+svm_preds2 <- predict(svmfit2, acq_test1)
+```
+
+```{r}
+acq_preds$svm_preds2 <- svm_preds2
+```
+
+```{r}
+svm_cm2 <- caret::confusionMatrix(acq_preds$svm_preds2, 
+                                  reference = acq_preds$actual, 
+                                  positive = '1')
+print(svm_cm2)
+```
+Tuning the SVM (svmfit2) only made the performance slightly worse
 
 
 # Decision Trees
