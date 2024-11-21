@@ -357,4 +357,16 @@ ggplot(dur_me_df, aes(x = ret_exp_seq, y = pred_duration)) +
   scale_x_continuous(breaks = seq(230,2000,120))
 ```
 
+```{r}
+dur_preds <- data.frame(actual = dur_test1$duration, 
+                        preds = predict(rfdur, dur_test1)$predicted)
+```
+
+```{r}
+print(paste('rmse', sqrt(mean((dur_preds$actual - dur_preds$preds)^2))))
+print(paste('mae', mean(abs(dur_preds$actual - dur_preds$preds))))
+print(paste('me', mean(dur_preds$actual - dur_preds$preds)))
+print(paste('mape', mean(abs(dur_preds$actual - dur_preds$preds)*100/(dur_preds$actual + .001))))
+```
+
 Can we use variables for duration that we used in acquisition? Yes, just not quite the other way around. i.e. some variables are only good for duration, but all the acquisition variables can be used for duration.
