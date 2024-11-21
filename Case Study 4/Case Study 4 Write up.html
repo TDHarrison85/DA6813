@@ -131,12 +131,24 @@ Instructions: Provide citations and key insights from sources relevant to the ca
 <p>The <code>acquisitionRetention</code> dataset supports two distinct prediction tasks: (1) predicting which prospects will be acquired and (2) forecasting the retention duration for acquired customers. Given these tasks, different subsets of variables are suitable for each prediction.</p>
 <section id="task-1-predicting-customer-acquisition" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="task-1-predicting-customer-acquisition"><span class="header-section-number">4.1</span> <strong>Task 1: Predicting Customer Acquisition</strong></h2>
-<p>For this task, we can only use variables that are available before acquisition to avoid data leakage. Variables directly tied to post-acquisition behavior, such as <code>duration</code> or <code>profit</code>, should be excluded. The following variables are suitable for predicting acquisition: <strong><code>acq_exp</code></strong>: Total dollars spent on acquiring a prospect. <strong><code>acq_exp_sq</code></strong>: Square of acquisition expenditure to capture potential non-linear effects. <strong><code>industry</code></strong>: Indicates whether the prospect operates in the B2B sector. <strong><code>revenue</code></strong>: Annual sales revenue of the prospect’s firm. <strong><code>employees</code></strong>: Number of employees in the prospect’s firm.</p>
+<p>For this task, we can only use variables that are available before acquisition to avoid data leakage. Variables directly tied to post-acquisition behavior, such as <code>duration</code> or <code>profit</code>, should be excluded. The following variables are suitable for predicting acquisition:</p>
+<p><strong><code>acq_exp</code></strong>: Total dollars spent on acquiring a prospect.</p>
+<p><strong><code>acq_exp_sq</code></strong>: Square of acquisition expenditure to capture potential non-linear effects.</p>
+<p><strong><code>industry</code></strong>: Indicates whether the prospect operates in the B2B sector.</p>
+<p><strong><code>revenue</code></strong>: Annual sales revenue of the prospect’s firm.</p>
+<p><strong><code>employees</code></strong>: Number of employees in the prospect’s firm.</p>
 <p>These variables describe the prospect’s financial and business characteristics and the firm’s investment in acquisition efforts, which are relevant predictors for whether a prospect is likely to become a customer.</p>
 </section>
 <section id="task-2-predicting-retention-duration" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="task-2-predicting-retention-duration"><span class="header-section-number">4.2</span> <strong>Task 2: Predicting Retention Duration</strong></h2>
-<p>Once a customer is acquired, variables reflecting post-acquisition behavior and engagement can be used to predict retention duration. The following variables are suitable for this task: <strong><code>duration</code></strong>: The target variable for retention prediction. <strong><code>ret_exp</code></strong>: Total dollars spent on retaining the customer. <strong><code>ret_exp_sq</code></strong>: Square of retention expenditure to capture non-linear retention effects. <strong><code>freq</code></strong>: Number of purchases made by the customer. <strong><code>freq_sq</code></strong>: Square of purchase frequency. <strong><code>crossbuy</code></strong>: Number of product categories the customer purchased from. <strong><code>sow</code></strong>: Share-of-Wallet, indicating the percentage of purchases made from the firm compared to competitors.</p>
+<p>Once a customer is acquired, variables reflecting post-acquisition behavior and engagement can be used to predict retention duration. The following variables are suitable for this task:</p>
+<p><strong><code>duration</code></strong>: The target variable for retention prediction.</p>
+<p><strong><code>ret_exp</code></strong>: Total dollars spent on retaining the customer.</p>
+<p><strong><code>ret_exp_sq</code></strong>: Square of retention expenditure to capture non-linear retention effects.</p>
+<p><strong><code>freq</code></strong>: Number of purchases made by the customer.</p>
+<p><strong><code>freq_sq</code></strong>: Square of purchase frequency.</p>
+<p><strong><code>crossbuy</code></strong>: Number of product categories the customer purchased from.</p>
+<p><strong><code>sow</code></strong>: Share-of-Wallet, indicating the percentage of purchases made from the firm compared to competitors.</p>
 <p>These variables capture customer engagement, retention efforts, and purchasing behavior, which are strong indicators of how long a customer will remain with the firm.</p>
 </section>
 <section id="variables-not-used-as-predictors" class="level2" data-number="4.3">
