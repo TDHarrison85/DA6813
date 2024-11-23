@@ -6,7 +6,7 @@ format: html
 # Load Data and Packages
 
 ```{r}
-pacman::p_load(survival, randomForestSRC, MASS, SMCRM, tidyverse, here, skimr, corrplot, rpart)
+pacman::p_load(survival, randomForestSRC, MASS, SMCRM, tidyverse, here, skimr, corrplot, rpart, e1071)
 ```
 
 ```{r}
@@ -137,7 +137,69 @@ acq_preds <- data.frame(actual = acq_test1$acquisition,
                         )
 ```
 
-# Support Vector Machines
+# Support Vector Machines---------------HOLLY PART
+
+```{r}
+set.seed(321)
+svmfit1 <- svm(acquisition ~ acq_exp + industry + revenue + employees, 
+               data = acq_train1, 
+               type = "C-classification", 
+               kernel = "radial",
+               cost = 1, #<--we can adjust this if needed
+               scale = TRUE
+                ) 
+
+
+summary(svmfit1)
+
+```
+Running SVM against the test data...
+```{r}
+svm_preds <- predict(svmfit1, acq_test1)
+```
+
+add the SVM predictions to the preds dataframe
+```{r}
+acq_preds$svm_preds <- svm_preds
+```
+
+No surprise the model has high sensitivity (i.e. identifying the positive class), but low specificity (46.88% aka non-acquisition). Accuracy is pretty decent 76%
+
+```{r}
+svm_cm <- caret::confusionMatrix(acq_preds$svm_preds, 
+                                 reference = acq_preds$actual, 
+                                 positive = '1')
+print(svm_cm)
+```
+#Tuning SVM model to see if there is a better SVM performance model
+
+```{r}
+set.seed(321)
+tune.out <- tune(svm, 
+                 acquisition ~ acq_exp + industry + revenue + employees, 
+                 data = acq_train1, 
+                 kernel = "radial",
+                 ranges = list(gamma = seq(.01,.1, by = .01), cost = seq(.1, 1, by = .1)))
+
+svmfit2 <- tune.out$best.model
+summary(svmfit2)
+```
+
+```{r}
+svm_preds2 <- predict(svmfit2, acq_test1)
+```
+
+```{r}
+acq_preds$svm_preds2 <- svm_preds2
+```
+
+```{r}
+svm_cm2 <- caret::confusionMatrix(acq_preds$svm_preds2, 
+                                  reference = acq_preds$actual, 
+                                  positive = '1')
+print(svm_cm2)
+```
+Tuning the SVM (svmfit2) only made the performance slightly worse
 
 
 # Decision Trees
@@ -226,7 +288,7 @@ Good sensitivity, but bad specificity. This means we should have most of the act
 ### SVM Confusion Matrix
 
 ```{r}
-
+caret::confusionMatrix(acq_preds$svm_preds, reference = acq_preds$actual, positive = '1')
 ```
 
 
@@ -329,33 +391,78 @@ ret_exp_seq = seq(0,1100,20)
 ```{r}
 min(rfdur$xvar$freq)
 max(rfdur$xvar$freq)
+freq_seq <- seq(1,21,1)
 ```
 
 ```{r}
 min(rfdur$xvar$acq_exp)
 max(rfdur$xvar$acq_exp)
+acq_exp_seq <- seq(140,880,20)
 ```
 
 ```{r}
-dur_marginal_effect <- randomForestSRC::partial(rfdur,
+retx_me <- randomForestSRC::partial(rfdur,
                            partial.xvar = "ret_exp",
                            partial.values = ret_exp_seq)
 
-dur_means_exp <- dur_marginal_effect$regrOutput$duration %>% colMeans()
+retx_me_means <- retx_me$regrOutput$duration %>% colMeans()
 ```
 
 ```{r}
-dur_me_df <-
-  data.frame(pred_duration = dur_means_exp, ret_exp_seq = ret_exp_seq)
+retx_me_df <-
+  data.frame(pred_duration = retx_me_means, ret_exp_seq = ret_exp_seq)
 ```
 
 ```{r}
-ggplot(dur_me_df, aes(x = ret_exp_seq, y = pred_duration)) +
+ggplot(retx_me_df, aes(x = ret_exp_seq, y = pred_duration)) +
   geom_point(shape = 21, color = "purple", size = 2, stroke = 1.2)+
-  geom_smooth(method = "lm", formula = y ~ poly(x,3), se = FALSE, color = "black")+ # try with other values 
-  labs(x = "Retention Expenditures in $", y = "Predicted duration") +
-  scale_x_continuous(breaks = seq(230,2000,120))
+  geom_smooth(method = "lm", formula = y ~ poly(x,6), se = FALSE, color = "black")+ # try with other values 
+  labs(x = "Retention Expenditures in $", y = "Predicted duration", title = 'Partial Dependence Plot: Retention Expenditure') +
+  scale_x_continuous(breaks = seq(0,1200,120))
 ```
+
+```{r}
+freq_me <- randomForestSRC::partial(rfdur,
+                           partial.xvar = "freq",
+                           partial.values = freq_seq)
+
+freq_me_means <- freq_me$regrOutput$duration %>% colMeans()
+```
+
+```{r}
+freq_me_df <-
+  data.frame(pred_duration = freq_me_means, freq_seq = freq_seq)
+```
+
+```{r}
+ggplot(freq_me_df, aes(x = freq_seq, y = pred_duration)) +
+  geom_point(shape = 21, color = "purple", size = 2, stroke = 1.2)+
+  geom_smooth(method = "lm", formula = y ~ poly(x,5), se = FALSE, color = "black")+ # try with other values 
+  labs(x = "Frequency of Purchases", y = "Predicted duration", title = 'Partial Dependence Plot: Frequency') +
+  scale_x_continuous(breaks = seq(0,21,3))
+```
+
+```{r}
+acqx_me <- randomForestSRC::partial(rfdur,
+                           partial.xvar = "acq_exp",
+                           partial.values = acq_exp_seq)
+
+acqx_me_means <- acqx_me$regrOutput$duration %>% colMeans()
+```
+
+```{r}
+acqx_me_df <-
+  data.frame(pred_duration = acqx_me_means, acq_exp_seq = acq_exp_seq)
+```
+
+```{r}
+ggplot(acqx_me_df, aes(x = acq_exp_seq, y = pred_duration)) +
+  geom_point(shape = 21, color = "purple", size = 2, stroke = 1.2)+
+  geom_smooth(method = "lm", formula = y ~ poly(x,9), se = FALSE, color = "black")+ # try with other values 
+  labs(x = "Acquisition Expenditures in $", y = "Predicted duration", title = 'Partial Dependence Plot: Acquisiton Expenditure') +
+  scale_x_continuous(breaks = seq(150,1000,150))
+```
+
 
 ```{r}
 dur_preds <- data.frame(actual = dur_test1$duration, 
@@ -366,7 +473,8 @@ dur_preds <- data.frame(actual = dur_test1$duration,
 print(paste('rmse', sqrt(mean((dur_preds$actual - dur_preds$preds)^2))))
 print(paste('mae', mean(abs(dur_preds$actual - dur_preds$preds))))
 print(paste('me', mean(dur_preds$actual - dur_preds$preds)))
-print(paste('mape', mean(abs(dur_preds$actual - dur_preds$preds)*100/(dur_preds$actual + .001))))
+print(paste('mape', mean(abs(dur_preds$actual - dur_preds$preds)*100/(dur_preds$actual + .1))))
 ```
-
-Can we use variables for duration that we used in acquisition? Yes, just not quite the other way around. i.e. some variables are only good for duration, but all the acquisition variables can be used for duration.
+Jotting down some thoughts to help explain the though process around these plots and how they contribute to the story.
+PDP Plot insights: 
+The Partial Dependence plots above, built for the three variables included in the dataset that had both the original value and squared terms, highlights the way that the plot may not have a perfectly linear relationship with duration. The retention expenditure partial dependence plot is a perfect example of this. From the model and variable importance relationships we might conclude that the value of duration increases for every unit increase of retention expenditure, however the partial dependence plot shows that after a certain point, duration barely increases with increases in expenditure. Also, note the y-axis scale for this plot; compared to the other two plots, the value of duration varies greatly based on the value of the expenditure. This suggests that retention expenditure is a very important variable to determine the duration of a customer, however it is important to remember that these models do not prove causation: essentially, we may spend more to keep an important customer, but they may be an important customer because they have already been customers for a long time. Furthermore, there may be retention expenditures that occur as a result of the threat of the loss of a customer, and if this happens multiple times then the cost to keep them as a customer may increase the longer we retain them, effectivley meaning that duration causes the increase in retention expenditure and not the other way around.
