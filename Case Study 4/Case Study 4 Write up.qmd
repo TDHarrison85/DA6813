@@ -1,6 +1,6 @@
 ---
 title: "DA 6813 Case Study 4 Customer Retention"
-author: "Will Hyltin, Holly Milazo and Tim Harrison"
+author: "Will Hyltin, Holly Milazzo and Tim Harrison"
 date: today
 format: 
   html:
@@ -25,7 +25,7 @@ Instructions: Summarize the performance of the models (e.g., random forest, deci
 -->
 
 
-This analysis focused on predicting customer acquisition and retention to optimize marketing strategies and resource allocation. Using the `acquisitionRetention` dataset, three models—Logistic Regression, Support Vector Machines (SVM), and Random Forest—were evaluated to classify prospects as "acquired" or "not acquired." Random Forest emerged as the best-performing model, achieving the highest sensitivity (91.2%) and balanced accuracy in the acquisition task, demonstrating its reliability in identifying prospects likely to convert into customers. When applied to the full dataset, Random Forest achieved an impressive accuracy of 95%, with high sensitivity (98.2%) and specificity (88.3%).
+This analysis focused on predicting customer acquisition and retention to optimize marketing strategies and resource allocation. Using the `acquisitionRetention` dataset, three models—Logistic Regression, Support Vector Machines (SVM), and Random Forest—were evaluated to classify prospects as "acquired" or "not acquired." Random Forest emerged as the best-performing model, achieving the highest sensitivity (91.2%) while maintaining high accuracy (75%) in the acquisition task, demonstrating its reliability in identifying prospects likely to convert into customers.
 
 For retention prediction, Random Forest was again employed to forecast customer duration, leveraging post-acquisition variables such as retention expenditures, purchase frequency, and cross-category buying behavior. Retention expenditures were identified as the most significant predictor, though a diminishing return effect was observed, suggesting the need to optimize spending. 
 
@@ -58,7 +58,7 @@ http://dx.doi.org/10.1023/A:1010933404324
 
 The `acquisitionRetention` dataset is designed to address two key prediction tasks: (1) identifying which prospects are likely to be acquired and (2) forecasting the retention duration for acquired customers. To meet the requirements of these tasks, different subsets of variables are selected to ensure data integrity and prevent leakage.
 
-To prepare the data for modeling, we normalized numeric variables when applying SVM and Logistic Regression to ensure comparability and improve model performance. However, for Random Forest, the raw data was used, as this model is not sensitive to feature scaling.
+To prepare the data for modeling, we centered and scaled numeric variables when applying SVM and Logistic Regression to ensure comparability and improve model performance. However, for Random Forest, the raw data was used, as this model is not sensitive to feature scaling.
 
 ### **Variables Used to Predict Customer Acquisition**
 
@@ -69,7 +69,7 @@ For the customer acquisition task, only variables available prior to acquisition
 - **`revenue`**: Annual sales revenue of the prospect’s firm.
 - **`employees`**: Number of employees in the prospect’s firm.
 
-Initially, **`acq_exp_sq`** (the square of acquisition expenditure) was included to capture potential non-linear effects. However, this variable was removed after analysis showed no significant non-linear relationship with acquisition outcomes.
+Initially, **`acq_exp_sq`** (the square of acquisition expenditure) was included to capture potential non-linear effects. However, this lead to issues with multicollinearity, diminishing our ability to understand the importance of the individual variables, relative to one another.
 
 These selected variables reflect the financial and business characteristics of each prospect, along with the firm's investment in acquisition efforts. They provide relevant and actionable insights into the likelihood of acquiring a customer while maintaining the model’s validity and interpretability. 
 
@@ -82,7 +82,7 @@ Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
 
-To conduct the analysis, we evaluated three models—Logistic Regression, Support Vector Machines (SVM), and Random Forest—to classify prospects as "acquired" or "not acquired," using pre-acquisition variables such as `acq_exp`, `industry`, `revenue`, and `employees` to avoid data leakage. The dataset was split into training and testing sets, and numeric variables were normalized for SVM and Logistic Regression, while Random Forest was applied to the raw data due to its robustness to scaling. Each model’s performance was assessed using accuracy, precision, recall, and AUC-ROC. Logistic Regression’s assumption of linearity and independence among predictors, as well as SVM’s reliance on normalized inputs and computational demands, limited their suitability for this task. Random Forest outperformed the other models, excelling in handling non-linear relationships, multicollinearity, and interactions, making it the preferred acquisition model. The Random Forest model was then applied to the full dataset to identify acquired customers, creating a subset for the retention task. For retention modeling, Random Forest was used again, leveraging its ability to capture complex relationships and interactions among behavioral and post-acquisition variables such as `freq`, `crossbuy`, and `ret_exp`. Model performance for retention was evaluated using Mean Absolute Error (MAE). This approach ensured that the methods were tailored to the task requirements, addressing model assumptions and limitations while maintaining interpretability.
+To conduct the analysis, we evaluated three models—Logistic Regression, Support Vector Machines (SVM), and Random Forest—to classify prospects as "acquired" or "not acquired," using pre-acquisition variables such as `acq_exp`, `industry`, `revenue`, and `employees` to avoid data leakage. The dataset was split into training and testing sets, and numeric variables were normalized for SVM and Logistic Regression, while Random Forest was applied to the raw data due to its robustness to scaling. Each model’s performance was assessed using accuracy, precision, recall, and AUC-ROC. Logistic Regression’s assumption of linearity and independence among predictors, as well as SVM’s reliance on normalized inputs and computational demands, limited their suitability for this task. Random Forest outperformed the other models, excelling in handling non-linear relationships, multicollinearity, and interactions, making it the preferred acquisition model. The Random Forest model was then applied to the full dataset to identify acquired customers, creating a subset for those predicted to be acquired. For retention modeling, Random Forest was used again, leveraging its ability to capture complex relationships and interactions among behavioral and post-acquisition variables such as `freq`, `crossbuy`, and `ret_exp`. Again, variables in the dataset that were square terms of other variables were excluded, to ensure proper measures of variable importance, and because Random Forest captures non-linear relationships between variables. Model performance for retention was evaluated using Root Mean Squared Error (RMSE). This approach ensured that the methods were tailored to the task requirements, addressing model assumptions and limitations while maintaining interpretability.
 
 
 
@@ -100,14 +100,14 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 The analysis of customer acquisition and retention utilized Logistic Regression, Support Vector Machines (SVM), and Random Forest models to classify prospects as “acquired” or “not acquired” and to predict retention duration for acquired customers. 
 
 #### **Customer Acquisition Findings**
-Random Forest demonstrated superior performance in predicting acquisition outcomes compared to Logistic Regression and SVM. While all models achieved comparable accuracy of 74%–75%, Random Forest excelled with the highest sensitivity (91.2%) and balanced accuracy (66.73%), indicating its robustness in identifying acquired customers. SVM and Logistic Regression performed similarly, with sensitivity scores of 89.7%, though their specificity (40.6%–43.8%) was lower than desired. Random Forest's ability to handle multicollinearity and non-linear relationships, combined with its interpretability via variable importance measures, solidified its position as the optimal model for acquisition predictions.
+Random Forest demonstrated superior performance in predicting acquisition outcomes compared to Logistic Regression and SVM. While all models achieved comparable accuracy of 74%–75%, Random Forest excelled with the highest sensitivity (91.2%) while maintaining high accuracy (75%), indicating its robustness in identifying acquired customers. SVM and Logistic Regression performed similarly, with slightly lower sensitivity scores of 89.7%, and similar measures of accuracy (74% - 75%). Random Forest's ability to handle multicollinearity and non-linear relationships, combined with its interpretability via variable importance measures, solidified its position as the optimal model for acquisition predictions. 
 
-Applying the Random Forest model to the full dataset yielded an accuracy of 95%, sensitivity of 98.2%, and specificity of 88.3%, reinforcing its reliability in a real-world application. These results were used to identify the subset of customers predicted to be acquired, which formed the basis for the retention analysis.
+It's important to note the method of applying the Random Forest model to the full dataset does result in perfect prediction on the training data, because the Random Forest Model is built on Decision Trees it always "knows the answer" for records that it was trained on. This means that the duration dataset will contain mostly correct values for acquisition, which may not be the case when applied in practice and the acqusition information is not known ahead of time.
 
 #### **Customer Retention Findings**
-The retention duration prediction was conducted using a Random Forest regression model. Key variables influencing retention included `ret_exp` (retention expenditures), `freq` (purchase frequency), and `crossbuy` (number of product categories purchased). Retention expenditures emerged as the most important predictor, with Partial Dependence Plots (PDPs) revealing a diminishing return effect: after a certain expenditure level, further increases had minimal impact on retention duration.
+The retention duration prediction was conducted using a Random Forest regression model. Key variables influencing retention included `ret_exp` (retention expenditures), `freq` (purchase frequency), and `crossbuy` (number of product categories purchased). Cross-buy behavior emerged as the most important predictor, with Retention Expenditure as a close second, falling short only due to a diminishing return effect revealed by the Partial Dependence Plot. After a certain expenditure level, further increases had minimal impact on retention duration. Additional Partial Dependence Plots were observed for two other variables: frequency and Acquisition Expenditure. While these plots do seem to indicate a non-linear relationship between the variables and duration, their impact was much less pronounced, being variables that ranked lower in variable importance
 
-Performance metrics for the retention model indicated robust predictions, with a Root Mean Square Error (RMSE) of 50.89 and a Mean Absolute Error (MAE) of 37.33. While the Mean Absolute Percentage Error (MAPE) was high, this can be attributed to the variability in customer retention durations, underscoring the importance of nuanced insights from the model rather than solely relying on error metrics.
+Performance metrics for the retention model indicated robust predictions, with a Root Mean Square Error (RMSE) of 50.89 and a Mean Absolute Error (MAE) of 37.33. This generally indicates that predictions for duration will be, on average, between 37.33 and 50.89 days of the actual value. While the Mean Absolute Percentage Error (MAPE) was high, this can be attributed to the existence of 0-valued durations, which occurred due to the use of the predictions on acquired customer where they were not actually acquired. This underscores the importance of nuanced insights from the model rather than solely relying on error metrics.
 
 
 ```{r, echo=FALSE}
@@ -357,24 +357,21 @@ conf_full_data <- caret::confusionMatrix(durdf$acq_preds, reference = durdf$acqu
 
 # Extract relevant metrics
 results <- data.frame(
-  Model = c("Logistic Regression", "SVM", "Random Forest", "Random Forest Full Data Set"),
+  Model = c("Logistic Regression", "SVM", "Random Forest"),
   Accuracy = c(
     conf_log$overall["Accuracy"], 
     conf_svm$overall["Accuracy"], 
-    conf_rf$overall["Accuracy"], 
-    conf_full_data$overall["Accuracy"]
+    conf_rf$overall["Accuracy"]
   ),
   Sensitivity = c(
     conf_log$byClass["Sensitivity"], 
     conf_svm$byClass["Sensitivity"], 
-    conf_rf$byClass["Sensitivity"], 
-    conf_full_data$byClass["Sensitivity"]
+    conf_rf$byClass["Sensitivity"]
   ),
   Specificity = c(
     conf_log$byClass["Specificity"], 
     conf_svm$byClass["Specificity"], 
-    conf_rf$byClass["Specificity"], 
-    conf_full_data$byClass["Specificity"]
+    conf_rf$byClass["Specificity"]
   )
 )
 
