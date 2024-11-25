@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Case Study 4</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="CS4_Sandbox_WH2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="CS4_Sandbox_WH2_files/libs/quarto-html/quarto.js"></script>
+<script src="CS4_Sandbox_WH2_files/libs/quarto-html/popper.min.js"></script>
+<script src="CS4_Sandbox_WH2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="CS4_Sandbox_WH2_files/libs/quarto-html/anchor.min.js"></script>
+<link href="CS4_Sandbox_WH2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="CS4_Sandbox_WH2_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="CS4_Sandbox_WH2_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="CS4_Sandbox_WH2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="CS4_Sandbox_WH2_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Case Study 4</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="load-data-and-packages" class="level1">
+<h1>Load Data and Packages</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(survival, randomForestSRC, MASS, SMCRM, tidyverse, here, skimr, corrplot, rpart, e1071)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(acquisitionRetention)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>rawdf <span class="ot">&lt;-</span> acquisitionRetention</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(rawdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   500 obs. of  15 variables:
+ $ customer   : num  1 2 3 4 5 6 7 8 9 10 ...
+ $ acquisition: num  1 1 1 0 1 1 1 1 0 0 ...
+ $ duration   : num  1635 1039 1288 0 1631 ...
+ $ profit     : num  6134 3524 4081 -638 5446 ...
+ $ acq_exp    : num  694 460 249 638 589 ...
+ $ ret_exp    : num  972 450 805 0 920 ...
+ $ acq_exp_sq : num  480998 211628 62016 407644 346897 ...
+ $ ret_exp_sq : num  943929 202077 648089 0 846106 ...
+ $ freq       : num  6 11 21 0 2 7 15 13 0 0 ...
+ $ freq_sq    : num  36 121 441 0 4 49 225 169 0 0 ...
+ $ crossbuy   : num  5 6 6 0 9 4 5 5 0 0 ...
+ $ sow        : num  95 22 90 0 80 48 51 23 0 0 ...
+ $ industry   : num  1 0 0 0 0 1 0 1 0 1 ...
+ $ revenue    : num  47.2 45.1 29.1 40.6 48.7 ...
+ $ employees  : num  898 686 1423 181 631 ...</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rawdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  customer acquisition duration  profit acq_exp ret_exp acq_exp_sq ret_exp_sq
+1        1           1     1635 6134.30  693.54  971.56  480997.73   943928.8
+2        2           1     1039 3523.62  460.03  449.53  211627.60   202077.2
+3        3           1     1288 4080.62  249.03  805.04   62015.94   648089.4
+4        4           0        0 -638.47  638.47    0.00  407643.94        0.0
+5        5           1     1631 5446.32  588.98  919.84  346897.44   846105.6
+6        6           1      942 3488.07  568.65  365.11  323362.82   133305.3
+  freq freq_sq crossbuy sow industry revenue employees
+1    6      36        5  95        1   47.20       898
+2   11     121        6  22        0   45.11       686
+3   21     441        6  90        0   29.10      1423
+4    0       0        0   0        0   40.64       181
+5    2       4        9  80        0   48.72       631
+6    7      49        4  48        1   35.43       617</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(rawdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">rawdf</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">customer</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">250.50</td>
+<td style="text-align: right;">144.48</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">125.75</td>
+<td style="text-align: right;">250.50</td>
+<td style="text-align: right;">375.25</td>
+<td style="text-align: right;">500.00</td>
+<td style="text-align: left;">▇▇▇▇▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">acquisition</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.68</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">▃▁▁▁▇</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">duration</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">742.45</td>
+<td style="text-align: right;">544.47</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">957.50</td>
+<td style="text-align: right;">1146.25</td>
+<td style="text-align: right;">1673.00</td>
+<td style="text-align: left;">▇▁▅▇▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">profit</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2403.84</td>
+<td style="text-align: right;">2083.19</td>
+<td style="text-align: right;">-1027.04</td>
+<td style="text-align: right;">-316.32</td>
+<td style="text-align: right;">3369.93</td>
+<td style="text-align: right;">3931.60</td>
+<td style="text-align: right;">6134.30</td>
+<td style="text-align: left;">▆▁▂▇▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">acq_exp</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">493.35</td>
+<td style="text-align: right;">166.95</td>
+<td style="text-align: right;">1.21</td>
+<td style="text-align: right;">384.14</td>
+<td style="text-align: right;">491.66</td>
+<td style="text-align: right;">600.20</td>
+<td style="text-align: right;">1027.04</td>
+<td style="text-align: left;">▁▅▇▃▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ret_exp</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">336.26</td>
+<td style="text-align: right;">266.59</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">398.10</td>
+<td style="text-align: right;">514.26</td>
+<td style="text-align: right;">1094.96</td>
+<td style="text-align: left;">▇▆▇▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">acq_exp_sq</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">271211.10</td>
+<td style="text-align: right;">172829.25</td>
+<td style="text-align: right;">1.46</td>
+<td style="text-align: right;">147561.95</td>
+<td style="text-align: right;">241729.67</td>
+<td style="text-align: right;">360246.04</td>
+<td style="text-align: right;">1054811.16</td>
+<td style="text-align: left;">▇▇▂▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ret_exp_sq</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">183999.83</td>
+<td style="text-align: right;">201982.60</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">158479.66</td>
+<td style="text-align: right;">264466.08</td>
+<td style="text-align: right;">1198937.40</td>
+<td style="text-align: left;">▇▂▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">freq</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6.22</td>
+<td style="text-align: right;">5.53</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">6.00</td>
+<td style="text-align: right;">11.00</td>
+<td style="text-align: right;">21.00</td>
+<td style="text-align: left;">▇▃▅▂▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">freq_sq</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">69.25</td>
+<td style="text-align: right;">84.55</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">36.00</td>
+<td style="text-align: right;">121.00</td>
+<td style="text-align: right;">441.00</td>
+<td style="text-align: left;">▇▂▁▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">crossbuy</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4.05</td>
+<td style="text-align: right;">3.24</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">5.00</td>
+<td style="text-align: right;">7.00</td>
+<td style="text-align: right;">11.00</td>
+<td style="text-align: left;">▇▃▆▅▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sow</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">38.88</td>
+<td style="text-align: right;">31.81</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">44.00</td>
+<td style="text-align: right;">66.00</td>
+<td style="text-align: right;">116.00</td>
+<td style="text-align: left;">▇▃▆▃▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">industry</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.52</td>
+<td style="text-align: right;">0.50</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: left;">▇▁▁▁▇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">revenue</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">40.54</td>
+<td style="text-align: right;">9.67</td>
+<td style="text-align: right;">14.49</td>
+<td style="text-align: right;">33.53</td>
+<td style="text-align: right;">41.43</td>
+<td style="text-align: right;">47.52</td>
+<td style="text-align: right;">65.10</td>
+<td style="text-align: left;">▁▅▇▆▂</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">employees</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">671.53</td>
+<td style="text-align: right;">242.99</td>
+<td style="text-align: right;">18.00</td>
+<td style="text-align: right;">503.00</td>
+<td style="text-align: right;">657.50</td>
+<td style="text-align: right;">826.00</td>
+<td style="text-align: right;">1461.00</td>
+<td style="text-align: left;">▁▇▇▃▁</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rawdf <span class="ot">&lt;-</span> rawdf <span class="sc">%&gt;%</span> <span class="fu">mutate_at</span>(<span class="fu">c</span>(<span class="st">'industry'</span>, <span class="st">'acquisition'</span>), as.factor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#column definitions</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>?acquisitionRetention</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>rawdf <span class="sc">%&gt;%</span> <span class="fu">select_if</span>(is.numeric) <span class="sc">%&gt;%</span> <span class="fu">cor</span>() <span class="sc">%&gt;%</span> <span class="fu">corrplot</span>(<span class="at">method =</span> <span class="st">'number'</span>, <span class="at">number.cex =</span> <span class="fl">0.6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>lots of multicollinearity. Random Forest will be able to handle this, so not a huge issue. But important to note for our narrative.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Survival Plot</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>surv <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">duration =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="fu">max</span>(rawdf<span class="sc">$</span>duration), <span class="at">by =</span> <span class="dv">1</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>surv1 <span class="ot">&lt;-</span> surv <span class="sc">%&gt;%</span> </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(duration) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dist =</span> <span class="fu">sum</span>(rawdf<span class="sc">$</span>duration <span class="sc">&gt;</span> duration))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#greater than removes all of the results where duration == 0, i.e. those not acquired</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>surv1 <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> duration, <span class="at">y =</span> dist)) <span class="sc">+</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name =</span> <span class="st">'Count'</span>, <span class="at">sec.axis =</span> <span class="fu">sec_axis</span>(<span class="at">transform =</span> <span class="sc">~</span>.<span class="sc">/</span><span class="fu">max</span>(surv1<span class="sc">$</span>dist), <span class="at">name =</span> <span class="st">'Distribution'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>for predicting those acquired: remove profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow. these variables are always zero when acquisition == 0. Basically gives the answers ahead of time, can’t use to predict</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(rawdf[<span class="fu">which</span>(rawdf<span class="sc">$</span>acquisition <span class="sc">==</span> <span class="dv">0</span>),]<span class="sc">$</span>duration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>rawdf <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">'sq'</span>)) <span class="sc">%&gt;%</span> <span class="fu">names</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "acq_exp_sq" "ret_exp_sq" "freq_sq"   </code></pre>
+</div>
+</div>
+<p>Gets names of variables with a square term. Idea is that these variables have been shown to have a quadratic relationship to response variables. This is mostly necessary for the steps when determining partial dependence, otherwise we would usually exclude these variables.</p>
+</section>
+<section id="test-and-train-split" class="level1">
+<h1>test and train split</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>acq_part <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(rawdf),<span class="fl">0.8</span><span class="sc">*</span><span class="fu">nrow</span>(rawdf),<span class="at">replace =</span> F)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>acq_train1 <span class="ot">&lt;-</span> rawdf[acq_part,]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>acq_test1 <span class="ot">&lt;-</span> rawdf[<span class="sc">-</span>acq_part,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Two test and train splits are performed, one on the raw data and one on the data filtered just to those which were acquired.</p>
+</section>
+<section id="predicting-acquisition" class="level1">
+<h1>Predicting Acquisition</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>acq_train1 <span class="ot">&lt;-</span> acq_train1 <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow)) </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>acq_test1 <span class="ot">&lt;-</span> acq_test1 <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(profit, duration, ret_exp, ret_exp_sq, freq, freq_sq, crossbuy, sow)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>note: did not remove customer so that I can use it to join predictions back on dataset later. Will remove from model formulae.</p>
+</section>
+<section id="logistic-regression" class="level1">
+<h1>Logistic Regression</h1>
+<p>doing logistic regression to set up a baseline for our random forest performance.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>logfit1 <span class="ot">&lt;-</span> <span class="fu">step</span>(<span class="fu">glm</span>(acquisition <span class="sc">~</span> . <span class="sc">-</span>customer, </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">data =</span> acq_train1, <span class="at">family =</span> binomial), </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">direction =</span> <span class="st">"backward"</span>, <span class="at">trace =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(logfit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = acquisition ~ (customer + acq_exp + acq_exp_sq + 
+    industry + revenue + employees) - customer, family = binomial, 
+    data = acq_train1)
+
+Coefficients:
+              Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -1.438e+01  1.683e+00  -8.541  &lt; 2e-16 ***
+acq_exp      2.779e-02  4.795e-03   5.796 6.79e-09 ***
+acq_exp_sq  -2.768e-05  4.755e-06  -5.822 5.82e-09 ***
+industry1    1.810e+00  3.362e-01   5.383 7.31e-08 ***
+revenue      8.263e-02  1.646e-02   5.020 5.17e-07 ***
+employees    8.047e-03  9.340e-04   8.615  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 504.46  on 399  degrees of freedom
+Residual deviance: 273.31  on 394  degrees of freedom
+AIC: 285.31
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>car<span class="sc">::</span><span class="fu">vif</span>(logfit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   acq_exp acq_exp_sq   industry    revenue  employees 
+ 28.071229  28.183096   1.187488   1.088178   1.254391 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>logfit2 <span class="ot">&lt;-</span> <span class="fu">step</span>(<span class="fu">glm</span>(acquisition <span class="sc">~</span> . <span class="sc">-</span>acq_exp_sq <span class="sc">-</span>customer, </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">data =</span> acq_train1, <span class="at">family =</span> binomial), </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">direction =</span> <span class="st">"backward"</span>, <span class="at">trace =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(logfit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = acquisition ~ industry + revenue + employees, family = binomial, 
+    data = acq_train1)
+
+Coefficients:
+              Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -7.7558047  0.9252495  -8.382  &lt; 2e-16 ***
+industry1    1.3923096  0.2924451   4.761 1.93e-06 ***
+revenue      0.0834765  0.0153024   5.455 4.89e-08 ***
+employees    0.0074872  0.0008474   8.836  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 504.46  on 399  degrees of freedom
+Residual deviance: 320.18  on 396  degrees of freedom
+AIC: 328.18
+
+Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>car<span class="sc">::</span><span class="fu">vif</span>(logfit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> industry   revenue employees 
+ 1.089928  1.093918  1.153956 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(logfit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-20-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-20-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>extreme values are causing lots of issues with logistic regression. May return to this to see of we can get better performance by normalizing or removing extreme values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>acq_preds <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">actual =</span> acq_test1<span class="sc">$</span>acquisition,</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">log_preds =</span> <span class="fu">predict</span>(logfit2, acq_test1, <span class="at">type =</span> <span class="st">'response'</span>)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">log_preds =</span> <span class="fu">as.factor</span>(<span class="fu">ifelse</span>(log_preds <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                        )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="support-vector-machinesholly-part" class="level1">
+<h1>Support Vector Machines—————HOLLY PART</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>svmfit1 <span class="ot">&lt;-</span> <span class="fu">svm</span>(acquisition <span class="sc">~</span> acq_exp <span class="sc">+</span> industry <span class="sc">+</span> revenue <span class="sc">+</span> employees, </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> acq_train1, </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">type =</span> <span class="st">"C-classification"</span>, </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">kernel =</span> <span class="st">"radial"</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">cost =</span> <span class="dv">1</span>, <span class="co">#&lt;--we can adjust this if needed</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale =</span> <span class="cn">TRUE</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>                ) </span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(svmfit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+svm(formula = acquisition ~ acq_exp + industry + revenue + employees, 
+    data = acq_train1, type = "C-classification", kernel = "radial", 
+    cost = 1, scale = TRUE)
+
+
+Parameters:
+   SVM-Type:  C-classification 
+ SVM-Kernel:  radial 
+       cost:  1 
+
+Number of Support Vectors:  181
+
+ ( 91 90 )
+
+
+Number of Classes:  2 
+
+Levels: 
+ 0 1</code></pre>
+</div>
+</div>
+<p>Running SVM against the test data…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>svm_preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(svmfit1, acq_test1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>add the SVM predictions to the preds dataframe</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>acq_preds<span class="sc">$</span>svm_preds <span class="ot">&lt;-</span> svm_preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>No surprise the model has high sensitivity (i.e.&nbsp;identifying the positive class), but low specificity (46.88% aka non-acquisition). Accuracy is pretty decent 76%</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>svm_cm <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(acq_preds<span class="sc">$</span>svm_preds, </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">reference =</span> acq_preds<span class="sc">$</span>actual, </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">positive =</span> <span class="st">'1'</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(svm_cm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 14  7
+         1 18 61
+                                          
+               Accuracy : 0.75            
+                 95% CI : (0.6534, 0.8312)
+    No Information Rate : 0.68            
+    P-Value [Acc &gt; NIR] : 0.07961         
+                                          
+                  Kappa : 0.368           
+                                          
+ Mcnemar's Test P-Value : 0.04550         
+                                          
+            Sensitivity : 0.8971          
+            Specificity : 0.4375          
+         Pos Pred Value : 0.7722          
+         Neg Pred Value : 0.6667          
+             Prevalence : 0.6800          
+         Detection Rate : 0.6100          
+   Detection Prevalence : 0.7900          
+      Balanced Accuracy : 0.6673          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>#Tuning SVM model to see if there is a better SVM performance model</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>tune.out <span class="ot">&lt;-</span> <span class="fu">tune</span>(svm, </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>                 acquisition <span class="sc">~</span> acq_exp <span class="sc">+</span> industry <span class="sc">+</span> revenue <span class="sc">+</span> employees, </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> acq_train1, </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">kernel =</span> <span class="st">"radial"</span>,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">ranges =</span> <span class="fu">list</span>(<span class="at">gamma =</span> <span class="fu">seq</span>(.<span class="dv">01</span>,.<span class="dv">1</span>, <span class="at">by =</span> .<span class="dv">01</span>), <span class="at">cost =</span> <span class="fu">seq</span>(.<span class="dv">1</span>, <span class="dv">1</span>, <span class="at">by =</span> .<span class="dv">1</span>)))</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>svmfit2 <span class="ot">&lt;-</span> tune.out<span class="sc">$</span>best.model</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(svmfit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+best.tune(METHOD = svm, train.x = acquisition ~ acq_exp + industry + 
+    revenue + employees, data = acq_train1, ranges = list(gamma = seq(0.01, 
+    0.1, by = 0.01), cost = seq(0.1, 1, by = 0.1)), kernel = "radial")
+
+
+Parameters:
+   SVM-Type:  C-classification 
+ SVM-Kernel:  radial 
+       cost:  0.6 
+
+Number of Support Vectors:  224
+
+ ( 111 113 )
+
+
+Number of Classes:  2 
+
+Levels: 
+ 0 1</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>svm_preds2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(svmfit2, acq_test1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>acq_preds<span class="sc">$</span>svm_preds2 <span class="ot">&lt;-</span> svm_preds2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>svm_cm2 <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(acq_preds<span class="sc">$</span>svm_preds2, </span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">reference =</span> acq_preds<span class="sc">$</span>actual, </span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">positive =</span> <span class="st">'1'</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(svm_cm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 12  4
+         1 20 64
+                                          
+               Accuracy : 0.76            
+                 95% CI : (0.6643, 0.8398)
+    No Information Rate : 0.68            
+    P-Value [Acc &gt; NIR] : 0.05132         
+                                          
+                  Kappa : 0.3644          
+                                          
+ Mcnemar's Test P-Value : 0.00220         
+                                          
+            Sensitivity : 0.9412          
+            Specificity : 0.3750          
+         Pos Pred Value : 0.7619          
+         Neg Pred Value : 0.7500          
+             Prevalence : 0.6800          
+         Detection Rate : 0.6400          
+   Detection Prevalence : 0.8400          
+      Balanced Accuracy : 0.6581          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>Tuning the SVM (svmfit2) only made the performance slightly worse</p>
+</section>
+<section id="decision-trees" class="level1">
+<h1>Decision Trees</h1>
+<p>I’m only doing this step to correlate back to the importance variable for our random forest. Basically so we can visualize the importance variables and where they are in the trees.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>dtfit1 <span class="ot">&lt;-</span> <span class="fu">rpart</span>(acquisition <span class="sc">~</span> . <span class="sc">-</span>customer, <span class="at">data =</span> acq_train1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dtfit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+rpart(formula = acquisition ~ . - customer, data = acq_train1)
+  n= 400 
+
+          CP nsplit rel error    xerror       xstd
+1 0.30769231      0 1.0000000 1.0000000 0.07205767
+2 0.07307692      1 0.6923077 0.8307692 0.06830146
+3 0.02307692      3 0.5461538 0.6076923 0.06124811
+4 0.01538462      4 0.5230769 0.6769231 0.06373020
+5 0.01000000      6 0.4923077 0.6846154 0.06398849
+
+Variable importance
+ employees    revenue    acq_exp acq_exp_sq   industry 
+        60         14         11         11          4 
+
+Node number 1: 400 observations,    complexity param=0.3076923
+  predicted class=1  expected loss=0.325  P(node) =1
+    class counts:   130   270
+   probabilities: 0.325 0.675 
+  left son=2 (158 obs) right son=3 (242 obs)
+  Primary splits:
+      employees  &lt; 581.5    to the left,  improve=47.505440, (0 missing)
+      acq_exp    &lt; 750.61   to the right, improve=12.653150, (0 missing)
+      acq_exp_sq &lt; 563426.9 to the right, improve=12.653150, (0 missing)
+      revenue    &lt; 33.78    to the left,  improve=11.740110, (0 missing)
+      industry   splits as  LR,           improve= 7.686865, (0 missing)
+  Surrogate splits:
+      acq_exp    &lt; 743.265  to the right, agree=0.627, adj=0.057, (0 split)
+      acq_exp_sq &lt; 552458.4 to the right, agree=0.627, adj=0.057, (0 split)
+      revenue    &lt; 33.78    to the left,  agree=0.618, adj=0.032, (0 split)
+
+Node number 2: 158 observations,    complexity param=0.07307692
+  predicted class=0  expected loss=0.3734177  P(node) =0.395
+    class counts:    99    59
+   probabilities: 0.627 0.373 
+  left son=4 (80 obs) right son=5 (78 obs)
+  Primary splits:
+      revenue    &lt; 41.01    to the left,  improve=9.746965, (0 missing)
+      employees  &lt; 427.5    to the left,  improve=6.701415, (0 missing)
+      industry   splits as  LR,           improve=4.218119, (0 missing)
+      acq_exp    &lt; 750.61   to the right, improve=3.105963, (0 missing)
+      acq_exp_sq &lt; 563426.9 to the right, improve=3.105963, (0 missing)
+  Surrogate splits:
+      industry   splits as  LR,           agree=0.557, adj=0.103, (0 split)
+      acq_exp    &lt; 685.885  to the right, agree=0.551, adj=0.090, (0 split)
+      acq_exp_sq &lt; 470439.9 to the right, agree=0.551, adj=0.090, (0 split)
+      employees  &lt; 309.5    to the left,  agree=0.544, adj=0.077, (0 split)
+
+Node number 3: 242 observations
+  predicted class=1  expected loss=0.1280992  P(node) =0.605
+    class counts:    31   211
+   probabilities: 0.128 0.872 
+
+Node number 4: 80 observations
+  predicted class=0  expected loss=0.2  P(node) =0.2
+    class counts:    64    16
+   probabilities: 0.800 0.200 
+
+Node number 5: 78 observations,    complexity param=0.07307692
+  predicted class=1  expected loss=0.4487179  P(node) =0.195
+    class counts:    35    43
+   probabilities: 0.449 0.551 
+  left son=10 (31 obs) right son=11 (47 obs)
+  Primary splits:
+      employees  &lt; 425.5    to the left,  improve=5.381782, (0 missing)
+      revenue    &lt; 55.46    to the left,  improve=2.789744, (0 missing)
+      acq_exp    &lt; 660.695  to the right, improve=1.851282, (0 missing)
+      acq_exp_sq &lt; 436518.6 to the right, improve=1.851282, (0 missing)
+      industry   splits as  LR,           improve=1.461401, (0 missing)
+  Surrogate splits:
+      acq_exp    &lt; 601.445  to the right, agree=0.641, adj=0.097, (0 split)
+      acq_exp_sq &lt; 361751   to the right, agree=0.641, adj=0.097, (0 split)
+      revenue    &lt; 60.835   to the right, agree=0.615, adj=0.032, (0 split)
+
+Node number 10: 31 observations,    complexity param=0.01538462
+  predicted class=0  expected loss=0.3225806  P(node) =0.0775
+    class counts:    21    10
+   probabilities: 0.677 0.323 
+  left son=20 (7 obs) right son=21 (24 obs)
+  Primary splits:
+      acq_exp    &lt; 660.695  to the right, improve=1.8817200, (0 missing)
+      acq_exp_sq &lt; 436518.6 to the right, improve=1.8817200, (0 missing)
+      industry   splits as  LR,           improve=1.6492270, (0 missing)
+      revenue    &lt; 47.615   to the left,  improve=0.8733871, (0 missing)
+      employees  &lt; 388.5    to the right, improve=0.8418654, (0 missing)
+  Surrogate splits:
+      acq_exp_sq &lt; 436518.6 to the right, agree=1.000, adj=1.000, (0 split)
+      employees  &lt; 317.5    to the left,  agree=0.806, adj=0.143, (0 split)
+
+Node number 11: 47 observations,    complexity param=0.02307692
+  predicted class=1  expected loss=0.2978723  P(node) =0.1175
+    class counts:    14    33
+   probabilities: 0.298 0.702 
+  left son=22 (7 obs) right son=23 (40 obs)
+  Primary splits:
+      acq_exp    &lt; 288.47   to the left,  improve=2.8524320, (0 missing)
+      acq_exp_sq &lt; 83401.81 to the left,  improve=2.8524320, (0 missing)
+      revenue    &lt; 53.485   to the left,  improve=1.7108570, (0 missing)
+      employees  &lt; 475.5    to the left,  improve=0.4595745, (0 missing)
+      industry   splits as  LR,           improve=0.1892041, (0 missing)
+  Surrogate splits:
+      acq_exp_sq &lt; 83401.81 to the left,  agree=1, adj=1, (0 split)
+
+Node number 20: 7 observations
+  predicted class=0  expected loss=0  P(node) =0.0175
+    class counts:     7     0
+   probabilities: 1.000 0.000 
+
+Node number 21: 24 observations,    complexity param=0.01538462
+  predicted class=0  expected loss=0.4166667  P(node) =0.06
+    class counts:    14    10
+   probabilities: 0.583 0.417 
+  left son=42 (12 obs) right son=43 (12 obs)
+  Primary splits:
+      industry   splits as  LR,           improve=3.0000000, (0 missing)
+      employees  &lt; 349.5    to the right, improve=1.3333330, (0 missing)
+      revenue    &lt; 47.615   to the left,  improve=0.8414918, (0 missing)
+      acq_exp    &lt; 401.945  to the left,  improve=0.3389356, (0 missing)
+      acq_exp_sq &lt; 161575.9 to the left,  improve=0.3389356, (0 missing)
+  Surrogate splits:
+      acq_exp    &lt; 583.63   to the left,  agree=0.708, adj=0.417, (0 split)
+      acq_exp_sq &lt; 341094   to the left,  agree=0.708, adj=0.417, (0 split)
+      revenue    &lt; 49.645   to the right, agree=0.708, adj=0.417, (0 split)
+      employees  &lt; 325.5    to the right, agree=0.625, adj=0.250, (0 split)
+
+Node number 22: 7 observations
+  predicted class=0  expected loss=0.2857143  P(node) =0.0175
+    class counts:     5     2
+   probabilities: 0.714 0.286 
+
+Node number 23: 40 observations
+  predicted class=1  expected loss=0.225  P(node) =0.1
+    class counts:     9    31
+   probabilities: 0.225 0.775 
+
+Node number 42: 12 observations
+  predicted class=0  expected loss=0.1666667  P(node) =0.03
+    class counts:    10     2
+   probabilities: 0.833 0.167 
+
+Node number 43: 12 observations
+  predicted class=1  expected loss=0.3333333  P(node) =0.03
+    class counts:     4     8
+   probabilities: 0.333 0.667 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>rattle<span class="sc">::</span><span class="fu">fancyRpartPlot</span>(dtfit1, <span class="at">sub =</span> <span class="st">''</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>acq_preds<span class="sc">$</span>dt_preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(dtfit1, acq_test1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="random-forest" class="level1">
+<h1>Random Forest</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>rffit1 <span class="ot">&lt;-</span> <span class="fu">rfsrc</span>(acquisition <span class="sc">~</span> acq_exp <span class="sc">+</span> industry <span class="sc">+</span> revenue <span class="sc">+</span> employees,</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> acq_train1, </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">importance =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">ntree =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>rffit1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                         Sample size: 400
+           Frequency of class labels: 130, 270
+                     Number of trees: 100
+           Forest terminal node size: 1
+       Average no. of terminal nodes: 60.56
+No. of variables tried at each split: 2
+              Total no. of variables: 4
+       Resampling used to grow trees: swor
+    Resample size used to grow trees: 253
+                            Analysis: RF-C
+                              Family: class
+                      Splitting rule: gini *random*
+       Number of random split points: 10
+                    Imbalanced ratio: 2.0769
+                   (OOB) Brier score: 0.13987867
+        (OOB) Normalized Brier score: 0.55951468
+                           (OOB) AUC: 0.86122507
+                      (OOB) Log-loss: 0.43233875
+                        (OOB) PR-AUC: 0.7502889
+                        (OOB) G-mean: 0.73805782
+   (OOB) Requested performance error: 0.1975, 0.4, 0.1
+
+Confusion matrix:
+
+          predicted
+  observed  0   1 class.error
+         0 80  50      0.3846
+         1 28 242      0.1037
+
+      (OOB) Misclassification rate: 0.195</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>rffit1<span class="sc">$</span>importance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 all          0         1
+acq_exp   0.20920425 -0.5959310 1.1195294
+industry  0.06171539  0.2571913 0.1218193
+revenue   0.17061121  0.3408307 0.5154668
+employees 0.30492305  0.8719412 0.7943424</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">importance =</span> rffit1<span class="sc">$</span>importance[,<span class="dv">3</span>]) <span class="sc">%&gt;%</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(variable,importance), <span class="at">y =</span> importance)) <span class="sc">+</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"orange"</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Variables"</span>, <span class="at">y =</span> <span class="st">"Variable importance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>acq_mindepth <span class="ot">&lt;-</span> <span class="fu">max.subtree</span>(rffit1, <span class="at">sub.order =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">round</span>(acq_mindepth<span class="sc">$</span>order, <span class="dv">3</span>)[,<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  acq_exp  industry   revenue employees 
+     1.47      1.97      1.28      0.62 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find.interaction</span>(rffit1, <span class="at">method =</span> <span class="st">'vimp'</span>, <span class="at">importance =</span> <span class="st">'permute'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Pairing employees with acq_exp 
+Pairing employees with revenue 
+Pairing employees with industry 
+Pairing acq_exp with revenue 
+Pairing acq_exp with industry 
+Pairing revenue with industry 
+
+                              Method: vimp
+                    No. of variables: 4
+           Variables sorted by VIMP?: TRUE
+   No. of variables used for pairing: 4
+    Total no. of paired interactions: 6
+            Monte Carlo replications: 1
+    Type of noising up used for VIMP: permute
+
+                    Var 1  Var 2 Paired Additive Difference
+employees:acq_exp  0.1013 0.0020 0.1244   0.1033     0.0211
+employees:revenue  0.1013 0.0172 0.1103   0.1185    -0.0081
+employees:industry 0.1013 0.0271 0.1156   0.1283    -0.0127
+acq_exp:revenue    0.0088 0.0165 0.0402   0.0252     0.0150
+acq_exp:industry   0.0088 0.0245 0.0276   0.0333    -0.0057
+revenue:industry   0.0278 0.0222 0.0423   0.0501    -0.0078</code></pre>
+</div>
+</div>
+<p>very little difference between additive and paired values for each variable so little interaction</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>acq_test_prob <span class="ot">&lt;-</span> <span class="fu">predict</span>(rffit1, <span class="at">newdata =</span> acq_test1)<span class="sc">$</span>predicted[,<span class="dv">2</span>]</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>acq_preds<span class="sc">$</span>rf_preds <span class="ot">&lt;-</span> acq_test_prob</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>acq_preds <span class="ot">&lt;-</span> acq_preds <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rf_preds =</span> <span class="fu">as.factor</span>(<span class="fu">ifelse</span>(rf_preds <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>###Logistic Confusion Matrix</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(acq_preds<span class="sc">$</span>log_preds, <span class="at">reference =</span> acq_preds<span class="sc">$</span>actual, <span class="at">positive =</span> <span class="st">'1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 13  7
+         1 19 61
+                                          
+               Accuracy : 0.74            
+                 95% CI : (0.6427, 0.8226)
+    No Information Rate : 0.68            
+    P-Value [Acc &gt; NIR] : 0.11802         
+                                          
+                  Kappa : 0.3367          
+                                          
+ Mcnemar's Test P-Value : 0.03098         
+                                          
+            Sensitivity : 0.8971          
+            Specificity : 0.4062          
+         Pos Pred Value : 0.7625          
+         Neg Pred Value : 0.6500          
+             Prevalence : 0.6800          
+         Detection Rate : 0.6100          
+   Detection Prevalence : 0.8000          
+      Balanced Accuracy : 0.6517          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>logistic regression performs just barely worse than the random forest (below). It is worse on the full dataset, so we can still continue with random forest, but we may just need some additional tuning for either model to see if we can improve one over the other. Also worth mentioning that logistic didn’t really pass it’s assumptions, so may be another reason to avoid logistic.</p>
+<section id="random-forest-confusion-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="random-forest-confusion-matrix">Random Forest Confusion Matrix</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(acq_preds<span class="sc">$</span>rf_preds, <span class="at">reference =</span> acq_preds<span class="sc">$</span>actual, <span class="at">positive =</span> <span class="st">'1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 13  6
+         1 19 62
+                                          
+               Accuracy : 0.75            
+                 95% CI : (0.6534, 0.8312)
+    No Information Rate : 0.68            
+    P-Value [Acc &gt; NIR] : 0.07961         
+                                          
+                  Kappa : 0.3563          
+                                          
+ Mcnemar's Test P-Value : 0.01640         
+                                          
+            Sensitivity : 0.9118          
+            Specificity : 0.4062          
+         Pos Pred Value : 0.7654          
+         Neg Pred Value : 0.6842          
+             Prevalence : 0.6800          
+         Detection Rate : 0.6200          
+   Detection Prevalence : 0.8100          
+      Balanced Accuracy : 0.6590          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>Good sensitivity, but bad specificity. This means we should have most of the actual acquired records in our dataset for duration, but we will let them in at the cost of several of the un-acquired records being let into the dataset.</p>
+</section>
+<section id="svm-confusion-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="svm-confusion-matrix">SVM Confusion Matrix</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(acq_preds<span class="sc">$</span>svm_preds, <span class="at">reference =</span> acq_preds<span class="sc">$</span>actual, <span class="at">positive =</span> <span class="st">'1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 14  7
+         1 18 61
+                                          
+               Accuracy : 0.75            
+                 95% CI : (0.6534, 0.8312)
+    No Information Rate : 0.68            
+    P-Value [Acc &gt; NIR] : 0.07961         
+                                          
+                  Kappa : 0.368           
+                                          
+ Mcnemar's Test P-Value : 0.04550         
+                                          
+            Sensitivity : 0.8971          
+            Specificity : 0.4375          
+         Pos Pred Value : 0.7722          
+         Neg Pred Value : 0.6667          
+             Prevalence : 0.6800          
+         Detection Rate : 0.6100          
+   Detection Prevalence : 0.7900          
+      Balanced Accuracy : 0.6673          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>Applying the acquisition model to the full dataset:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>acq_raw_prob <span class="ot">&lt;-</span> <span class="fu">predict</span>(rffit1, <span class="at">newdata =</span> <span class="fu">select</span>(rawdf, <span class="fu">names</span>(acq_test1)))<span class="sc">$</span>predicted[,<span class="dv">2</span>]</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>durdf <span class="ot">&lt;-</span> rawdf <span class="sc">%&gt;%</span> <span class="fu">bind_cols</span>(<span class="at">preds =</span> acq_raw_prob) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">acq_preds =</span> <span class="fu">as.factor</span>(<span class="fu">ifelse</span>(preds <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>One last confusion matrix to check how it did on the whole dataset:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">confusionMatrix</span>(durdf<span class="sc">$</span>acq_preds, durdf<span class="sc">$</span>acquisition, <span class="at">positive =</span> <span class="st">'1'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 143   6
+         1  19 332
+                                          
+               Accuracy : 0.95            
+                 95% CI : (0.9271, 0.9674)
+    No Information Rate : 0.676           
+    P-Value [Acc &gt; NIR] : &lt;2e-16          
+                                          
+                  Kappa : 0.8834          
+                                          
+ Mcnemar's Test P-Value : 0.0164          
+                                          
+            Sensitivity : 0.9822          
+            Specificity : 0.8827          
+         Pos Pred Value : 0.9459          
+         Neg Pred Value : 0.9597          
+             Prevalence : 0.6760          
+         Detection Rate : 0.6640          
+   Detection Prevalence : 0.7020          
+      Balanced Accuracy : 0.9325          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>so for some reason, predicting on training set leads to 100% accuracy for training records, despite their being gaps in random forest output earlier. This is great for building our subset for predicting duration, but we cannot report acquisition performance on these results, only the earlier ones on the test set.</p>
+</section>
+</section>
+<section id="predicting-duration" class="level1">
+<h1>Predicting Duration</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>durdf1 <span class="ot">&lt;-</span> durdf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(acq_preds <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>acquisition)</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>dur_part <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(durdf1),<span class="fl">0.8</span><span class="sc">*</span><span class="fu">nrow</span>(durdf1),<span class="at">replace =</span> F)</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>dur_train1 <span class="ot">&lt;-</span> durdf1[dur_part,]</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>dur_test1 <span class="ot">&lt;-</span> durdf1[<span class="sc">-</span>dur_part,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(dur_train1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "customer"   "duration"   "profit"     "acq_exp"    "ret_exp"   
+ [6] "acq_exp_sq" "ret_exp_sq" "freq"       "freq_sq"    "crossbuy"  
+[11] "sow"        "industry"   "revenue"    "employees"  "preds"     
+[16] "acq_preds" </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">321</span>)</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>rfdur <span class="ot">&lt;-</span> <span class="fu">rfsrc</span>(duration <span class="sc">~</span> profit <span class="sc">+</span> acq_exp <span class="sc">+</span> ret_exp <span class="sc">+</span> freq <span class="sc">+</span> crossbuy <span class="sc">+</span> sow <span class="sc">+</span> industry <span class="sc">+</span> revenue <span class="sc">+</span> employees, <span class="co">#-customer -acq_exp_sq -ret_exp_sq -freq_sq,</span></span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> dur_train1, </span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">importance =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">ntree =</span> <span class="dv">500</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>rfdur</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                         Sample size: 280
+                     Number of trees: 500
+           Forest terminal node size: 5
+       Average no. of terminal nodes: 34.214
+No. of variables tried at each split: 3
+              Total no. of variables: 9
+       Resampling used to grow trees: swor
+    Resample size used to grow trees: 177
+                            Analysis: RF-R
+                              Family: regr
+                      Splitting rule: mse *random*
+       Number of random split points: 10
+                     (OOB) R squared: 0.9753718
+   (OOB) Requested performance error: 2420.98205213</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">importance =</span> rfdur<span class="sc">$</span>importance) <span class="sc">%&gt;%</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"variable"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(variable,importance), <span class="at">y =</span> importance)) <span class="sc">+</span></span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"orange"</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Variables"</span>, <span class="at">y =</span> <span class="st">"Variable importance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="co">#     theme_nice </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>rfdur<span class="sc">$</span>importance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     profit     acq_exp     ret_exp        freq    crossbuy         sow 
+ 66596.4656   3924.4559 145895.7477  81290.2168 210894.6809  37276.7675 
+   industry     revenue   employees 
+   105.0242   2543.1627   3587.0100 </code></pre>
+</div>
+</div>
+<section id="minimal-depth" class="level3">
+<h3 class="anchored" data-anchor-id="minimal-depth">Minimal Depth</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>dur_mindepth <span class="ot">&lt;-</span> <span class="fu">max.subtree</span>(rfdur,</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">sub.order =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">round</span>(dur_mindepth<span class="sc">$</span>order, <span class="dv">3</span>)[,<span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   profit   acq_exp   ret_exp      freq  crossbuy       sow  industry   revenue 
+    1.974     3.984     1.586     2.726     2.948     3.990     7.682     4.732 
+employees 
+    4.326 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>dur_mindepth<span class="sc">$</span>sub.order</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             profit   acq_exp   ret_exp      freq  crossbuy       sow  industry
+profit    0.1942289 0.4318192 0.2525983 0.4142007 0.5724637 0.5596874 0.8217917
+acq_exp   0.5539497 0.3947206 0.4765667 0.6584514 0.7662858 0.7326850 0.8997585
+ret_exp   0.2605732 0.4150131 0.1543483 0.3349335 0.5116082 0.4903398 0.8073177
+freq      0.4699447 0.6144395 0.3798628 0.2709533 0.6764052 0.6658914 0.8511000
+crossbuy  0.5339468 0.6359098 0.4428069 0.6230860 0.2917158 0.6886878 0.8712114
+sow       0.6315249 0.7278318 0.5778807 0.7096276 0.7976616 0.3955185 0.9182403
+industry  0.8935724 0.9214311 0.8702517 0.9371273 0.9559453 0.9509128 0.7544537
+revenue   0.6931536 0.7340379 0.5832325 0.7374688 0.8381370 0.8045320 0.9316565
+employees 0.6380847 0.7106279 0.5350913 0.6997302 0.8090930 0.7779019 0.9331769
+            revenue employees
+profit    0.5262826 0.4895716
+acq_exp   0.7406204 0.7171366
+ret_exp   0.4969874 0.4489508
+freq      0.6382911 0.6459213
+crossbuy  0.6895152 0.6684833
+sow       0.7675002 0.7559092
+industry  0.9430447 0.9438455
+revenue   0.4692727 0.7685113
+employees 0.7769390 0.4306620</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find.interaction</span>(rfdur,</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">method =</span> <span class="st">"vimp"</span>,</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">importance =</span> <span class="st">"permute"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Pairing crossbuy with ret_exp 
+Pairing crossbuy with freq 
+Pairing crossbuy with profit 
+Pairing crossbuy with sow 
+Pairing crossbuy with acq_exp 
+Pairing crossbuy with employees 
+Pairing crossbuy with revenue 
+Pairing crossbuy with industry 
+Pairing ret_exp with freq 
+Pairing ret_exp with profit 
+Pairing ret_exp with sow 
+Pairing ret_exp with acq_exp 
+Pairing ret_exp with employees 
+Pairing ret_exp with revenue 
+Pairing ret_exp with industry 
+Pairing freq with profit 
+Pairing freq with sow 
+Pairing freq with acq_exp 
+Pairing freq with employees 
+Pairing freq with revenue 
+Pairing freq with industry 
+Pairing profit with sow 
+Pairing profit with acq_exp 
+Pairing profit with employees 
+Pairing profit with revenue 
+Pairing profit with industry 
+Pairing sow with acq_exp 
+Pairing sow with employees 
+Pairing sow with revenue 
+Pairing sow with industry 
+Pairing acq_exp with employees 
+Pairing acq_exp with revenue 
+Pairing acq_exp with industry 
+Pairing employees with revenue 
+Pairing employees with industry 
+Pairing revenue with industry 
+
+                              Method: vimp
+                    No. of variables: 9
+           Variables sorted by VIMP?: TRUE
+   No. of variables used for pairing: 9
+    Total no. of paired interactions: 36
+            Monte Carlo replications: 1
+    Type of noising up used for VIMP: permute
+
+                        Var 1      Var 2     Paired   Additive Difference
+crossbuy:ret_exp   12399.9662 38522.4229 59370.8774 50922.3892  8448.4883
+crossbuy:freq      12399.9662  8501.2522 22846.4101 20901.2185  1945.1916
+crossbuy:profit    12399.9662 15236.9369 32903.8995 27636.9031  5266.9964
+crossbuy:sow       12399.9662  4439.1415 19208.0235 16839.1077  2368.9158
+crossbuy:acq_exp   12399.9662   807.1448 12548.9055 13207.1110  -658.2055
+crossbuy:employees 12399.9662    40.1016 12806.1785 12440.0678   366.1107
+crossbuy:revenue   12399.9662   -50.3846 12596.5319 12349.5816   246.9503
+crossbuy:industry  12399.9662    29.2509 13037.0458 12429.2172   607.8286
+ret_exp:freq       38952.8505  8460.2203 50260.0838 47413.0708  2847.0129
+ret_exp:profit     38952.8505 15520.1610 66186.3293 54473.0115 11713.3178
+ret_exp:sow        38952.8505  4259.9231 46110.4541 43212.7736  2897.6805
+ret_exp:acq_exp    38952.8505   756.5708 39804.1327 39709.4213    94.7114
+ret_exp:employees  38952.8505    96.7504 39289.2566 39049.6009   239.6558
+ret_exp:revenue    38952.8505    17.5061 38911.4703 38970.3566   -58.8863
+ret_exp:industry   38952.8505    14.8199 38607.6645 38967.6704  -360.0059
+freq:profit         8367.8847 16187.3851 25557.5754 24555.2698  1002.3055
+freq:sow            8367.8847  4438.0317 13919.1738 12805.9164  1113.2573
+freq:acq_exp        8367.8847   662.5711  8826.8618  9030.4559  -203.5941
+freq:employees      8367.8847    50.6272  7882.5156  8418.5119  -535.9963
+freq:revenue        8367.8847   -76.3552  8199.3623  8291.5295   -92.1672
+freq:industry       8367.8847    41.3115  8421.5506  8409.1962    12.3544
+profit:sow         15434.8772  4533.4849 21310.4560 19968.3621  1342.0939
+profit:acq_exp     15434.8772   742.9432 15202.8222 16177.8204  -974.9982
+profit:employees   15434.8772   137.0105 15946.6935 15571.8877   374.8058
+profit:revenue     15434.8772    -8.8810 15628.4472 15425.9962   202.4510
+profit:industry    15434.8772    31.5998 15626.0365 15466.4770   159.5595
+sow:acq_exp         4374.6261   696.2830  4964.4799  5070.9091  -106.4292
+sow:employees       4374.6261    31.2664  4612.8536  4405.8925   206.9611
+sow:revenue         4374.6261   -58.0124  4417.6684  4316.6137   101.0548
+sow:industry        4374.6261    42.2840  4432.1109  4416.9101    15.2008
+acq_exp:employees    674.9215    44.1291   882.1528   719.0507   163.1021
+acq_exp:revenue      674.9215   -39.3147   597.7647   635.6068   -37.8421
+acq_exp:industry     674.9215    18.7558   710.2712   693.6773    16.5939
+employees:revenue     69.7568   -48.7312   -27.4040    21.0256   -48.4296
+employees:industry    69.7568    33.4683    37.4700   103.2252   -65.7551
+revenue:industry     -43.1181    37.7005   -17.6319    -5.4177   -12.2142</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># regression with linear specification</span></span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>dur_reg_lin <span class="ot">&lt;-</span> <span class="fu">lm</span>(duration <span class="sc">~</span>  .<span class="sc">-</span>acq_exp_sq <span class="sc">-</span>ret_exp_sq <span class="sc">-</span>freq_sq <span class="sc">-</span>customer, <span class="at">data =</span> <span class="fu">select</span>(dur_train1, <span class="sc">-</span>acq_preds))</span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>dur_reg_exp <span class="ot">&lt;-</span> <span class="fu">lm</span>(duration <span class="sc">~</span>  .<span class="sc">-</span>customer, <span class="at">data =</span> <span class="fu">select</span>(dur_train1, <span class="sc">-</span>acq_preds))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dur_reg_lin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = duration ~ . - acq_exp_sq - ret_exp_sq - freq_sq - 
+    customer, data = select(dur_train1, -acq_preds))
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-198.851  -21.291    4.309   26.963  125.324 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  4.417e+02  3.178e+01  13.900  &lt; 2e-16 ***
+profit       1.901e-01  8.129e-03  23.385  &lt; 2e-16 ***
+acq_exp     -3.434e-01  2.402e-02 -14.293  &lt; 2e-16 ***
+ret_exp      6.542e-01  3.901e-02  16.771  &lt; 2e-16 ***
+freq        -6.020e+00  6.865e-01  -8.769  &lt; 2e-16 ***
+crossbuy    -6.608e-01  1.453e+00  -0.455 0.649671    
+sow          1.973e-01  1.445e-01   1.366 0.173172    
+industry1   -2.119e+01  6.086e+00  -3.481 0.000582 ***
+revenue     -5.058e-01  3.270e-01  -1.547 0.123081    
+employees   -5.093e-02  1.568e-02  -3.249 0.001307 ** 
+preds       -1.074e+02  3.603e+01  -2.981 0.003136 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 46.88 on 269 degrees of freedom
+Multiple R-squared:  0.9784,    Adjusted R-squared:  0.9776 
+F-statistic:  1221 on 10 and 269 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dur_reg_exp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = duration ~ . - customer, data = select(dur_train1, 
+    -acq_preds))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-44.111 -11.767   0.315   9.952  40.899 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  1.741e+02  1.727e+01  10.081  &lt; 2e-16 ***
+profit       4.176e-02  5.024e-03   8.312 4.88e-15 ***
+acq_exp     -3.216e-01  4.848e-02  -6.633 1.83e-10 ***
+ret_exp      2.411e+00  4.791e-02  50.324  &lt; 2e-16 ***
+acq_exp_sq   2.796e-04  4.496e-05   6.220 1.92e-09 ***
+ret_exp_sq  -1.042e-03  2.762e-05 -37.713  &lt; 2e-16 ***
+freq         6.481e+00  9.888e-01   6.554 2.89e-10 ***
+freq_sq     -7.810e-01  5.119e-02 -15.257  &lt; 2e-16 ***
+crossbuy     2.271e+00  5.489e-01   4.136 4.73e-05 ***
+sow          3.023e-01  5.390e-02   5.609 5.10e-08 ***
+industry1   -1.748e+01  2.299e+00  -7.606 4.90e-13 ***
+revenue     -4.483e-01  1.208e-01  -3.711 0.000251 ***
+employees   -4.326e-02  5.960e-03  -7.259 4.30e-12 ***
+preds       -1.360e+01  1.397e+01  -0.974 0.331144    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 17.2 on 266 degrees of freedom
+Multiple R-squared:  0.9971,    Adjusted R-squared:  0.997 
+F-statistic:  7111 on 13 and 266 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(rfdur<span class="sc">$</span>xvar<span class="sc">$</span>ret_exp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(rfdur<span class="sc">$</span>xvar<span class="sc">$</span>ret_exp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1094.96</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>ret_exp_seq <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1100</span>,<span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(rfdur<span class="sc">$</span>xvar<span class="sc">$</span>freq)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(rfdur<span class="sc">$</span>xvar<span class="sc">$</span>freq)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 21</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>freq_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>,<span class="dv">21</span>,<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(rfdur<span class="sc">$</span>xvar<span class="sc">$</span>acq_exp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 151.04</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(rfdur<span class="sc">$</span>xvar<span class="sc">$</span>acq_exp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 864.1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>acq_exp_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">140</span>,<span class="dv">880</span>,<span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>retx_me <span class="ot">&lt;-</span> randomForestSRC<span class="sc">::</span><span class="fu">partial</span>(rfdur,</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">partial.xvar =</span> <span class="st">"ret_exp"</span>,</span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">partial.values =</span> ret_exp_seq)</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>retx_me_means <span class="ot">&lt;-</span> retx_me<span class="sc">$</span>regrOutput<span class="sc">$</span>duration <span class="sc">%&gt;%</span> <span class="fu">colMeans</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>retx_me_df <span class="ot">&lt;-</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">pred_duration =</span> retx_me_means, <span class="at">ret_exp_seq =</span> ret_exp_seq)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(retx_me_df, <span class="fu">aes</span>(<span class="at">x =</span> ret_exp_seq, <span class="at">y =</span> pred_duration)) <span class="sc">+</span></span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">"purple"</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">stroke =</span> <span class="fl">1.2</span>)<span class="sc">+</span></span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> <span class="fu">poly</span>(x,<span class="dv">6</span>), <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span> <span class="co"># try with other values </span></span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Retention Expenditures in $"</span>, <span class="at">y =</span> <span class="st">"Predicted duration"</span>, <span class="at">title =</span> <span class="st">'Partial Dependence Plot: Retention Expenditure'</span>) <span class="sc">+</span></span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1200</span>,<span class="dv">120</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-64-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>freq_me <span class="ot">&lt;-</span> randomForestSRC<span class="sc">::</span><span class="fu">partial</span>(rfdur,</span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">partial.xvar =</span> <span class="st">"freq"</span>,</span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">partial.values =</span> freq_seq)</span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>freq_me_means <span class="ot">&lt;-</span> freq_me<span class="sc">$</span>regrOutput<span class="sc">$</span>duration <span class="sc">%&gt;%</span> <span class="fu">colMeans</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>freq_me_df <span class="ot">&lt;-</span></span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">pred_duration =</span> freq_me_means, <span class="at">freq_seq =</span> freq_seq)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(freq_me_df, <span class="fu">aes</span>(<span class="at">x =</span> freq_seq, <span class="at">y =</span> pred_duration)) <span class="sc">+</span></span>
+<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">"purple"</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">stroke =</span> <span class="fl">1.2</span>)<span class="sc">+</span></span>
+<span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> <span class="fu">poly</span>(x,<span class="dv">5</span>), <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span> <span class="co"># try with other values </span></span>
+<span id="cb110-4"><a href="#cb110-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Frequency of Purchases"</span>, <span class="at">y =</span> <span class="st">"Predicted duration"</span>, <span class="at">title =</span> <span class="st">'Partial Dependence Plot: Frequency'</span>) <span class="sc">+</span></span>
+<span id="cb110-5"><a href="#cb110-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">21</span>,<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-67-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>acqx_me <span class="ot">&lt;-</span> randomForestSRC<span class="sc">::</span><span class="fu">partial</span>(rfdur,</span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">partial.xvar =</span> <span class="st">"acq_exp"</span>,</span>
+<span id="cb111-3"><a href="#cb111-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">partial.values =</span> acq_exp_seq)</span>
+<span id="cb111-4"><a href="#cb111-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb111-5"><a href="#cb111-5" aria-hidden="true" tabindex="-1"></a>acqx_me_means <span class="ot">&lt;-</span> acqx_me<span class="sc">$</span>regrOutput<span class="sc">$</span>duration <span class="sc">%&gt;%</span> <span class="fu">colMeans</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>acqx_me_df <span class="ot">&lt;-</span></span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">pred_duration =</span> acqx_me_means, <span class="at">acq_exp_seq =</span> acq_exp_seq)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(acqx_me_df, <span class="fu">aes</span>(<span class="at">x =</span> acq_exp_seq, <span class="at">y =</span> pred_duration)) <span class="sc">+</span></span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">"purple"</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">stroke =</span> <span class="fl">1.2</span>)<span class="sc">+</span></span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> <span class="fu">poly</span>(x,<span class="dv">9</span>), <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span> <span class="co"># try with other values </span></span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Acquisition Expenditures in $"</span>, <span class="at">y =</span> <span class="st">"Predicted duration"</span>, <span class="at">title =</span> <span class="st">'Partial Dependence Plot: Acquisiton Expenditure'</span>) <span class="sc">+</span></span>
+<span id="cb113-5"><a href="#cb113-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">150</span>,<span class="dv">1000</span>,<span class="dv">150</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="CS4_Sandbox_WH2_files/figure-html/unnamed-chunk-70-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a>dur_preds <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">actual =</span> dur_test1<span class="sc">$</span>duration, </span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">preds =</span> <span class="fu">predict</span>(rfdur, dur_test1)<span class="sc">$</span>predicted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'rmse'</span>, <span class="fu">sqrt</span>(<span class="fu">mean</span>((dur_preds<span class="sc">$</span>actual <span class="sc">-</span> dur_preds<span class="sc">$</span>preds)<span class="sc">^</span><span class="dv">2</span>))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "rmse 50.8875513647442"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'mae'</span>, <span class="fu">mean</span>(<span class="fu">abs</span>(dur_preds<span class="sc">$</span>actual <span class="sc">-</span> dur_preds<span class="sc">$</span>preds))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "mae 37.332395908786"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'me'</span>, <span class="fu">mean</span>(dur_preds<span class="sc">$</span>actual <span class="sc">-</span> dur_preds<span class="sc">$</span>preds)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "me -14.4580854012965"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">'mape'</span>, <span class="fu">mean</span>(<span class="fu">abs</span>(dur_preds<span class="sc">$</span>actual <span class="sc">-</span> dur_preds<span class="sc">$</span>preds)<span class="sc">*</span><span class="dv">100</span><span class="sc">/</span>(dur_preds<span class="sc">$</span>actual <span class="sc">+</span> .<span class="dv">1</span>))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "mape 3021.00532729391"</code></pre>
+</div>
+</div>
+<p>Jotting down some thoughts to help explain the though process around these plots and how they contribute to the story. PDP Plot insights: The Partial Dependence plots above, built for the three variables included in the dataset that had both the original value and squared terms, highlights the way that the plot may not have a perfectly linear relationship with duration. The retention expenditure partial dependence plot is a perfect example of this. From the model and variable importance relationships we might conclude that the value of duration increases for every unit increase of retention expenditure, however the partial dependence plot shows that after a certain point, duration barely increases with increases in expenditure. Also, note the y-axis scale for this plot; compared to the other two plots, the value of duration varies greatly based on the value of the expenditure. This suggests that retention expenditure is a very important variable to determine the duration of a customer, however it is important to remember that these models do not prove causation: essentially, we may spend more to keep an important customer, but they may be an important customer because they have already been customers for a long time. Furthermore, there may be retention expenditures that occur as a result of the threat of the loss of a customer, and if this happens multiple times then the cost to keep them as a customer may increase the longer we retain them, effectivley meaning that duration causes the increase in retention expenditure and not the other way around.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

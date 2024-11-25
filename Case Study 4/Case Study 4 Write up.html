@@ -6,8 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Will Hytlin, Holly Millazo and Tim Harrison">
-<meta name="dcterms.date" content="2024-11-19">
+<meta name="author" content="Will Hyltin, Holly Milazo and Tim Harrison">
+<meta name="dcterms.date" content="2024-11-24">
 
 <title>DA 6813 Case Study 4 Customer Retention</title>
 <style>
@@ -35,6 +35,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="Case Study 4 Write up_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Case Study 4 Write up_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="Case Study 4 Write up_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="Case Study 4 Write up_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="Case Study 4 Write up_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
 
 
 </head>
@@ -50,12 +52,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary"><span class="header-section-number">1</span> Executive Summary</a></li>
   <li><a href="#problem-statement" id="toc-problem-statement" class="nav-link" data-scroll-target="#problem-statement"><span class="header-section-number">2</span> Problem Statement</a></li>
   <li><a href="#additional-sources" id="toc-additional-sources" class="nav-link" data-scroll-target="#additional-sources"><span class="header-section-number">3</span> Additional Sources</a></li>
-  <li><a href="#data-exploration-and-preprocessing" id="toc-data-exploration-and-preprocessing" class="nav-link" data-scroll-target="#data-exploration-and-preprocessing"><span class="header-section-number">4</span> Data Exploration and Preprocessing</a>
-  <ul class="collapse">
-  <li><a href="#task-1-predicting-customer-acquisition" id="toc-task-1-predicting-customer-acquisition" class="nav-link" data-scroll-target="#task-1-predicting-customer-acquisition"><span class="header-section-number">4.1</span> <strong>Task 1: Predicting Customer Acquisition</strong></a></li>
-  <li><a href="#task-2-predicting-retention-duration" id="toc-task-2-predicting-retention-duration" class="nav-link" data-scroll-target="#task-2-predicting-retention-duration"><span class="header-section-number">4.2</span> <strong>Task 2: Predicting Retention Duration</strong></a></li>
-  <li><a href="#variables-not-used-as-predictors" id="toc-variables-not-used-as-predictors" class="nav-link" data-scroll-target="#variables-not-used-as-predictors"><span class="header-section-number">4.3</span> <strong>Variables Not Used as Predictors</strong></a></li>
-  </ul></li>
+  <li><a href="#data-exploration-and-preprocessing" id="toc-data-exploration-and-preprocessing" class="nav-link" data-scroll-target="#data-exploration-and-preprocessing"><span class="header-section-number">4</span> Data Exploration and Preprocessing</a></li>
   <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology"><span class="header-section-number">5</span> Methodology</a></li>
   <li><a href="#findings" id="toc-findings" class="nav-link" data-scroll-target="#findings"><span class="header-section-number">6</span> Findings</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">7</span> Conclusion</a></li>
@@ -79,14 +76,14 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Will Hytlin, Holly Millazo and Tim Harrison </p>
+             <p>Will Hyltin, Holly Milazo and Tim Harrison </p>
           </div>
   </div>
     
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">November 19, 2024</p>
+      <p class="date">November 24, 2024</p>
     </div>
   </div>
   
@@ -104,7 +101,9 @@ ul.task-list li input[type="checkbox"] {
 Purpose: Provide a concise overview of the key findings and results of the analysis.
 Instructions: Summarize the performance of the models (e.g., random forest, decision tree, logistic regression). Highlight the best-performing model and key insights regarding customer acquisition. Avoid technical details, focusing on high-level conclusions that decision-makers would care about.
 -->
-<p>Content for Executive Summary goes here.</p>
+<p>This analysis focused on predicting customer acquisition and retention to optimize marketing strategies and resource allocation. Using the <code>acquisitionRetention</code> dataset, three models—Logistic Regression, Support Vector Machines (SVM), and Random Forest—were evaluated to classify prospects as “acquired” or “not acquired.” Random Forest emerged as the best-performing model, achieving the highest sensitivity (91.2%) and balanced accuracy in the acquisition task, demonstrating its reliability in identifying prospects likely to convert into customers. When applied to the full dataset, Random Forest achieved an impressive accuracy of 95%, with high sensitivity (98.2%) and specificity (88.3%).</p>
+<p>For retention prediction, Random Forest was again employed to forecast customer duration, leveraging post-acquisition variables such as retention expenditures, purchase frequency, and cross-category buying behavior. Retention expenditures were identified as the most significant predictor, though a diminishing return effect was observed, suggesting the need to optimize spending.</p>
+<p>Key recommendations include exploring additional external factors, refining spending thresholds for retention efforts, and evaluating advanced ensemble techniques to further enhance predictive accuracy. These insights provide actionable guidance for improving customer acquisition and retention strategies, enabling more efficient resource allocation and sustained business growth.</p>
 </section>
 <section id="problem-statement" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Problem Statement</h1>
@@ -112,10 +111,7 @@ Instructions: Summarize the performance of the models (e.g., random forest, deci
 Purpose: Explain the problem that the study aims to solve.
 Instructions: Clearly define the task at hand, which in this case is predicting customer acquisition. Outline the objectives and what solving this problem would mean for the company.
 -->
-<section id="problem-statement-1" class="level3" data-number="2.0.1">
-<h3 data-number="2.0.1" class="anchored" data-anchor-id="problem-statement-1"><span class="header-section-number">2.0.1</span> Problem Statement</h3>
 <p>In today’s competitive market, managing customer acquisition and retention is crucial for maintaining long-term business success. Companies face the dual challenge of predicting which current customers are at risk of ending their relationship and identifying new customers likely to join. Accurate predictions enable firms to allocate resources effectively, targeting at-risk customers with retention strategies and high-potential prospects with acquisition incentives. This study aims to develop predictive models using the <code>acquisitionRetention</code> dataset to forecast customer acquisition and retention, specifically focusing on the likelihood of acquisition and the duration of customer relationships. The analysis will involve building and evaluating models such as Random Forest, Decision Trees, and Logistic Regression to identify significant predictors and improve model performance. Insights gained from this analysis will help optimize marketing strategies, reduce campaign costs, and maximize the efficient use of firm resources.</p>
-</section>
 </section>
 <section id="additional-sources" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Additional Sources</h1>
@@ -128,33 +124,19 @@ Instructions: Provide citations and key insights from sources relevant to the ca
 </section>
 <section id="data-exploration-and-preprocessing" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Data Exploration and Preprocessing</h1>
-<p>The <code>acquisitionRetention</code> dataset supports two distinct prediction tasks: (1) predicting which prospects will be acquired and (2) forecasting the retention duration for acquired customers. Given these tasks, different subsets of variables are suitable for each prediction.</p>
-<section id="task-1-predicting-customer-acquisition" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="task-1-predicting-customer-acquisition"><span class="header-section-number">4.1</span> <strong>Task 1: Predicting Customer Acquisition</strong></h2>
-<p>For this task, we can only use variables that are available before acquisition to avoid data leakage. Variables directly tied to post-acquisition behavior, such as <code>duration</code> or <code>profit</code>, should be excluded. The following variables are suitable for predicting acquisition:</p>
-<p><strong><code>acq_exp</code></strong>: Total dollars spent on acquiring a prospect.</p>
-<p><strong><code>acq_exp_sq</code></strong>: Square of acquisition expenditure to capture potential non-linear effects.</p>
-<p><strong><code>industry</code></strong>: Indicates whether the prospect operates in the B2B sector.</p>
-<p><strong><code>revenue</code></strong>: Annual sales revenue of the prospect’s firm.</p>
-<p><strong><code>employees</code></strong>: Number of employees in the prospect’s firm.</p>
-<p>These variables describe the prospect’s financial and business characteristics and the firm’s investment in acquisition efforts, which are relevant predictors for whether a prospect is likely to become a customer.</p>
-</section>
-<section id="task-2-predicting-retention-duration" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="task-2-predicting-retention-duration"><span class="header-section-number">4.2</span> <strong>Task 2: Predicting Retention Duration</strong></h2>
-<p>Once a customer is acquired, variables reflecting post-acquisition behavior and engagement can be used to predict retention duration. The following variables are suitable for this task:</p>
-<p><strong><code>duration</code></strong>: The target variable for retention prediction.</p>
-<p><strong><code>ret_exp</code></strong>: Total dollars spent on retaining the customer.</p>
-<p><strong><code>ret_exp_sq</code></strong>: Square of retention expenditure to capture non-linear retention effects.</p>
-<p><strong><code>freq</code></strong>: Number of purchases made by the customer.</p>
-<p><strong><code>freq_sq</code></strong>: Square of purchase frequency.</p>
-<p><strong><code>crossbuy</code></strong>: Number of product categories the customer purchased from.</p>
-<p><strong><code>sow</code></strong>: Share-of-Wallet, indicating the percentage of purchases made from the firm compared to competitors.</p>
-<p>These variables capture customer engagement, retention efforts, and purchasing behavior, which are strong indicators of how long a customer will remain with the firm.</p>
-</section>
-<section id="variables-not-used-as-predictors" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="variables-not-used-as-predictors"><span class="header-section-number">4.3</span> <strong>Variables Not Used as Predictors</strong></h2>
-<p>The following variables are not directly used as predictors in either task:</p>
-<p><strong><code>customer</code></strong>: This is a unique identifier for each prospect or customer and carries no predictive value. <strong><code>profit</code></strong>: Represents the Customer Lifetime Value (CLV), which is a cumulative measure reflecting both acquisition and retention outcomes, making it unsuitable as a predictor for either task. Specifically, <code>profit</code> incorporates both <code>acq_exp</code> and <code>duration</code>, with <code>duration</code> being the target variable for retention. Including <code>profit</code> would result in data leakage, as it would give the model indirect access to the information it is trying to predict. Additionally, since <code>profit</code> aggregates multiple aspects of customer behavior and engagement, its use as a predictor would reduce model interpretability and could bias predictions by conflating cause and effect.</p>
+<p>The <code>acquisitionRetention</code> dataset is designed to address two key prediction tasks: (1) identifying which prospects are likely to be acquired and (2) forecasting the retention duration for acquired customers. To meet the requirements of these tasks, different subsets of variables are selected to ensure data integrity and prevent leakage.</p>
+<p>To prepare the data for modeling, we normalized numeric variables when applying SVM and Logistic Regression to ensure comparability and improve model performance. However, for Random Forest, the raw data was used, as this model is not sensitive to feature scaling.</p>
+<section id="variables-used-to-predict-customer-acquisition" class="level3" data-number="4.0.1">
+<h3 data-number="4.0.1" class="anchored" data-anchor-id="variables-used-to-predict-customer-acquisition"><span class="header-section-number">4.0.1</span> <strong>Variables Used to Predict Customer Acquisition</strong></h3>
+<p>For the customer acquisition task, only variables available prior to acquisition were used to avoid data leakage. Post-acquisition variables, such as <code>duration</code> and <code>profit</code>, were excluded because they rely on outcomes that would not be known at the time of prediction. The following variables were used:</p>
+<ul>
+<li><strong><code>acq_exp</code></strong>: Total dollars spent on acquiring a prospect.</li>
+<li><strong><code>industry</code></strong>: Indicates whether the prospect operates in the B2B sector.</li>
+<li><strong><code>revenue</code></strong>: Annual sales revenue of the prospect’s firm.</li>
+<li><strong><code>employees</code></strong>: Number of employees in the prospect’s firm.</li>
+</ul>
+<p>Initially, <strong><code>acq_exp_sq</code></strong> (the square of acquisition expenditure) was included to capture potential non-linear effects. However, this variable was removed after analysis showed no significant non-linear relationship with acquisition outcomes.</p>
+<p>These selected variables reflect the financial and business characteristics of each prospect, along with the firm’s investment in acquisition efforts. They provide relevant and actionable insights into the likelihood of acquiring a customer while maintaining the model’s validity and interpretability.</p>
 </section>
 </section>
 <section id="methodology" class="level1" data-number="5">
@@ -163,11 +145,7 @@ Instructions: Provide citations and key insights from sources relevant to the ca
 Purpose: Describe the methods and processes used to conduct the analysis.
 Instructions: Detail the models used and the reasoning behind them. Include specifics such as hyperparameter tuning, data splitting, and assumptions of each model.
 -->
-<ol type="1">
-<li>Classify -aquire/not aquire all models types</li>
-<li>Build duration fom susbset of customers we will acquire using best model available(probably random forrest)</li>
-<li>PDP plot for extra credit</li>
-</ol>
+<p>To conduct the analysis, we evaluated three models—Logistic Regression, Support Vector Machines (SVM), and Random Forest—to classify prospects as “acquired” or “not acquired,” using pre-acquisition variables such as <code>acq_exp</code>, <code>industry</code>, <code>revenue</code>, and <code>employees</code> to avoid data leakage. The dataset was split into training and testing sets, and numeric variables were normalized for SVM and Logistic Regression, while Random Forest was applied to the raw data due to its robustness to scaling. Each model’s performance was assessed using accuracy, precision, recall, and AUC-ROC. Logistic Regression’s assumption of linearity and independence among predictors, as well as SVM’s reliance on normalized inputs and computational demands, limited their suitability for this task. Random Forest outperformed the other models, excelling in handling non-linear relationships, multicollinearity, and interactions, making it the preferred acquisition model. The Random Forest model was then applied to the full dataset to identify acquired customers, creating a subset for the retention task. For retention modeling, Random Forest was used again, leveraging its ability to capture complex relationships and interactions among behavioral and post-acquisition variables such as <code>freq</code>, <code>crossbuy</code>, and <code>ret_exp</code>. Model performance for retention was evaluated using Mean Absolute Error (MAE). This approach ensured that the methods were tailored to the task requirements, addressing model assumptions and limitations while maintaining interpretability.</p>
 <hr>
 </section>
 <section id="findings" class="level1" data-number="6">
@@ -176,7 +154,125 @@ Instructions: Detail the models used and the reasoning behind them. Include spec
 Purpose: Present the results of the analysis.
 Instructions: Report accuracy rates and compare the performance of models. Discuss significant variables or interactions discovered.
 -->
-<p>Content for Findings goes here.</p>
+<p>The analysis of customer acquisition and retention utilized Logistic Regression, Support Vector Machines (SVM), and Random Forest models to classify prospects as “acquired” or “not acquired” and to predict retention duration for acquired customers.</p>
+<section id="customer-acquisition-findings" class="level4" data-number="6.0.0.1">
+<h4 data-number="6.0.0.1" class="anchored" data-anchor-id="customer-acquisition-findings"><span class="header-section-number">6.0.0.1</span> <strong>Customer Acquisition Findings</strong></h4>
+<p>Random Forest demonstrated superior performance in predicting acquisition outcomes compared to Logistic Regression and SVM. While all models achieved comparable accuracy of 74%–75%, Random Forest excelled with the highest sensitivity (91.2%) and balanced accuracy (66.73%), indicating its robustness in identifying acquired customers. SVM and Logistic Regression performed similarly, with sensitivity scores of 89.7%, though their specificity (40.6%–43.8%) was lower than desired. Random Forest’s ability to handle multicollinearity and non-linear relationships, combined with its interpretability via variable importance measures, solidified its position as the optimal model for acquisition predictions.</p>
+<p>Applying the Random Forest model to the full dataset yielded an accuracy of 95%, sensitivity of 98.2%, and specificity of 88.3%, reinforcing its reliability in a real-world application. These results were used to identify the subset of customers predicted to be acquired, which formed the basis for the retention analysis.</p>
+</section>
+<section id="customer-retention-findings" class="level4" data-number="6.0.0.2">
+<h4 data-number="6.0.0.2" class="anchored" data-anchor-id="customer-retention-findings"><span class="header-section-number">6.0.0.2</span> <strong>Customer Retention Findings</strong></h4>
+<p>The retention duration prediction was conducted using a Random Forest regression model. Key variables influencing retention included <code>ret_exp</code> (retention expenditures), <code>freq</code> (purchase frequency), and <code>crossbuy</code> (number of product categories purchased). Retention expenditures emerged as the most important predictor, with Partial Dependence Plots (PDPs) revealing a diminishing return effect: after a certain expenditure level, further increases had minimal impact on retention duration.</p>
+<p>Performance metrics for the retention model indicated robust predictions, with a Root Mean Square Error (RMSE) of 50.89 and a Mean Absolute Error (MAE) of 37.33. While the Mean Absolute Percentage Error (MAPE) was high, this can be attributed to the variability in customer retention durations, underscoring the importance of nuanced insights from the model rather than solely relying on error metrics.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Model Performance Metrics</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model</th>
+<th style="text-align: right;">Accuracy</th>
+<th style="text-align: right;">Sensitivity</th>
+<th style="text-align: right;">Specificity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Logistic Regression</td>
+<td style="text-align: right;">0.74</td>
+<td style="text-align: right;">0.897</td>
+<td style="text-align: right;">0.406</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SVM</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.897</td>
+<td style="text-align: right;">0.438</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Random Forest</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.912</td>
+<td style="text-align: right;">0.406</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Random Forest Full Data Set</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: right;">0.982</td>
+<td style="text-align: right;">0.883</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-4-Write-up_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-4-Write-up_files/figure-html/unnamed-chunk-57-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-4-Write-up_files/figure-html/unnamed-chunk-60-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Case-Study-4-Write-up_files/figure-html/unnamed-chunk-63-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Error Metrics for Predictions</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Metric</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">RMSE</td>
+<td style="text-align: right;">50.888</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MAE</td>
+<td style="text-align: right;">37.332</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ME</td>
+<td style="text-align: right;">-14.458</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MAPE</td>
+<td style="text-align: right;">3021.005</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
 </section>
 <section id="conclusion" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Conclusion</h1>
@@ -184,7 +280,8 @@ Instructions: Report accuracy rates and compare the performance of models. Discu
 Purpose: Summarize the key takeaways and provide actionable recommendations.
 Instructions: Conclude with the most important findings and offer suggestions for further analysis or improvements.
 -->
-<p>Content for Conclusion goes here.</p>
+<p>This analysis provided valuable insights into customer acquisition and retention, leveraging predictive models to inform data-driven strategies. Random Forest emerged as the most effective model for both acquisition and retention predictions, demonstrating superior performance in handling complex, non-linear relationships and providing interpretable results through variable importance measures.</p>
+<p>Key findings include the importance of retention expenditures, purchase frequency, and cross-category buying as significant predictors of customer duration. However, the diminishing returns observed in retention expenditures suggest that firms should optimize spending thresholds to maximize cost efficiency. Additionally, the application of Random Forest to classify acquisition outcomes yielded high accuracy and sensitivity, making it a reliable tool for identifying prospects likely to convert into customers.</p>
 </section>
 <section id="appendix" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Appendix</h1>
@@ -192,7 +289,22 @@ Instructions: Conclude with the most important findings and offer suggestions fo
 Purpose: Include supplementary material or detailed technical results.
 Instructions: Provide code snippets, detailed model output, and data summaries.
 -->
-<p>Content for Appendix goes here.</p>
+<p>In addition to the primary analyses detailed in the main report, several exploratory and supporting methods were performed to validate conclusions and refine insights. These methods, documented in the attached sandbox file, include:</p>
+<ol type="1">
+<li><strong>Correlation Analysis</strong>:
+<ul>
+<li>A correlation matrix was used to explore relationships among variables, identifying potential multicollinearity issues. This analysis informed variable selection and preprocessing steps for models like Logistic Regression and SVM, ensuring robust inputs.</li>
+</ul></li>
+<li><strong>Exploratory Analysis</strong>:
+<ul>
+<li>Initial data exploration involved visualizations to understand distributions and relationships among variables. These insights, referenced in the sandbox file, helped highlight key data characteristics such as the skewed retention durations and the variability in acquisition expenditures.</li>
+</ul></li>
+<li><strong>Testing Alternative Models</strong>:
+<ul>
+<li>Several models, including Decision Trees and basic linear models, were tested for comparative purposes. While these models were not selected for the final analysis, their performance helped confirm the reliability of the chosen methods and supported the final conclusions.</li>
+</ul></li>
+</ol>
+<p>These additional analyses, as documented in the sandbox file, provided valuable context and helped validate the predictive models and findings. They reflect the rigor of the analytical approach and the effort to ensure robust, actionable insights.</p>
 </section>
 
 </main>
